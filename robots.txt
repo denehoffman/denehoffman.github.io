@@ -1,4 +1,4 @@
 User-agent: *
 Disallow:
 
-Sitemap: https://denehoffman.github.io/blog//sitemap.xml
+Sitemap: https://denehoffman.github.io//sitemap.xml
