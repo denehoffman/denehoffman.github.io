@@ -64,7 +64,7 @@
 - title: Publications
   type: nested_list
   contents:
-    - title: "See <a href=#publications/>Publications</a>"
+    - title: "See <a href=/publications/>Publications</a>"
 
 - title: Work Experience
   type: time_table
