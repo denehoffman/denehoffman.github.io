@@ -1,5 +1,109 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en"><generator uri="https://jekyllrb.com/" version="4.3.2">Jekyll</generator><link href="https://denehoffman.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://denehoffman.github.io/" rel="alternate" type="text/html" hreflang="en" /><updated>2023-04-27T04:40:31+00:00</updated><id>https://denehoffman.github.io/feed.xml</id><title type="html">Dene Hoffman</title><subtitle>A simple, whitespace theme for academics. Based on [*folio](https://github.com/bogoli/-folio) design.
-</subtitle><entry><title type="html">How I Made This Site</title><link href="https://denehoffman.github.io/blog/2023/how-i-made-this-site/" rel="alternate" type="text/html" title="How I Made This Site" /><published>2023-04-26T10:06:07+00:00</published><updated>2023-04-26T10:06:07+00:00</updated><id>https://denehoffman.github.io/blog/2023/how-i-made-this-site</id><content type="html" xml:base="https://denehoffman.github.io/blog/2023/how-i-made-this-site/"><![CDATA[<h3 id="getting-started">Getting Started</h3>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en"><generator uri="https://jekyllrb.com/" version="4.3.2">Jekyll</generator><link href="https://denehoffman.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://denehoffman.github.io/" rel="alternate" type="text/html" hreflang="en" /><updated>2023-05-16T19:59:30+00:00</updated><id>https://denehoffman.github.io/feed.xml</id><title type="html">Dene Hoffman</title><subtitle>A simple, whitespace theme for academics. Based on [*folio](https://github.com/bogoli/-folio) design.
+</subtitle><entry><title type="html">How to install Python on *NIX systems (the right way)</title><link href="https://denehoffman.github.io/blog/2023/how-to-install-python-on-nix-systems-(the-right-way)/" rel="alternate" type="text/html" title="How to install Python on *NIX systems (the right way)" /><published>2023-05-16T14:27:56+00:00</published><updated>2023-05-16T14:27:56+00:00</updated><id>https://denehoffman.github.io/blog/2023/how-to-install-python-on-*nix-systems-(the-right-way)</id><content type="html" xml:base="https://denehoffman.github.io/blog/2023/how-to-install-python-on-nix-systems-(the-right-way)/"><![CDATA[<h3 id="introduction">Introduction</h3>
+
+<p>For over a decade, Python, specifically Python3, has been instrumental for developers, scientists, scripters, and beginner coders alike. However, one annoying part of python is that there is no built-in version management outside of virtual environments, and these have their drawbacks as well. Imagine the following scenario: You’ve just purchased a brand new Macbook, and you want to start coding in Python. MacOS is a UNIX-like system, so you can easily open up a new terminal window, type <code class="language-plaintext highlighter-rouge">python3</code> or <code class="language-plaintext highlighter-rouge">/usr/bin/python3</code>, and be greeted with a REPL running Python 3.9.6 (at/near time of writing). For many, this is fine, and if you don’t need anything beyond this, you can stop reading now. However, what if you wanted a different version of Python? The current latest release is 3.11.3, and future versions promise to not only have new features, but they will be faster, <a href="https://peps.python.org/pep-0659/">possibly</a> <a href="https://github.com/faster-cpython/ideas">much</a> <a href="https://thechief.io/c/editorial/how-python-is-becoming-faster/">faster</a>. Or, alternatively, you might work with a large collaboration with members who are hesitant to use newer Python versions. My collaboration uses Python 3.6, and there are significant backwards-incompatible changes that have been made since this version was released (some people even use Python 2.7, against my personal recommendations).</p>
+
+<p>So how do you go about installing these versions on your computer? Well you could just <a href="https://www.python.org/downloads/">download</a> and build it yourself. This is a perfectly good option if you want to stay with the same version for a very long time and don’t care about manually changing your <code class="language-plaintext highlighter-rouge">$PATH</code> any time you want to switch versions. But there is a better way, and it’s called “pyenv”.</p>
+
+<h4 id="what-is-pyenv">What is pyenv?</h4>
+
+<p><a href="https://github.com/pyenv/pyenv">Pyenv</a> is a fork from a similar project for managing Ruby versions, and as the name suggests, it is a version/environment manager for Python. It provides a command, <code class="language-plaintext highlighter-rouge">pyenv</code> with various options for setting the current Python version, installing new versions, and setting defaults for the global environment or even specific folders. I’ll tell you how to install it, how to use it, and how to add a couple of plugins that I use frequently.</p>
+
+<h4 id="how-to-install-pyenv">How to install pyenv</h4>
+
+<p>There are three main methods to install pyenv:</p>
+
+<ol>
+  <li>You can use <a href="https://brew.sh/">Homebrew</a>:
+    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>brew update
+brew <span class="nb">install </span>pyenv
+</code></pre></div>    </div>
+    <p>If you don’t already have Homebrew, I would recommend it, at least for MacOS. There’s a simple install script which you can run right in the terminal:</p>
+    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/bin/bash <span class="nt">-c</span> <span class="s2">"</span><span class="si">$(</span>curl <span class="nt">-fsSL</span> https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh<span class="si">)</span><span class="s2">"</span>
+</code></pre></div>    </div>
+    <p>Note that you should be cautious to run anything which is pulled directly from the internet. I would recommend checking the link and glancing over the install script, just so you’re sure nothing fishy is going on. Homebrew is used by <em>lots</em> of developers, so I wouldn’t worry about this particular link, but it’s good practice to use caution.</p>
+  </li>
+  <li>In a similar fashion, you can install it via an automatic installer script:
+    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl https://pyenv.run | bash
+</code></pre></div>    </div>
+  </li>
+  <li>You can just clone the GitHub repository directly:
+    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git clone https://github.com/pyenv/pyenv.git ~/.pyenv
+</code></pre></div>    </div>
+    <p>If you do it this way, you can also compile the <code class="language-plaintext highlighter-rouge">bash</code> extension by running</p>
+    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cd</span> ~/.pyenv <span class="o">&amp;&amp;</span> src/configure <span class="o">&amp;&amp;</span> make <span class="nt">-C</span> src
+</code></pre></div>    </div>
+    <p>If this fails, the pyenv people say it should still run fine, so don’t worry too much.</p>
+  </li>
+</ol>
+
+<p>After you install pyenv, you should make sure your shell environment recognizes it by adding the proper directories to your <code class="language-plaintext highlighter-rouge">$PATH</code> and evaluating pyenv’s “init” function. This is shell-dependent, so I would recommend following the documentation <a href="https://github.com/pyenv/pyenv#set-up-your-shell-environment-for-pyenv">here</a>.</p>
+
+<p>After installation, restart your terminal to make sure the changes go into effect.</p>
+
+<h4 id="how-to-use-pyenv">How to use pyenv</h4>
+
+<p>Now that we have pyenv, we should install a new version of Python. Pyenv conveniently includes your system version by default, so even if you don’t want to install another version (see my discussion of virtual environments below), you can still use pyenv. However, if you do want another python version, just use <code class="language-plaintext highlighter-rouge">pyenv install</code> followed by the desired version. To see a list of available versions, run <code class="language-plaintext highlighter-rouge">pyenv install --list</code> or use tab completion after <code class="language-plaintext highlighter-rouge">pyenv install</code>.</p>
+
+<p>This makes it easy to install developer versions (with all the proper C headers), as well as alternatives to <a href="https://github.com/python/cpython">CPython</a> (the modern standard), like <a href="https://github.com/stackless-dev/stackless/wiki/">Stackless Python</a>, <a href="https://www.pyston.org/">Pyston</a>, <a href="https://www.pypy.org/">PyPy</a>, <a href="https://github.com/conda-forge/miniforge">Miniforge/Mambaforge</a>, <a href="https://www.anaconda.com/download">Anaconda</a>, <a href="https://docs.conda.io/en/latest/miniconda.html">Miniconda</a>, <a href="https://micropython.org/">MicroPython</a>, <a href="https://www.jython.org/">Jython</a>, <a href="https://ironpython.net/">IronPython</a>, <a href="https://github.com/oracle/graalpython">GraalPy</a>, <a href="https://github.com/facebookincubator/cinder">Cinder</a>, and <a href="https://www.activestate.com/products/python/">ActivePython</a>.</p>
+
+<p>To switch between versions in a specific shell, you can use the <code class="language-plaintext highlighter-rouge">pyenv shell</code> command, followed by the version (again, this should work with tab completion). This will set the version for the current terminal window, so if you want to quickly switch between versions, this is a convenient option. Pyenv installs all the versions in the same place, and dynamically chooses the proper path depending on the environment variable <code class="language-plaintext highlighter-rouge">$PYENV_VERSION</code>. However, if this variable isn’t set, it defaults back to the “local” version or “global” version, in that order.</p>
+
+<p>The “local” version can be set by creating a file called <code class="language-plaintext highlighter-rouge">.python-version</code> which contains a single line identifying the desired version, although the simpler way to do this is by running the <code class="language-plaintext highlighter-rouge">pyenv local</code> command followed by the version. To “unset” the local version, just delete that file, or run <code class="language-plaintext highlighter-rouge">pyenv local --unset</code>. When a local version is set, navigating to the parent directory in a terminal will automatically change the Python version. This is extremely useful if you have multiple projects which run on different versions of Python, or if you like having separate virtual environments for each project (more on this later).</p>
+
+<p>Finally, you should select the “global” version, which will be the default if no shell or local version is found by pyenv. This can be set by the command (you guessed it) <code class="language-plaintext highlighter-rouge">pyenv global</code> followed by the version. By default, when you install pyenv, this will just be the system version.</p>
+
+<h4 id="plugins">Plugins</h4>
+
+<p>There are numerous <a href="https://github.com/pyenv/pyenv/wiki/Plugins">plugins for pyenv</a>, but I will briefly discuss a couple that I use:</p>
+
+<ol>
+  <li>
+    <p><a href="https://github.com/pyenv/pyenv-virtualenv">pyenv-virtualenv</a> adds some simple commands for dealing with virtual environments. If you are unfamiliar with virtual environments in Python, check out the <a href="https://docs.python.org/3/library/venv.html">docs here</a>. Essentially, they are self-contained Python installations with their own set of packages, but importantly they can have the same overall version as other virtual environments. If you use these, you might be used to the following workflow:</p>
+
+    <p>a. Create a new virtual environment in a project path:</p>
+    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>python <span class="nt">-m</span> venv /path/to/my/project/my-venv
+</code></pre></div>    </div>
+
+    <p>b. When you want to work on the project, run</p>
+    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">source</span> /path/to/my/project/my-venv/bin/activate
+</code></pre></div>    </div>
+    <p>(additional scripts for <code class="language-plaintext highlighter-rouge">csh</code> and <code class="language-plaintext highlighter-rouge">fish</code> exist here too)</p>
+
+    <p>c. When you’re done using the virtual environment, just run <code class="language-plaintext highlighter-rouge">deactivate</code>.</p>
+  </li>
+</ol>
+
+<p>In my opinion, this seems rather annoying. I used to alias the activate command, since it’s annoying to type out the path, and if you put your virtual environments in a project directory, you often have to add something to a <code class="language-plaintext highlighter-rouge">.gitignore</code> to ignore the virtual environment if your want to use subversioning. This plugin simplifies all of that by adding the following command to pyenv:</p>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pyenv virtualenv &lt;version&gt; &lt;name&gt;
+</code></pre></div></div>
+<p>Now you can use all of the above pyenv commands but with your own contained version! Additionally, the new environment is located in the same directory as the other regular python environments installed by pyenv, so there’s no more clutter in your project folder (or remembering what path you used). The previous workflow now looks like this:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>a. `pyenv virtualenv 3.11 myproject@3.11` (I like to include the version I use in the virtual environment name)
+
+b. `cd /path/to/my/project &amp;&amp; pyenv local myproject@3.11`
+</code></pre></div></div>
+
+<p>Now, every time you enter the project directory, the virtual environment is automatically activated, and when you leave the directory, it gets deactivated! No more fumbling around with activation scripts!</p>
+
+<ol>
+  <li>
+    <p>I use <a href="https://github.com/microsoft/pyright">pyright</a> to lint my code (I should write a blog post about my IDE setup eventually), and by default, it won’t work well with pyenv’s “local” versioning. However, there’s an extremely simple fix, a plugin called <a href="https://github.com/alefpereira/pyenv-pyright">pyenv-pyright</a>. Install it with <code class="language-plaintext highlighter-rouge">git</code>, and then run <code class="language-plaintext highlighter-rouge">pyenv pyright</code> in the desired directory, and it creates the proper <code class="language-plaintext highlighter-rouge">pyrightconfig.json</code> to handle everything.</p>
+  </li>
+  <li>
+    <p>While researching this post, I found <a href="https://github.com/jawshooah/pyenv-default-packages">pyenv-default-packages</a>, which provides a convenient way to specify some default packages to install every time you install a new Python version or virtual environment with pyenv. If you are a scientist like me, you probably always want <code class="language-plaintext highlighter-rouge">numpy</code>, <code class="language-plaintext highlighter-rouge">scipy</code>, and <code class="language-plaintext highlighter-rouge">matplotlib</code> installed in any project, and this is a quick way to just do it and forget about it.</p>
+  </li>
+</ol>
+
+<h3 id="conclusion">Conclusion</h3>
+
+<p>If you followed this tutorial, you’ll hopefully have a clean way to install and switch between versions and virtual environments of Python. In the future, I’ll make a post describing my entire Python setup, which includes <a href="https://www.lunarvim.org/">LunarVim</a> and a set of plugins and scripts to make code-writing simple. Feel free to reach out to me if you run into problems or have questions, I’m happy to help!</p>
+
+<blockquote>
+  <p><em>“Simplicity is the ultimate sophistication”</em></p>
+
+  <p>Leonardo da Vinci</p>
+</blockquote>]]></content><author><name></name></author><category term="python" /><category term="python" /><category term="shell" /><category term="linux" /><category term="macos" /><summary type="html"><![CDATA[Some tips and tricks I've learned that should save you from future pain]]></summary></entry><entry><title type="html">How I Made This Site</title><link href="https://denehoffman.github.io/blog/2023/how-i-made-this-site/" rel="alternate" type="text/html" title="How I Made This Site" /><published>2023-04-26T10:06:07+00:00</published><updated>2023-04-26T10:06:07+00:00</updated><id>https://denehoffman.github.io/blog/2023/how-i-made-this-site</id><content type="html" xml:base="https://denehoffman.github.io/blog/2023/how-i-made-this-site/"><![CDATA[<h3 id="getting-started">Getting Started</h3>
 
 <p>This guide is mostly for academics who may have coding and scripting experience but might not want to take a whole course in HTML and CSS to create a professional website. I will walk you through the steps I took to create this site, as well as a few scripts I wrote to automate some of its features. I operate on Linux and I use <a href="https://www.lunarvim.org/">LunarVim</a> as my default terminal editor, so my comments will mostly be specific to those platforms, but can easily be generalized. For this tutorial, I will assume you have some familiarity with a shell environment such as <code class="language-plaintext highlighter-rouge">bash</code> or <code class="language-plaintext highlighter-rouge">zsh</code>, as well as <code class="language-plaintext highlighter-rouge">python</code> for scripting, so aside from installation differences, everything should be more or less platform independent.</p>
 
@@ -106,9 +210,9 @@ gem 'github-pages', group: :jekyll_plugins
 <span class="kn">import</span> <span class="n">os</span>
 
 <span class="k">class</span> <span class="nc">NamePrompt</span><span class="p">(</span><span class="n">PromptBase</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
-    <span class="s">'''
+    <span class="sh">'''</span><span class="s">
     A custom prompt which will only validate strings longer than 5 characters
-    '''</span>
+    </span><span class="sh">'''</span>
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">check</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="n">output</span> <span class="o">=</span> <span class="nf">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
@@ -116,71 +220,71 @@ gem 'github-pages', group: :jekyll_plugins
             <span class="k">raise</span> <span class="nb">ValueError</span>
         <span class="k">return</span> <span class="n">output</span>
     <span class="n">response_type</span> <span class="o">=</span> <span class="n">check</span>
-    <span class="n">validate_error_message</span> <span class="o">=</span> <span class="s">"[prompt.invalid]Please enter a title longer than 5 characters"</span>
+    <span class="n">validate_error_message</span> <span class="o">=</span> <span class="sh">"</span><span class="s">[prompt.invalid]Please enter a title longer than 5 characters</span><span class="sh">"</span>
 
 
-<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">'__main__'</span><span class="p">:</span>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="sh">'</span><span class="s">__main__</span><span class="sh">'</span><span class="p">:</span>
     <span class="n">console</span> <span class="o">=</span> <span class="nc">Console</span><span class="p">()</span> <span class="c1"># create the console object for pretty printing
 </span>    <span class="c1"># Path to _posts directory
-</span>    <span class="n">post_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">.</span><span class="nf">home</span><span class="p">()</span> <span class="o">/</span> <span class="nc">Path</span><span class="p">(</span><span class="s">'Documents'</span><span class="p">,</span>
-                                  <span class="s">'denehoffman.github.io'</span><span class="p">,</span>
-                                  <span class="s">'_posts'</span><span class="p">)</span>
+</span>    <span class="n">post_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">.</span><span class="nf">home</span><span class="p">()</span> <span class="o">/</span> <span class="nc">Path</span><span class="p">(</span><span class="sh">'</span><span class="s">Documents</span><span class="sh">'</span><span class="p">,</span>
+                                  <span class="sh">'</span><span class="s">denehoffman.github.io</span><span class="sh">'</span><span class="p">,</span>
+                                  <span class="sh">'</span><span class="s">_posts</span><span class="sh">'</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">post_dir</span><span class="p">.</span><span class="nf">is_dir</span><span class="p">():</span>
-        <span class="nf">exit</span><span class="p">(</span><span class="sa">f</span><span class="s">"Could not locate </span><span class="si">{</span><span class="n">post_dir</span><span class="si">}</span><span class="s">!"</span><span class="p">)</span>
+        <span class="nf">exit</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">Could not locate </span><span class="si">{</span><span class="n">post_dir</span><span class="si">}</span><span class="s">!</span><span class="sh">"</span><span class="p">)</span>
 
-    <span class="n">console</span><span class="p">.</span><span class="nf">rule</span><span class="p">(</span><span class="s">"[bold blue]New Blog Post"</span><span class="p">)</span>
-    <span class="n">title</span> <span class="o">=</span> <span class="n">NamePrompt</span><span class="p">.</span><span class="nf">ask</span><span class="p">(</span><span class="s">"Enter a blog title"</span><span class="p">)</span> <span class="c1"># ask for the title
-</span>    <span class="n">title_string</span> <span class="o">=</span> <span class="s">'-'</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="n">title</span><span class="p">.</span><span class="nf">lower</span><span class="p">().</span><span class="nf">split</span><span class="p">())</span> <span class="c1"># "My custom Blog   Post" -&gt; "my-custom-blog-post"
+    <span class="n">console</span><span class="p">.</span><span class="nf">rule</span><span class="p">(</span><span class="sh">"</span><span class="s">[bold blue]New Blog Post</span><span class="sh">"</span><span class="p">)</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">NamePrompt</span><span class="p">.</span><span class="nf">ask</span><span class="p">(</span><span class="sh">"</span><span class="s">Enter a blog title</span><span class="sh">"</span><span class="p">)</span> <span class="c1"># ask for the title
+</span>    <span class="n">title_string</span> <span class="o">=</span> <span class="sh">'</span><span class="s">-</span><span class="sh">'</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="n">title</span><span class="p">.</span><span class="nf">lower</span><span class="p">().</span><span class="nf">split</span><span class="p">())</span> <span class="c1"># "My custom Blog   Post" -&gt; "my-custom-blog-post"
 </span>
-    <span class="n">description</span> <span class="o">=</span> <span class="n">Prompt</span><span class="p">.</span><span class="nf">ask</span><span class="p">(</span><span class="s">"Enter a description for this post"</span><span class="p">)</span>
+    <span class="n">description</span> <span class="o">=</span> <span class="n">Prompt</span><span class="p">.</span><span class="nf">ask</span><span class="p">(</span><span class="sh">"</span><span class="s">Enter a description for this post</span><span class="sh">"</span><span class="p">)</span>
 
     <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="p">.</span><span class="nf">now</span><span class="p">()</span> <span class="c1"># get current time
-</span>    <span class="n">date_time_string</span> <span class="o">=</span> <span class="n">now</span><span class="p">.</span><span class="nf">strftime</span><span class="p">(</span><span class="s">"%Y-%m-%d %H:%M:%S"</span><span class="p">)</span>
-    <span class="n">date_string</span> <span class="o">=</span> <span class="n">now</span><span class="p">.</span><span class="nf">strftime</span><span class="p">(</span><span class="s">"%Y-%m-%d"</span><span class="p">)</span>
+</span>    <span class="n">date_time_string</span> <span class="o">=</span> <span class="n">now</span><span class="p">.</span><span class="nf">strftime</span><span class="p">(</span><span class="sh">"</span><span class="s">%Y-%m-%d %H:%M:%S</span><span class="sh">"</span><span class="p">)</span>
+    <span class="n">date_string</span> <span class="o">=</span> <span class="n">now</span><span class="p">.</span><span class="nf">strftime</span><span class="p">(</span><span class="sh">"</span><span class="s">%Y-%m-%d</span><span class="sh">"</span><span class="p">)</span>
 
-    <span class="n">post_path</span> <span class="o">=</span> <span class="n">post_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s">"</span><span class="si">{</span><span class="n">date_string</span><span class="si">}</span><span class="s">-</span><span class="si">{</span><span class="n">title_string</span><span class="si">}</span><span class="s">.md"</span>
+    <span class="n">post_path</span> <span class="o">=</span> <span class="n">post_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="sh">"</span><span class="si">{</span><span class="n">date_string</span><span class="si">}</span><span class="s">-</span><span class="si">{</span><span class="n">title_string</span><span class="si">}</span><span class="s">.md</span><span class="sh">"</span>
     <span class="k">if</span> <span class="n">post_path</span><span class="p">.</span><span class="nf">is_file</span><span class="p">():</span>
-        <span class="nf">exit</span><span class="p">(</span><span class="sa">f</span><span class="s">"File already exists: </span><span class="si">{</span><span class="n">post_path</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+        <span class="nf">exit</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">File already exists: </span><span class="si">{</span><span class="n">post_path</span><span class="si">}</span><span class="sh">"</span><span class="p">)</span>
 
     <span class="c1"># let's collect any existing tags in our posts so we don't forget any
 </span>    <span class="n">all_tags</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">post</span> <span class="ow">in</span> <span class="n">post_dir</span><span class="p">.</span><span class="nf">glob</span><span class="p">(</span><span class="s">"*.md"</span><span class="p">):</span> <span class="c1"># iterate through all Markdown posts
+    <span class="k">for</span> <span class="n">post</span> <span class="ow">in</span> <span class="n">post_dir</span><span class="p">.</span><span class="nf">glob</span><span class="p">(</span><span class="sh">"</span><span class="s">*.md</span><span class="sh">"</span><span class="p">):</span> <span class="c1"># iterate through all Markdown posts
 </span>        <span class="n">post_text</span> <span class="o">=</span> <span class="n">post</span><span class="p">.</span><span class="nf">read_text</span><span class="p">()</span> <span class="c1"># clever little pathlib shortcut
-</span>        <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="p">.</span><span class="nf">search</span><span class="p">(</span><span class="sa">r</span><span class="s">'^tags:\s*(.*)$'</span><span class="p">,</span> <span class="n">post_text</span><span class="p">,</span> <span class="n">re</span><span class="p">.</span><span class="n">MULTILINE</span><span class="p">)</span>
+</span>        <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="p">.</span><span class="nf">search</span><span class="p">(</span><span class="sa">r</span><span class="sh">'</span><span class="s">^tags:\s*(.*)$</span><span class="sh">'</span><span class="p">,</span> <span class="n">post_text</span><span class="p">,</span> <span class="n">re</span><span class="p">.</span><span class="n">MULTILINE</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
             <span class="n">all_tags</span><span class="p">.</span><span class="nf">extend</span><span class="p">(</span><span class="n">match</span><span class="p">.</span><span class="nf">group</span><span class="p">(</span><span class="mi">1</span><span class="p">).</span><span class="nf">split</span><span class="p">())</span>
     <span class="c1"># this list will probably have duplicates that we don't care about
 </span>    <span class="n">all_tags</span> <span class="o">=</span> <span class="nf">sorted</span><span class="p">(</span><span class="nf">list</span><span class="p">(</span><span class="nf">set</span><span class="p">(</span><span class="n">all_tags</span><span class="p">)))</span>
-    <span class="n">console</span><span class="p">.</span><span class="nf">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"Existing blog tags:</span><span class="se">\n</span><span class="si">{</span><span class="s">', '</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="n">all_tags</span><span class="p">)</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
-    <span class="n">tags</span> <span class="o">=</span> <span class="n">Prompt</span><span class="p">.</span><span class="nf">ask</span><span class="p">(</span><span class="s">"Enter some space-separated tags"</span><span class="p">).</span><span class="nf">split</span><span class="p">()</span>
+    <span class="n">console</span><span class="p">.</span><span class="nf">print</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">Existing blog tags:</span><span class="se">\n</span><span class="si">{</span><span class="sh">'</span><span class="s">, </span><span class="sh">'</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="n">all_tags</span><span class="p">)</span><span class="si">}</span><span class="sh">"</span><span class="p">)</span>
+    <span class="n">tags</span> <span class="o">=</span> <span class="n">Prompt</span><span class="p">.</span><span class="nf">ask</span><span class="p">(</span><span class="sh">"</span><span class="s">Enter some space-separated tags</span><span class="sh">"</span><span class="p">).</span><span class="nf">split</span><span class="p">()</span>
     
     <span class="c1"># we can do the same thing for categories
 </span>    <span class="n">all_categories</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">post</span> <span class="ow">in</span> <span class="n">post_dir</span><span class="p">.</span><span class="nf">glob</span><span class="p">(</span><span class="s">"*.md"</span><span class="p">):</span> <span class="c1"># iterate through all Markdown posts
+    <span class="k">for</span> <span class="n">post</span> <span class="ow">in</span> <span class="n">post_dir</span><span class="p">.</span><span class="nf">glob</span><span class="p">(</span><span class="sh">"</span><span class="s">*.md</span><span class="sh">"</span><span class="p">):</span> <span class="c1"># iterate through all Markdown posts
 </span>        <span class="n">post_text</span> <span class="o">=</span> <span class="n">post</span><span class="p">.</span><span class="nf">read_text</span><span class="p">()</span> <span class="c1"># clever little pathlib shortcut
-</span>        <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="p">.</span><span class="nf">search</span><span class="p">(</span><span class="sa">r</span><span class="s">'^categories:\s*(.*)$'</span><span class="p">,</span> <span class="n">post_text</span><span class="p">,</span> <span class="n">re</span><span class="p">.</span><span class="n">MULTILINE</span><span class="p">)</span>
+</span>        <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="p">.</span><span class="nf">search</span><span class="p">(</span><span class="sa">r</span><span class="sh">'</span><span class="s">^categories:\s*(.*)$</span><span class="sh">'</span><span class="p">,</span> <span class="n">post_text</span><span class="p">,</span> <span class="n">re</span><span class="p">.</span><span class="n">MULTILINE</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
             <span class="n">all_categories</span><span class="p">.</span><span class="nf">extend</span><span class="p">(</span><span class="n">match</span><span class="p">.</span><span class="nf">group</span><span class="p">(</span><span class="mi">1</span><span class="p">).</span><span class="nf">split</span><span class="p">())</span>
     <span class="c1"># this list will probably have duplicates that we don't care about
 </span>    <span class="n">all_categories</span> <span class="o">=</span> <span class="nf">sorted</span><span class="p">(</span><span class="nf">list</span><span class="p">(</span><span class="nf">set</span><span class="p">(</span><span class="n">all_categories</span><span class="p">)))</span>
-    <span class="n">console</span><span class="p">.</span><span class="nf">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"Existing blog categories:</span><span class="se">\n</span><span class="si">{</span><span class="s">', '</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="n">all_categories</span><span class="p">)</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
-    <span class="n">categories</span> <span class="o">=</span> <span class="n">Prompt</span><span class="p">.</span><span class="nf">ask</span><span class="p">(</span><span class="s">"Enter some space-separated categories"</span><span class="p">).</span><span class="nf">split</span><span class="p">()</span>
+    <span class="n">console</span><span class="p">.</span><span class="nf">print</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">Existing blog categories:</span><span class="se">\n</span><span class="si">{</span><span class="sh">'</span><span class="s">, </span><span class="sh">'</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="n">all_categories</span><span class="p">)</span><span class="si">}</span><span class="sh">"</span><span class="p">)</span>
+    <span class="n">categories</span> <span class="o">=</span> <span class="n">Prompt</span><span class="p">.</span><span class="nf">ask</span><span class="p">(</span><span class="sh">"</span><span class="s">Enter some space-separated categories</span><span class="sh">"</span><span class="p">).</span><span class="nf">split</span><span class="p">()</span>
 
-    <span class="n">post_text</span> <span class="o">=</span> <span class="sa">f</span><span class="s">"""---
+    <span class="n">post_text</span> <span class="o">=</span> <span class="sa">f</span><span class="sh">"""</span><span class="s">---
 layout: post
 title: </span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s">
 date: </span><span class="si">{</span><span class="n">date_time_string</span><span class="si">}</span><span class="s">
 description: </span><span class="si">{</span><span class="n">description</span><span class="si">}</span><span class="s">
-tags: </span><span class="si">{</span><span class="s">' '</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="n">tags</span><span class="p">)</span><span class="si">}</span><span class="s">
-categories: </span><span class="si">{</span><span class="s">' '</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="n">categories</span><span class="p">)</span><span class="si">}</span><span class="s">
+tags: </span><span class="si">{</span><span class="sh">'</span><span class="s"> </span><span class="sh">'</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="n">tags</span><span class="p">)</span><span class="si">}</span><span class="s">
+categories: </span><span class="si">{</span><span class="sh">'</span><span class="s"> </span><span class="sh">'</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="n">categories</span><span class="p">)</span><span class="si">}</span><span class="s">
 ---
-"""</span>
+</span><span class="sh">"""</span>
     <span class="n">post_path</span><span class="p">.</span><span class="nf">touch</span><span class="p">()</span>
     <span class="n">post_path</span><span class="p">.</span><span class="nf">write_text</span><span class="p">(</span><span class="n">post_text</span><span class="p">)</span>
 
     <span class="c1"># You can set the default behavior however you want,
 </span>    <span class="c1"># I also set $EDITOR to be 'lvim'
-</span>    <span class="n">editor</span> <span class="o">=</span> <span class="n">os</span><span class="p">.</span><span class="n">environ</span><span class="p">.</span><span class="nf">get</span><span class="p">(</span><span class="s">'EDITOR'</span><span class="p">,</span> <span class="s">'lvim'</span><span class="p">)</span>
+</span>    <span class="n">editor</span> <span class="o">=</span> <span class="n">os</span><span class="p">.</span><span class="n">environ</span><span class="p">.</span><span class="nf">get</span><span class="p">(</span><span class="sh">'</span><span class="s">EDITOR</span><span class="sh">'</span><span class="p">,</span> <span class="sh">'</span><span class="s">lvim</span><span class="sh">'</span><span class="p">)</span>
     <span class="nf">call</span><span class="p">([</span><span class="n">editor</span><span class="p">,</span> <span class="nf">str</span><span class="p">(</span><span class="n">post_path</span><span class="p">)])</span>
 </code></pre></div></div>
 
@@ -196,9 +300,9 @@ categories: </span><span class="si">{</span><span class="s">' '</span><span clas
 <span class="kn">import</span> <span class="n">os</span>
 
 <span class="k">class</span> <span class="nc">NamePrompt</span><span class="p">(</span><span class="n">PromptBase</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
-    <span class="s">'''
+    <span class="sh">'''</span><span class="s">
     A custom prompt which will only validate strings longer than 5 characters
-    '''</span>
+    </span><span class="sh">'''</span>
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">check</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="n">output</span> <span class="o">=</span> <span class="nf">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
@@ -206,44 +310,44 @@ categories: </span><span class="si">{</span><span class="s">' '</span><span clas
             <span class="k">raise</span> <span class="nb">ValueError</span>
         <span class="k">return</span> <span class="n">output</span>
     <span class="n">response_type</span> <span class="o">=</span> <span class="n">check</span>
-    <span class="n">validate_error_message</span> <span class="o">=</span> <span class="s">"[prompt.invalid]Please enter a title longer than 5 characters"</span>
+    <span class="n">validate_error_message</span> <span class="o">=</span> <span class="sh">"</span><span class="s">[prompt.invalid]Please enter a title longer than 5 characters</span><span class="sh">"</span>
 
 
-<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">'__main__'</span><span class="p">:</span>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="sh">'</span><span class="s">__main__</span><span class="sh">'</span><span class="p">:</span>
     <span class="n">console</span> <span class="o">=</span> <span class="nc">Console</span><span class="p">()</span> <span class="c1"># create the console object for pretty printing
 </span>    <span class="c1"># Path to _posts directory
-</span>    <span class="n">post_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">.</span><span class="nf">home</span><span class="p">()</span> <span class="o">/</span> <span class="nc">Path</span><span class="p">(</span><span class="s">'Documents'</span><span class="p">,</span>
-                                  <span class="s">'denehoffman.github.io'</span><span class="p">,</span>
-                                  <span class="s">'_news'</span><span class="p">)</span>
+</span>    <span class="n">post_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">.</span><span class="nf">home</span><span class="p">()</span> <span class="o">/</span> <span class="nc">Path</span><span class="p">(</span><span class="sh">'</span><span class="s">Documents</span><span class="sh">'</span><span class="p">,</span>
+                                  <span class="sh">'</span><span class="s">denehoffman.github.io</span><span class="sh">'</span><span class="p">,</span>
+                                  <span class="sh">'</span><span class="s">_news</span><span class="sh">'</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">post_dir</span><span class="p">.</span><span class="nf">is_dir</span><span class="p">():</span>
-        <span class="nf">exit</span><span class="p">(</span><span class="sa">f</span><span class="s">"Could not locate </span><span class="si">{</span><span class="n">post_dir</span><span class="si">}</span><span class="s">!"</span><span class="p">)</span>
+        <span class="nf">exit</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">Could not locate </span><span class="si">{</span><span class="n">post_dir</span><span class="si">}</span><span class="s">!</span><span class="sh">"</span><span class="p">)</span>
 
-    <span class="n">console</span><span class="p">.</span><span class="nf">rule</span><span class="p">(</span><span class="s">"[bold blue]New News Announcement"</span><span class="p">)</span>
-    <span class="n">title</span> <span class="o">=</span> <span class="n">NamePrompt</span><span class="p">.</span><span class="nf">ask</span><span class="p">(</span><span class="s">"Enter a title"</span><span class="p">)</span> <span class="c1"># ask for the title
-</span>    <span class="n">title_string</span> <span class="o">=</span> <span class="s">'-'</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="n">title</span><span class="p">.</span><span class="nf">lower</span><span class="p">().</span><span class="nf">split</span><span class="p">())</span> <span class="c1"># "My custom News   Post" -&gt; "my-custom-news-post"
+    <span class="n">console</span><span class="p">.</span><span class="nf">rule</span><span class="p">(</span><span class="sh">"</span><span class="s">[bold blue]New News Announcement</span><span class="sh">"</span><span class="p">)</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">NamePrompt</span><span class="p">.</span><span class="nf">ask</span><span class="p">(</span><span class="sh">"</span><span class="s">Enter a title</span><span class="sh">"</span><span class="p">)</span> <span class="c1"># ask for the title
+</span>    <span class="n">title_string</span> <span class="o">=</span> <span class="sh">'</span><span class="s">-</span><span class="sh">'</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="n">title</span><span class="p">.</span><span class="nf">lower</span><span class="p">().</span><span class="nf">split</span><span class="p">())</span> <span class="c1"># "My custom News   Post" -&gt; "my-custom-news-post"
 </span>
     <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="p">.</span><span class="nf">now</span><span class="p">()</span> <span class="c1"># get current time
-</span>    <span class="n">date_time_string</span> <span class="o">=</span> <span class="n">now</span><span class="p">.</span><span class="nf">strftime</span><span class="p">(</span><span class="s">"%Y-%m-%d %H:%M:%S"</span><span class="p">)</span>
-    <span class="n">date_string</span> <span class="o">=</span> <span class="n">now</span><span class="p">.</span><span class="nf">strftime</span><span class="p">(</span><span class="s">"%Y-%m-%d"</span><span class="p">)</span>
+</span>    <span class="n">date_time_string</span> <span class="o">=</span> <span class="n">now</span><span class="p">.</span><span class="nf">strftime</span><span class="p">(</span><span class="sh">"</span><span class="s">%Y-%m-%d %H:%M:%S</span><span class="sh">"</span><span class="p">)</span>
+    <span class="n">date_string</span> <span class="o">=</span> <span class="n">now</span><span class="p">.</span><span class="nf">strftime</span><span class="p">(</span><span class="sh">"</span><span class="s">%Y-%m-%d</span><span class="sh">"</span><span class="p">)</span>
 
-    <span class="n">post_path</span> <span class="o">=</span> <span class="n">post_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s">"</span><span class="si">{</span><span class="n">date_string</span><span class="si">}</span><span class="s">-</span><span class="si">{</span><span class="n">title_string</span><span class="si">}</span><span class="s">.md"</span>
+    <span class="n">post_path</span> <span class="o">=</span> <span class="n">post_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="sh">"</span><span class="si">{</span><span class="n">date_string</span><span class="si">}</span><span class="s">-</span><span class="si">{</span><span class="n">title_string</span><span class="si">}</span><span class="s">.md</span><span class="sh">"</span>
     <span class="k">if</span> <span class="n">post_path</span><span class="p">.</span><span class="nf">is_file</span><span class="p">():</span>
-        <span class="nf">exit</span><span class="p">(</span><span class="sa">f</span><span class="s">"File already exists: </span><span class="si">{</span><span class="n">post_path</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+        <span class="nf">exit</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">File already exists: </span><span class="si">{</span><span class="n">post_path</span><span class="si">}</span><span class="sh">"</span><span class="p">)</span>
 
-    <span class="n">post_text</span> <span class="o">=</span> <span class="sa">f</span><span class="s">"""---
+    <span class="n">post_text</span> <span class="o">=</span> <span class="sa">f</span><span class="sh">"""</span><span class="s">---
 layout: post
 title: </span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s">
 date: </span><span class="si">{</span><span class="n">date_time_string</span><span class="si">}</span><span class="s">
 inline: true
 related_posts: false
 ---
-"""</span>
+</span><span class="sh">"""</span>
     <span class="n">post_path</span><span class="p">.</span><span class="nf">touch</span><span class="p">()</span>
     <span class="n">post_path</span><span class="p">.</span><span class="nf">write_text</span><span class="p">(</span><span class="n">post_text</span><span class="p">)</span>
 
     <span class="c1"># You can set the default behavior however you want,
 </span>    <span class="c1"># I also set $EDITOR to be 'lvim'
-</span>    <span class="n">editor</span> <span class="o">=</span> <span class="n">os</span><span class="p">.</span><span class="n">environ</span><span class="p">.</span><span class="nf">get</span><span class="p">(</span><span class="s">'EDITOR'</span><span class="p">,</span> <span class="s">'lvim'</span><span class="p">)</span>
+</span>    <span class="n">editor</span> <span class="o">=</span> <span class="n">os</span><span class="p">.</span><span class="n">environ</span><span class="p">.</span><span class="nf">get</span><span class="p">(</span><span class="sh">'</span><span class="s">EDITOR</span><span class="sh">'</span><span class="p">,</span> <span class="sh">'</span><span class="s">lvim</span><span class="sh">'</span><span class="p">)</span>
     <span class="nf">call</span><span class="p">([</span><span class="n">editor</span><span class="p">,</span> <span class="nf">str</span><span class="p">(</span><span class="n">post_path</span><span class="p">)])</span>
 </code></pre></div></div>
 
