@@ -1,2 +1,21 @@
-- name: actions-template-sync
-  uses: AndreasAugustin/actions-template-sync@v2.0.1
+name: sync_with_template
+on:
+  push:
+    branches:
+      - master
+      - main
+  pull_request:
+    branches:
+      - master
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: actions-template-sync
+      uses: AndreasAugustin/actions-template-sync@v2.0.1
