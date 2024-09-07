@@ -17,11 +17,11 @@ highlight_code = true
 [extra]
 # Put all your custom variables here
 header_nav = [
-  { name_en = "🮤home🮥", url = "/" },
-  { name_en = "🮤blog🮥", url = "/blog" },
-  { name_en = "🮤publications🮥", url = "/publications" },
-  { name_en = "🮤cv🮥", url = "/cv" },
-  { name_en = "🮤projects🮥", url = "/projects" },
+  { name_en = "<home>", url = "/" },
+  { name_en = "<blog>", url = "/blog" },
+  { name_en = "<publications>", url = "/publications" },
+  { name_en = "<cv>", url = "/cv" },
+  { name_en = "<projects>", url = "/projects" },
 ]
 accent_color = "blue-auto"
 logo_text = "Dene Hoffman"
