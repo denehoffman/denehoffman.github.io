@@ -20,22 +20,7 @@ $$
 $$
 where $f: \mathbb{R}^n \to \mathbb{R}$ is the objective function we are trying to minimize and $\alpha_n$ is some positive step length (also called the learning rate). The minus sign here is why we call it gradient descent; we are always moving opposite the gradient, which always points uphill. For simplicity, we'll also refer to the gradient as a function $\vec{g}(\vec{x}) \equiv \vec{\nabla}f(\vec{x})$ Now if you just throw in some very small value for $\alpha$ and cross your fingers, you might eventually end up at the function's minimum, but it certainly won't be the most efficient way to get there. If your $\alpha$ is too big, you could end up overshooting the minimum and bouncing back and forth around it endlessly.
 
-There are several ways we can optimize the choice of step length, but we will be implementing an algorithm that attempts to satisfy the Strong Wolfe conditions. These are conditions for accepting a step length given some step direction $\vec{p}_k$ (we'll see later why we need to generalize this, but for now you can always just imagine $\vec{p}_k = -g(\vec{x}_k)$).
-
-The first of these conditions is also called the Armijo rule:
-$$
-f(\vec{x}_k + \alpha_k \vec{p}_k) \leq f(\vec{x}_k) + c_1 \alpha_k \left(\vec{p}_k \cdot \vec{g}(\vec{x}_k)\right)
-$$
-for some value $0 < c_1 < 1$. The usual choice of $c_1$ is $10^{-4}$, which I believe just comes from some experimentation on standard test functions. This method is also called the sufficient decrease condition, and we can see why. The left-hand side is the function value at the new location, which we hope is at least smaller than the previous location (otherwise we are ascending!). However, for it to be sufficiently smaller, the difference must exceed the final term in the equation, which is usually going to be negative due to that dot product.
-
-The second condition, dubbed the curvature condition, requires that the gradient of the function decrease sufficiently. This is usually harder to accomplish, so when we implement this in Rust, we will make it optional but desired.
-$$
--\left(\vec{p}_k \cdot \vec{g}(\vec{x}_k + \alpha_k \vec{p}_k)\right) \leq -c_2 \left(\vec{p}_k \cdot \vec{g}(\vec{x}_k)\right)
-$$
-This condition adds another hyperparameter, $0 < c_1 < c_2 < 1$ where $c_2 = 0.9$ in most applications. However, if we really want to find the best point, we should try to satisfy the **strong** version of the curvature condition:
-$$
-\left|\vec{p}_k \cdot \vec{g}(\vec{x}_k + \alpha_k \vec{p}_k)\right| \leq c_2 \left|\vec{p}_k \cdot \vec{g}(\vec{x}_k)\right|
-$$
+There are several ways we can optimize the choice of step length. Skip ahead to [here](#line-searches) to see the implementation I use for the BFGS family.
 
 # Rust implementation
 
@@ -259,3 +244,110 @@ where
 ```
 
 For now, we will ignore the `Bound` struct mentioned here, since we won't use it till we get to the `L-BFGS-B` algorithm. Note that `PhantomData` is required here because we don't actually store anything of type `U` or `E` but we need to include it in generics.
+
+The main `minimize` function should also look pretty straightforward. We first call `Algorithm::initialize` and then proceed into a while-loop that checks if we either exceed the maximum allowed algorithm steps or if `Algorithm::check_for_termination` tells us to stop the algorithm (in case of problems or convergence). Inside this loop, we just run `Algorithm::step`. We finish off with `Algorithm::postprocessing` and grab the final `Status` of the algorithm. This will be the workflow for every `Algorithm` we implement[^1].
+
+# Line Searches
+
+We will be implementing an algorithm that attempts to satisfy the Strong Wolfe conditions. These are conditions for accepting a step length given some step direction $\vec{p}$ (we'll see later why we need to generalize this, but for now you can always just imagine $\vec{p} = -g(\vec{x})$).
+
+The first of these conditions is also called the Armijo rule:
+$$
+f(\vec{x} + \alpha_k \vec{p}) \leq f(\vec{x}) + c_1 \alpha_k \left(\vec{p} \cdot \vec{g}(\vec{x})\right)
+$$
+for some value $0 < c_1 < 1$. The usual choice of $c_1$ is $10^{-4}$, which I believe just comes from some experimentation on standard test functions. This method is also called the sufficient decrease condition, and we can see why. The left-hand side is the function value at the new location, which we hope is at least smaller than the previous location (otherwise we are ascending!). However, for it to be sufficiently smaller, the difference must exceed the final term in the equation, which is usually going to be negative due to that dot product.
+
+The second condition, dubbed the curvature condition, requires that the gradient of the function decrease sufficiently. This is usually harder to accomplish, so when we implement this in Rust, we will make it optional but desired.
+$$
+-\left(\vec{p} \cdot \vec{g}(\vec{x} + \alpha_k \vec{p})\right) \leq -c_2 \left(\vec{p} \cdot \vec{g}(\vec{x})\right)
+$$
+This condition adds another hyperparameter, $0 < c_1 < c_2 < 1$ where $c_2 = 0.9$ in most applications. However, if we really want to find the best point, we should try to satisfy the **strong** version of the curvature condition:
+$$
+\left|\vec{p}_k \cdot \vec{g}(\vec{x}_k + \alpha_k \vec{p}_k)\right| \leq c_2 \left|\vec{p}_k \cdot \vec{g}(\vec{x}_k)\right|
+$$
+
+We'll start the implementation with another trait (since other algorithms might use a different search method):
+
+```rust
+pub trait LineSearch<T, U, E> {
+    fn search(
+        &mut self,
+        x: &DVector<T>,
+        p: &DVector<T>,
+        max_step: Option<T>,
+        func: &dyn Function<T, U, E>,
+        bounds: Option<&Vec<Bound<T>>>,
+        user_data: &mut U,
+        status: &mut Status<T>,
+    ) -> Result<(bool, T, T, Vec<T>), E>;
+}
+```
+
+We'll be implementing Algorithms 3.5 and 3.6 from ["Numerical Optimization"](https://doi.org/10.1007/978-0-387-40065-5), which (roughly) reads as follows:
+
+#### Algorithm 3.5
+1. $\alpha_0 \gets 0$, $\alpha_\text{max} > 0$, $\alpha_1 \in (0, \alpha_\text{max})$, $i \gets 1$
+2. `loop`
+   1. `if`
+
+      $f(\vec{x} + \alpha_i \vec{p}) > f(\vec{x}) + c_1\alpha_i\left(\vec{p}\cdot\vec{g}(\vec{x})\right)$ (not Armijo)
+
+      `or`
+
+      ($i > 1$ `and` $f(\vec{x} + \alpha_i \vec{p}) \geq f(\vec{x} + \alpha_{i-1}\vec{p})$) (the function value has not decreased since the previous step)
+
+      `then` `return` $\text{zoom}(\alpha_{i-1}, \alpha_i)$
+   2. `if`
+      
+      $\left|\vec{p}\cdot\vec{g}(\vec{x} + \alpha_i\vec{p})\right| < c_2 \left|\vec{p}\cdot\vec{g}(\vec{x})\right|$ (strong Wolfe)
+
+      `then` `return` $\alpha_i$
+   3. `if`
+
+      $\vec{p}\cdot\vec{g}(\vec{x} + \alpha_i\vec{p}) \geq 0$ (gradient at new position generally points in the same direction as the given step direction)
+
+      `then` `return` $\text{zoom}(\alpha_i,\alpha_{i-1})$
+   4. $\alpha_{i+1} \in (\alpha_i, \alpha_\text{max})$ (choose some larger step that is smaller than the max step)
+   5. $i \gets i + 1$
+
+In each loop, we are first checking to see if the function is sufficiently decreasing. If it isn't, we know that the step size overshoots. Imagine we are just minimizing into a 1D parabola. If we are sitting to the left of the minimum, the optimal step length $\alpha_\text{opt}$ would put us right at the minimum. If we pick a step $\alpha < \alpha_\text{opt}$ would be fine, but it would mean we converge slower than optimal. The same can be said for a step length $\alpha > \alpha_\text{opt}$, but at a certain point, we will be stepping to a point higher up the parabola than where we began, even though we are moving in the right direction! Step 2.1 ensures that if this happens, we will do a more refined search (`zoom`) between the current and previous step lengths (note that $\alpha_{i-1} = 0$ when $i=1$ on the first loop). This will happen a lot if we pick a starting step length that is too large (see the following diagram).
+
+![Taking a step that is too large](line_search_increase.svg)
+If we are decreasing, we are in that region where we are converging, but we might not be converging at an optimal rate. This is where the strong Wolfe condition comes in. We first project the gradients at the original and stepped positions onto the step direction. If the gradient *is* the step direction (well, opposite to it), then we can ignore $\vec{p}$ here and think of this in terms of a change in gradient magnitude. If the gradient decreases by at least a factor of $c_2$, we accept the step (see the following diagram).
+
+![An acceptable step](line_search_accept.svg)
+
+If we are decreasing sufficiently, but the magnitude of the projected gradient isn't (the gray region in the previous plots), we are either undershooting the optimal step, in which case we should increase the step size and run the loop again (Step 4) or we are overshooting, in which case we should run `zoom` between the current step and the previous one. How do we tell? Well, if we overshoot, the gradient on the next step will tell us to move in the opposite direction, but if we undershoot, we should still be moving in the same direction. This is what the if-statement of Step 3. checks for.
+
+![A step that would result in the final condition being checked](line_search_armijo.svg)
+
+In the above plot, both points meet the Armijo condition, but they fail to meet the strong Wolfe condition. This means they make it to Step 3 in our line search algorithm. For the left-most point, the gradient points in the $-x$ direction while the step was in the $+x$ direction, so the condition at Step 3 is not satisfied, and we increase our step size (hopefully landing in the green region). For the right-most point, the gradient now points in the $+x$ direction, so Step 3 is satisfied and we again `zoom` between this step size and the previous. Note that the arguments to `zoom` are switched here. In the definition of the `zoom` algorithm, we will refer to the first argument as $\alpha_{\text{lo}}$ and the second as $\alpha_{\text{hi}}$. However, since $\alpha_i$ is strictly increasing in Algorithm 3.5, we shouldn't think of one of these values as larger than the other, but rather that the function evaluations at these points are lower or higher. Here, $\alpha_\text{lo}$ will always refer to a step length which satisfied the Armijo condition, which means that the function value with this step length is the lower of the two. $\alpha_\text{hi}$ will be the previous step if the current one is the first to satisfy the Armijo condition (Step 2.3) or it will be the current step if the previous step gave a smaller function evaluation (Step 2.1). In either case, we know that the optimal step length is in the given range.
+
+#### Algorithm 3.6 (`zoom`)
+1. loop
+   1. Choose $\alpha_j$ between $\alpha_{\text{lo}}$ and $\alpha_{\text{hi}}$ (it's possible for $\alpha_\text{lo} > \alpha_\text{hi}$).
+   2. `if` 
+
+      $f(\vec{x} + \alpha_j \vec{p}) > f(\vec{x}) + c_1\alpha_j\left(\vec{p}\cdot\vec{g}(\vec{x})\right)$ (not Armijo)
+
+      `or`
+
+      $f(\vec{x} + \alpha_j \vec{p}) \geq f(\vec{x} + \alpha_{\text{lo}}\vec{p})$ (the function value has not decreased since the previous step)
+
+      `then` $\alpha_\text{hi} \gets \alpha_j$
+
+      `else`
+         1. `if`
+         
+            $\left|\vec{p}\cdot\vec{g}(\vec{x} + \alpha_j\vec{p})\right| \leq c_2\left|\vec{p}\cdot\vec{g}(\vec{x})\right|$
+
+             `then` `return` $\alpha_j$
+         2. `if`
+
+            $\vec{p}\cdot\vec{g}(\vec{x} + \alpha_j\vec{p}) (\alpha_\text{hi} - \alpha_\text{lo}) \geq 0$
+
+            `then` $\alpha_\text{hi} \gets \alpha_\text{lo}$
+         3. $\alpha_\text{lo} \gets \alpha_j$
+
+
+[^1]: In the full code, there are additional clauses for updating outside `Observer`s, which can monitor the `Algorithm` at each step.
