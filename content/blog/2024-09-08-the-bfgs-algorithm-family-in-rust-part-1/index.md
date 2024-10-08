@@ -332,7 +332,7 @@ In the above plot, both points meet the Armijo condition, but they fail to meet 
 
       `or`
 
-      $f(\vec{x} + \alpha_j \vec{p}) \geq f(\vec{x} + \alpha_{\text{lo}}\vec{p})$ (the function value has not decreased since the previous step)
+      $f(\vec{x} + \alpha_j \vec{p}) \geq f(\vec{x} + \alpha_{\text{lo}}\vec{p})$ (the function value has not decreased relative to $\alpha_{\text{lo}}$)
 
       `then` $\alpha_\text{hi} \gets \alpha_j$
 
@@ -348,6 +348,162 @@ In the above plot, both points meet the Armijo condition, but they fail to meet 
 
             `then` $\alpha_\text{hi} \gets \alpha_\text{lo}$
          3. $\alpha_\text{lo} \gets \alpha_j$
+
+There are only a few possible outcomes of this loop. The "middle" outcome is to return $\alpha_j$ if it satisfies the Strong Wolfe and Armijo conditions. We check first for Armijo (remember, this is generally less restrictive), and if it's not satisfied, or if the evaluation is worse than $\alpha_{\text{lo}}$, we move $\alpha_{\text{hi}}$ to $\alpha_j$. Remember, the subscripts represent the relative value of the function evaluated at that step, and we know that [Algorithm 3.5](#algorithm-3-5) will guarantee that the two steps given will surround the "green" region of optimal step size. If Armijo is satisfied but Wolfe is not, we will always move $\alpha_{\text{lo}}$ up to $\alpha_j$, but if the condition in 2.2 is met, this implies that either the order of $\alpha_{\text{hi}}$ and $\alpha_{\text{lo}}$ is opposite what we think it should be (because in reality these functions are not always smooth minima like the previous diagrams) or the step $\alpha_j$ no longer goes in the direction of steepest descent. In either case, we then need move our $\alpha_{\text{hi}}$ endpoint to $\alpha_{\text{lo}}$ first. I'd recommend drawing out several minima scenarios to get a handle on this algorithm, but eventually it will start to make some sense.
+
+Together, these algorithms constitute a line search which should result in a step that satisfies Strong Wolfe curvature conditions. This is needed to get optimal convergence from BFGS-like algorithms, but in practice it's not always efficient to run either algorithm in a (possibly infinite) loop, so I add a maximum number of loops to both algorithms. From my own testing, most problems will have no issue converging within a maximum of `100` iterations for each algorithm. That being said, here's my implementation of the line search:
+
+```rust
+pub struct StrongWolfeLineSearch<T> {
+    max_iters: usize,
+    max_zoom: usize,
+    c1: T,
+    c2: T,
+}
+
+impl<T> Default for StrongWolfeLineSearch<T>
+where
+    T: Float,
+{
+    fn default() -> Self {
+        Self {
+            max_iters: 100,
+            max_zoom: 100,
+            c1: convert!(1e-4, T),
+            c2: convert!(0.9, T),
+        }
+    }
+}
+
+impl<T> StrongWolfeLineSearch<T>
+where
+    T: Float + RealField,
+{
+    fn f_eval<U, E>(
+        &self,
+        func: &dyn Function<T, U, E>,
+        x: &DVector<T>,
+        bounds: Option<&Vec<Bound<T>>>,
+        user_data: &mut U,
+        status: &mut Status<T>,
+    ) -> Result<T, E> {
+        status.inc_n_f_evals();
+        func.evaluate(x.as_slice(), user_data)
+    }
+    fn g_eval<U, E>(
+        &self,
+        func: &dyn Function<T, U, E>,
+        x: &DVector<T>,
+        bounds: Option<&Vec<Bound<T>>>,
+        user_data: &mut U,
+        status: &mut Status<T>,
+    ) -> Result<DVector<T>, E> {
+        status.inc_n_g_evals();
+        func.gradient(x.as_slice(), user_data).map(DVector::from)
+    }
+
+    // Algorithm 3.6
+    fn zoom<U, E>(
+        &self,
+        func: &dyn Function<T, U, E>,
+        x0: &DVector<T>,
+        bounds: Option<&Vec<Bound<T>>>,
+        user_data: &mut U,
+        f0: T,
+        g0: &DVector<T>,
+        p: &DVector<T>,
+        alpha_lo: T,
+        alpha_hi: T,
+        status: &mut Status<T>,
+    ) -> Result<(bool, T, T, DVector<T>), E> {
+        let mut alpha_lo = alpha_lo;
+        let mut alpha_hi = alpha_hi;
+        let dphi0 = g0.dot(p);
+        let mut i = 0;
+        loop {
+            let alpha_i = (alpha_lo + alpha_hi) / convert!(2, T);
+            let x = x0 + p.scale(alpha_i);
+            let f_i = self.f_eval(func, &x, bounds, user_data, status)?;
+            let x_lo = x0 + p.scale(alpha_lo);
+            let f_lo = self.f_eval(func, &x_lo, bounds, user_data, status)?;
+            let valid = if (f_i > f0 + self.c1 * alpha_i * dphi0) || (f_i >= f_lo) {
+                alpha_hi = alpha_i;
+                false
+            } else {
+                let g_i = self.g_eval(func, &x, bounds, user_data, status)?;
+                let dphi = g_i.dot(p);
+                if Float::abs(dphi) <= -self.c2 * dphi0 {
+                    return Ok((true, alpha_i, f_i, g_i));
+                }
+                if dphi * (alpha_hi - alpha_lo) >= T::zero() {
+                    alpha_hi = alpha_lo;
+                }
+                alpha_lo = alpha_i;
+                true
+            };
+            i += 1;
+            if i > self.max_zoom {
+                let g_i = self.g_eval(func, &x, bounds, user_data, status)?;
+                return Ok((valid, alpha_i, f_i, g_i));
+            }
+        }
+    }
+}
+
+impl<T, U, E> LineSearch<T, U, E> for StrongWolfeLineSearch<T>
+where
+    T: Float + FromPrimitive + Debug + RealField + 'static,
+{
+    // Algorithm 3.5
+    fn search(
+        &mut self,
+        x0: &DVector<T>,
+        p: &DVector<T>,
+        max_step: Option<T>,
+        func: &dyn Function<T, U, E>,
+        bounds: Option<&Vec<Bound<T>>>,
+        user_data: &mut U,
+        status: &mut Status<T>,
+    ) -> Result<(bool, T, T, DVector<T>), E> {
+        let f0 = self.f_eval(func, x0, bounds, user_data, status)?;
+        let g0 = self.g_eval(func, x0, bounds, user_data, status)?;
+        let alpha_max = max_step.map_or_else(T::one, |alpha_max| alpha_max);
+        let mut alpha_im1 = T::zero();
+        let mut alpha_i = T::one();
+        let mut f_im1 = f0;
+        let dphi0 = g0.dot(p);
+        let mut i = 0;
+        loop {
+            let x = x0 + p.scale(alpha_i);
+            let f_i = self.f_eval(func, &x, bounds, user_data, status)?;
+            if (f_i > f0 + self.c1 * dphi0) || (i > 1 && f_i >= f_im1) {
+                return self.zoom(
+                    func, x0, bounds, user_data, f0, &g0, p, alpha_im1, alpha_i, status,
+                );
+            }
+            let g_i = self.g_eval(func, &x, bounds, user_data, status)?;
+            let dphi = g_i.dot(p);
+            if Float::abs(dphi) <= self.c2 * Float::abs(dphi0) {
+                return Ok((true, alpha_i, f_i, g_i));
+            }
+            if dphi >= T::zero() {
+                return self.zoom(
+                    func, x0, bounds, user_data, f0, &g0, p, alpha_i, alpha_im1, status,
+                );
+            }
+            alpha_im1 = alpha_i;
+            f_im1 = f_i;
+            alpha_i += convert!(0.8, T) * (alpha_max - alpha_i);
+            i += 1;
+            if i > self.max_iters {
+                return Ok((false, alpha_i, f_i, g_i));
+            }
+        }
+    }
+}
+```
+
+The full implementation (with a nicer API and some other features I'm not going to mention in these blog posts) can be found [here](https://github.com/denehoffman/ganesh/blob/604a8ebd47c519fe07104439e87e22b2425e9f62/src/algorithms/line_search.rs). In the next post, I will describe the first of the BFGS family of algorithms, the standard BFGS algorithm (no bounds, no limited-memory optimizations).
 
 
 [^1]: In the full code, there are additional clauses for updating outside `Observer`s, which can monitor the `Algorithm` at each step.
