@@ -503,7 +503,7 @@ where
 }
 ```
 
-The full implementation (with a nicer API and some other features I'm not going to mention in these blog posts) can be found [here](https://github.com/denehoffman/ganesh/blob/604a8ebd47c519fe07104439e87e22b2425e9f62/src/algorithms/line_search.rs). In the next post, I will describe the first of the BFGS family of algorithms, the standard BFGS algorithm (no bounds, no limited-memory optimizations).
+The full implementation (with a nicer API and some other features I'm not going to mention in these blog posts) can be found [here](https://github.com/denehoffman/ganesh/blob/604a8ebd47c519fe07104439e87e22b2425e9f62/src/algorithms/line_search.rs). In the [next post](@/blog/2024-12-15-the-bfgs-algorithm-family-in-rust-part-2/index.md), I will describe the first of the BFGS family of algorithms, the standard BFGS algorithm (no bounds, no limited-memory optimizations).
 
 
 [^1]: In the full code, there are additional clauses for updating outside `Observer`s, which can monitor the `Algorithm` at each step.
