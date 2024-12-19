@@ -6,16 +6,30 @@
 <meta content="text/html; charset=UTF-8" http-equiv="content-type"/>
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 <meta name="robots" content="index, follow">
+<!-- <script> -->
+<!-- MathJax = { -->
+<!--   tex: { -->
+<!--     inlineMath: [['$', '$'], ['\\(', '\\)']] -->
+<!--   } -->
+<!-- }; -->
+<!-- </script> -->
+<!-- <script type="text/javascript" id="MathJax-script" async -->
+<!--   src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"> -->
+<!-- </script> -->
+<link rel="stylesheet" href="https://denehoffman.com/katex.css">
+<script defer src="https://denehoffman.com/katex.js"></script>
+<script defer src="https://denehoffman.com/auto-render.js"></script>
 <script>
-MathJax = {
-  tex: {
-    inlineMath: [['$', '$'], ['\\(', '\\)']]
-  }
-};
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+            delimiters: [
+              {left: "$$", right: "$$", display: true},
+              {left: "$", right: "$", display: false},
+            ]
+        });
+    });
 </script>
-<script type="text/javascript" id="MathJax-script" async
-  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
-</script>
+
 
 
 
