@@ -8,11 +8,25 @@ title = "Projects"
 
 `laddu` grew out of my frustration with the way amplitude analyses were being done within the GlueX collaboration. Everyone had these messy configuration files which would need to be duplicated and modified, usually by one-off scripts, to produce fit results which would then have to be collected by yet another set of scripts. I got tired of the constant file management, I was spending more time debugging config files than actually doing physics! Since my original foray into Rust in March 2024, I have learned a lot about what is required to distribute a project like this via Python. There are tons of small optimizations that can be made, and I'd imagine there are still quite a few to go. This project has taught me everything from memory management to the intricacies of floating-point numbers to quite a lot about parallel processing. I believe the project is still in an exploratory state, but it is certainly usable enough to do some actual research now. Since I'm actively using it while I develop it, I quickly discover new sharp corners and quality-of-life features to implement, and there's always little chores to do like documentation and testing.
 
+---
+
 [![](ganesh_logo.png)](https://github.com/denehoffman/ganesh)
 
 [`ganesh`](https://github.com/denehoffman/ganesh) (/ɡəˈneɪʃ/), named after the Hindu god of wisdom, provides several common minimization algorithms as well as a straightforward, trait-based interface to create your own extensions. This crate is intended to be as simple as possible. The user needs to implement the `Function` trait on some struct which will take a vector of parameters and return a single-valued `Result` ($f(\mathbb{R}^n)\to\mathbb{R}$). Users can optionally provide a gradient function to speed up some algorithms, but a default central finite-difference implementation is provided so that all algorithms will work out of the box.
 
 Part of the difficulty of this project is the lack of well-documented implementations of some of the more useful algorithms, like the BFGS family. While I am not sure, I believe this might be the first pure Rust implementation of L-BFGS-B. If you look through other optimization crates, Python packages, or even C/C++ libraries, a common theme you'll find is that they mostly just bind the original FORTRAN code written for this algorithm. I wanted to write the algorithm from scratch for two reasons. First, it's a great way to learn the language, and it's very convenient to not have to worry about dependencies in external languages like FORTRAN. Second, I had a lot of trouble finding bounded optimizers for Rust. [argmin](https://github.com/argmin-rs), the most-downloaded optimization crate, [currently doesn't implement any constrained optimizers](https://github.com/argmin-rs/argmin/issues/137), although external solvers like [egobox](https://crates.io/crates/egobox-ego) and [cobyla](https://crates.io/crates/cobyla) can be used to accomplish this. [nlopt](https://crates.io/crates/nlopt) has a Rust wrapper that includes these algorithms (written in C), but I quit using it after one too many C-related exceptions that were all-but-impossible to track down or solve with Rust code.
+
+---
+
+[`modak`](https://github.com/denehoffman/modak) is a simple-to-use, opinionated task queue system with dependency management, resource allocation, and isolation control. Tasks are run respecting topological dependencies, resource limits, and optional isolation.
+
+This library only has two classes, `Task`s, which are an abstract class with a single method to override, `run(self) -> None`, and a `TaskQueue` which manages the execution order. Additionally, `modak` comes with a task monitor TUI which can be invoked with the `modak` shell command.
+
+The `TaskQueue` has been written in Rust to get past issues with parallelism and the GIL. Instead of using a thread pool or even a multiprocessing pool, the tasks are serialized into bytes and passed to the Rust-side manager, which handles dispatching and execution. Each task is then run as a separate subprocess spawned in a Rust thread. This means the only way to share state between tasks is by writing to an output file and having a task depend on that file.
+
+By default, `modak` scripts will create a state file called `.modak` in the current working directory. This can be changed by setting it in the `TaskQueue`'s initialization method. The `modak` CLI also supports an optional argument to point to the location of the state file.
+
+# Archived
 
 [![](rustitude_logo.png)](https://github.com/denehoffman/rustitude)
 
