@@ -1,30 +1,95 @@
-# The URL the site will be built for
+theme = "duckquill"
+
+title = "Dene Hoffman"
 base_url = "https://denehoffman.com"
+description = "My personal website and blog"
 
-theme = "anemone"
-
-# Whether to automatically compile all Sass files in the sass directory
 compile_sass = true
-
-# Whether to build a search index to be used later on by a JavaScript library
+minify_html = true
+generate_feeds = true
+feed_filenames = ["rss.xml", "atom.xml"]
 build_search_index = true
+author = "Dene Hoffman"
+
+default_language = "en"
+taxonomies = [{ name = "tags", feed = true }]
 
 [markdown]
-# Whether to do syntax highlighting
-# Theme can be customised by setting the `highlight_theme` variable to a theme supported by Zola
 highlight_code = true
+highlight_theme = "css"
+highlight_themes_css = [
+  { theme = "solarized-dark", filename = "syntax-theme-dark.css" },
+  { theme = "solarized-light", filename = "syntax-theme-light.css" },
+]
+smart_punctuation = true
+bottom_footnotes = true
+
+[search]
+index_format = "fuse_json"
 
 [extra]
-# Put all your custom variables here
-header_nav = [
-  { name_en = "<home>", url = "/" },
-  { name_en = "<blog>", url = "/blog" },
-  { name_en = "<publications>", url = "/publications" },
-  { name_en = "<cv>", url = "https://github.com/denehoffman/CV/raw/main/cv.pdf", newtab = true },
-  { name_en = "<projects>", url = "/projects" },
+accent_color = "#fe640b"
+accent_color_dark = "#fab387"
+issues_url = "https://github.com/denehoffman/denehoffman.github.io/issues"
+source_url = "https://github.com/denehoffman/denehoffman.github.io"
+show_copy_button = true
+show_reading_time = true
+show_share_button = true
+show_backlinks = true
+katex = true
+
+
+csp = [
+  { directive = "font-src", domains = [
+    "'self'",
+  ] },
+  { directive = "img-src", domains = [
+    "'self'",
+    "https:",
+    "data:",
+  ] },
+  { directive = "media-src", domains = [
+    "'self'",
+    "https:",
+  ] },
+  { directive = "script-src", domains = [
+    "'self'",
+  ] },
+  { directive = "style-src", domains = [
+    "'self'",
+    "'unsafe-inline'",
+  ] },
+  { directive = "frame-src", domains = [
+    "https://player.vimeo.com",
+    "https://www.youtube-nocookie.com",
+    "https://toot.community",
+  ] },
+  { directive = "connect-src", domains = [
+    "https://toot.community",
+  ] },
+  { directive = "base-uri", domains = [
+    "'none'",
+  ] },
+  { directive = "form-action", domains = [
+    "'none'",
+  ] },
 ]
-accent_color = "blue-auto"
+
+[extra.nav]
+links = [
+  { url = "@/blog/_index.md", name = "Blog" },
+  { url = "@/publications/index.md", name = "Publications" },
+  { url = "https://github.com/denehoffman/CV/raw/main/cv.pdf", name = "CV" },
+  { url = "@/projects/index.md", name = "Projects" },
+]
+
+[extra.footer]
+show_copyright = true
+
 logo_text = "Dene Hoffman"
 author = "Nathaniel D. Hoffman"
 display_author = "Dene Hoffman"
 favicon = "favicon.ico"
+show_feed = true
+show_theme_switcher = true
+show_repo = true
