@@ -1,16 +1,23 @@
 +++
 title = "The BFGS Algorithm Family in Rust (Part 2)"
+description = "The L-BFGS implementation"
+[taxonomies]
+tags = ["rust", "algorithms", "programming"]
 +++
 
-> Since writing the [previous post](@/blog/2024-09-08-the-bfgs-algorithm-family-in-rust-part-1/index.md), I have made several simplifications to the library that will change how some structs and traits are used here. The biggest change is that I've abandoned generic floats in favor of a feature gate:
-> ```rust
-> #[cfg(not(feature = "f32"))]
-> pub type Float = f64;
->  
-> #[cfg(feature = "f32")]
-> pub type Float = f32;
-> ```
-> With this code, I can turn the `f32` version of my crate on and off with a feature flag. While generics can be nice, in this instance they were actually causing the crate to be slower (just according to some of my own internal benchmarks, this might not be the case in general) and more difficult to read. Any instances in the last post where there was a generic type `T` representing floating-point values have been replaced with this `Float` type, so `Status<T>` is now just `Status`, for example.
+{% alert(note=true) %}
+Since writing the [previous post](@/blog/2024-09-08-the-bfgs-algorithm-family-in-rust-part-1/index.md), I have made several simplifications to the library that will change how some structs and traits are used here. The biggest change is that I've abandoned generic floats in favor of a feature gate:
+
+ ```rust
+ #[cfg(not(feature = "f32"))]
+ pub type Float = f64;
+  
+ #[cfg(feature = "f32")]
+ pub type Float = f32;
+ ```
+
+With this code, I can turn the `f32` version of my crate on and off with a feature flag. While generics can be nice, in this instance they were actually causing the crate to be slower (just according to some of my own internal benchmarks, this might not be the case in general) and more difficult to read. Any instances in the last post where there was a generic type `T` representing floating-point values have been replaced with this `Float` type, so `Status<T>` is now just `Status`, for example.
+{% end %}
 
 Let's talk about the core BFGS algorithm. The details I'm using here can be found in Nocedal and Wright's book ["Numerical Optimization"](https://doi.org/10.1007/978-0-387-40065-5) in Chapter 6: Quasi-Newton Methods. In the last post, I alluded to this and described gradient descent, but we should really cover what Newton's method is first.
 
@@ -182,6 +189,7 @@ impl<U, E> Default for BFGS<U, E> {
 ```
 
 Next, our update formula:
+
 ```rust
 impl<U, E> BFGS<U, E> {
     fn update_h_inv(&mut self, step: usize, n: usize, s: &DVector<Float>, y: &DVector<Float>) {
@@ -306,7 +314,6 @@ That's pretty much it. Of course, we need to add a few details to tell the algor
 > I have to apologize a bit for the amount of changes in the code that have taken place since the last article. I'm developing this in conjunction with a library I'm currently using for amplitude analysis of particle physics data, and being relatively new to Rust, I often find improvements by realizing that I've backed myself into an implementation corner. I hope this article serves as a nice introduction to the BFGS algorithm and how one _might_ implement it in Rust, but it is likely not the best way to implement this or the other algorithms I've discussed. If any readers see places where my code could be improved, I would welcome suggestions [via the GitHub repo](https://github.com/denehoffman/ganesh/issues).
 
 With that, I'll end this portion of the series. In the next post, I'll discuss the L-BFGS algorithm, the "limited memory" version of BFGS. The surprising thing we will see is that this method tends to work better than BFGS in most practical settings, and its close, bounded cousin, L-BFGS-B also tends to outperform standard BFGS updates. This is mostly because these methods not only reduce the memory required to perform BFGS updates (for large parameter spaces), they tend to involve fewer operations, which makes them more efficient to calculate. The core idea will be, rather than update and store the entire inverse Hessian, just store the changes and update an identity matrix, and while we're at it, just calculate the update step directly from the stored changes to the gradient!
-
 
 [^1]: This notation is somewhat standard, but if you spend any time reading old papers on this, you'll find that they tend to use $B$, $H$, and their inverses rather interchangeably. For the sake of clarity, $H$ here will always refer to the true Hessian and $B$ to some approximated Hessian.
 
