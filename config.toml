@@ -76,20 +76,20 @@ csp = [
 ]
 
 [extra.nav]
+show_feed = true
+show_theme_switcher = true
+show_repo = true
 links = [
   { url = "@/blog/_index.md", name = "Blog" },
   { url = "@/publications/index.md", name = "Publications" },
-  { url = "https://github.com/denehoffman/CV/raw/main/cv.pdf", name = "CV" },
-  { url = "@/projects/index.md", name = "Projects" },
+  { url = "https://github.com/denehoffman/CV/blob/main/cv.pdf", name = "CV" },
+  { name = "Projects", menu = [
+    { url = "@/projects/laddu/index.md", name = "laddu" },
+    { url = "@/projects/ganesh/index.md", name = "ganesh" },
+    { url = "@/projects/modak/index.md", name = "modak" },
+    { url = "@/projects/rustitude/index.md", name = "rustitude" },
+  ] },
 ]
 
 [extra.footer]
 show_copyright = true
-
-logo_text = "Dene Hoffman"
-author = "Nathaniel D. Hoffman"
-display_author = "Dene Hoffman"
-favicon = "favicon.ico"
-show_feed = true
-show_theme_switcher = true
-show_repo = true

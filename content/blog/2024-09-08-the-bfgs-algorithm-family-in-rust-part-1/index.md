@@ -1,5 +1,8 @@
 +++
 title = "The BFGS Algorithm Family in Rust (Part 1)"
+description = "The BFGS implementation"
+[taxonomies]
+tags = ["rust", "algorithms", "programming"]
 +++
 
 The BFGS (Broyden-Fletcher-Goldfarb-Shanno) algorithm and its derivatives were (and for the most part still are) the gold standard methods for quasi-Newton optimization. In this post, I want to give a brief overview of the main idea, the limited-memory adaptation (L-BFGS), and the bounded version (L-BFGS-B) and how I implemented them in a Rust crate I'm developing called [`ganesh`](https://github.com/denehoffman/ganesh). The full algorithm can be seen there, and I will mainly be focusing on the main methodology, since the actual literature on it is rather old and difficult to parse (and even has a few typos!).
@@ -59,6 +62,7 @@ where
 ```
 
 I also use a little macro to convert raw numeric fields to our generic type `T`, if possible:
+
 ```rust
 #[macro_export]
 macro_rules! convert {
@@ -93,6 +97,7 @@ We should also define what an algorithm should give us in return!
 5. Some `String` message that can tell us any additional information about how the fit progressed/is progressing
 
 Let's call this struct `Status` and define it as follows:
+
 ```rust
 #[derive(Debug, Default, Clone)]
 pub struct Status<T> {
@@ -173,6 +178,7 @@ pub trait Algorithm<T, U, E> {
     }
 }
 ```
+
 Most of these methods are fairly self-explanatory and have very similar signatures. Finally, let's wrap all of this up in a nice interface for the end-user to work with:
 
 ```rust
@@ -286,6 +292,7 @@ pub trait LineSearch<T, U, E> {
 We'll be implementing Algorithms 3.5 and 3.6 from ["Numerical Optimization"](https://doi.org/10.1007/978-0-387-40065-5), which (roughly) reads as follows:
 
 #### Algorithm 3.5
+
 1. $\alpha_0 \gets 0$, $\alpha_\text{max} > 0$, $\alpha_1 \in (0, \alpha_\text{max})$, $i \gets 1$
 2. `loop`
    1. `if`
@@ -298,7 +305,7 @@ We'll be implementing Algorithms 3.5 and 3.6 from ["Numerical Optimization"](htt
 
       `then` `return` $\text{zoom}(\alpha_{i-1}, \alpha_i)$
    2. `if`
-      
+
       $\left|\vec{p}\cdot\vec{g}(\vec{x} + \alpha_i\vec{p})\right| < c_2 \left|\vec{p}\cdot\vec{g}(\vec{x})\right|$ (strong Wolfe)
 
       `then` `return` $\alpha_i$
@@ -324,9 +331,10 @@ If we are decreasing sufficiently, but the magnitude of the projected gradient i
 In the above plot, both points meet the Armijo condition, but they fail to meet the strong Wolfe condition. This means they make it to Step 3 in our line search algorithm. For the left-most point, the gradient points in the $-x$ direction while the step was in the $+x$ direction, so the condition at Step 3 is not satisfied, and we increase our step size (hopefully landing in the green region). For the right-most point, the gradient now points in the $+x$ direction, so Step 3 is satisfied and we again `zoom` between this step size and the previous. Note that the arguments to `zoom` are switched here. In the definition of the `zoom` algorithm, we will refer to the first argument as $\alpha_{\text{lo}}$ and the second as $\alpha_{\text{hi}}$. However, since $\alpha_i$ is strictly increasing in Algorithm 3.5, we shouldn't think of one of these values as larger than the other, but rather that the function evaluations at these points are lower or higher. Here, $\alpha_\text{lo}$ will always refer to a step length which satisfied the Armijo condition, which means that the function value with this step length is the lower of the two. $\alpha_\text{hi}$ will be the previous step if the current one is the first to satisfy the Armijo condition (Step 2.3) or it will be the current step if the previous step gave a smaller function evaluation (Step 2.1). In either case, we know that the optimal step length is in the given range.
 
 #### Algorithm 3.6 (`zoom`)
+
 1. loop
    1. Choose $\alpha_j$ between $\alpha_{\text{lo}}$ and $\alpha_{\text{hi}}$ (it's possible for $\alpha_\text{lo} > \alpha_\text{hi}$).
-   2. `if` 
+   2. `if`
 
       $f(\vec{x} + \alpha_j \vec{p}) > f(\vec{x}) + c_1\alpha_j\left(\vec{p}\cdot\vec{g}(\vec{x})\right)$ (not Armijo)
 
@@ -338,7 +346,7 @@ In the above plot, both points meet the Armijo condition, but they fail to meet 
 
       `else`
          1. `if`
-         
+
             $\left|\vec{p}\cdot\vec{g}(\vec{x} + \alpha_j\vec{p})\right| \leq c_2\left|\vec{p}\cdot\vec{g}(\vec{x})\right|$
 
              `then` `return` $\alpha_j$
@@ -504,6 +512,5 @@ where
 ```
 
 The full implementation (with a nicer API and some other features I'm not going to mention in these blog posts) can be found [here](https://github.com/denehoffman/ganesh/blob/604a8ebd47c519fe07104439e87e22b2425e9f62/src/algorithms/line_search.rs). In the [next post](@/blog/2024-12-15-the-bfgs-algorithm-family-in-rust-part-2/index.md), I will describe the first of the BFGS family of algorithms, the standard BFGS algorithm (no bounds, no limited-memory optimizations).
-
 
 [^1]: In the full code, there are additional clauses for updating outside `Observer`s, which can monitor the `Algorithm` at each step.
