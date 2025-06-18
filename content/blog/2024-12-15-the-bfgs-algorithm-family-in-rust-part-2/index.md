@@ -1,6 +1,6 @@
 +++
 title = "The BFGS Algorithm Family in Rust (Part 2)"
-description = "The L-BFGS implementation"
+description = "The BFGS implementation"
 [taxonomies]
 tags = ["rust", "algorithms", "programming"]
 +++
@@ -161,7 +161,7 @@ $$
 
 At this point, we should be pretty happy. Given some starting value for the inverse Hessian, we have a way of determining a new inverse Hessian at our next step given the value of the old one! We could go and write this up, but then this article would need a different title. It just so happens that you can apply this very same process, but swap out $B$ for $B^{-1}$ at every step (with a new secant condition, $ B_{k+1}^{-1}\vec{y}_k = \vec{s}_k $) and skip that last bit entirely, _and it works better in practice_! In other words, the update step,
 
-$$ B_{k+1}^{-1} = (I - \rho\_k \vec{s}\_k \vec{y}\_k^{\intercal})B_{k+1}^{-1} (I - \rho\_k \vec{y}\_k \vec{s}\_k^{\intercal}) + \rho\_k \vec{s}\_k \vec{s}\_k^{\intercal} $$
+$$ B_{k+1}^{-1} = (I - \rho\_k \vec{s}\_k \vec{y}\_k^{\intercal})B_{k}^{-1} (I - \rho\_k \vec{y}\_k \vec{s}\_k^{\intercal}) + \rho\_k \vec{s}\_k \vec{s}\_k^{\intercal} $$
 
 is also a unique solution to our quasi-Newton problem. This is the BFGS update. Of course, we still have the problem of what values should be assigned to $B_0^{-1}$. The neat part about BFGS is that this update step tends to be self-correcting (DFP is generally worse in this regard), assuming the Wolfe condition is met in the line search (this is why I spent so much time on the line search part of the previous post, it really is that important to make educated leaps in the gradient direction!). What this means is that even if we start with a bad initial guess at $B_0^{-1}$, after some number of steps, we should get to a good approximation regardless. We could of course just start with the numerically calculated Hessian, invert it, and go from there, but in practice, this really isn't worth the effort. Instead, we can just use the identity matrix[^3] for the very first step (just regular gradient descent!) and then correct that identity matrix each time. We will later find that this isn't even the most efficient way of doing things when we look at L-BFGS, but for now we have a formula, let's implement it!
 

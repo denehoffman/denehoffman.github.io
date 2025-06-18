@@ -1,6 +1,6 @@
 +++
 title = "The BFGS Algorithm Family in Rust (Part 1)"
-description = "The BFGS implementation"
+description = "Intro to line searches"
 [taxonomies]
 tags = ["rust", "algorithms", "programming"]
 +++
