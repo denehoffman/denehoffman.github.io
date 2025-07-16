@@ -265,7 +265,7 @@ The details of this algorithm are quite daunting, but the general idea is that w
 
 $$ (Z_k)_{i,j} = \begin{cases} 1 & \text{if } i = j \text{ and } j\in\mathcal{F} \\\\ 0 & \text{otherwise} \end{cases} $$
 
-We can then imagine operations $\hat{B}_k = Z_k^{\intercal} B_k Z_k$ which take the Hessian as a $n\times n$ matrix to a reduced Hessian of dimension $n_\text{free}\times n_\text{free}$. We can compute a reduced gradient at the generalized Cauchy point as
+We can then imagine operations $\hat{B}\_k = Z\_k^{\intercal} B_k Z_k$ which take the Hessian as a $n\times n$ matrix to a reduced Hessian of dimension $n_\text{free}\times n_\text{free}$. We can compute a reduced gradient at the generalized Cauchy point as
 
 $$ \hat{r}^c = Z_k^{\intercal} (g_k + \theta(x^c - x_k) - W_k M_k \vec{c}) $$
 
@@ -346,4 +346,4 @@ This is the last post in my first series of blog posts on this site. As you migh
 
 [^1]: [R. H. Byrd, J. Nocedal, and R. B. Schnabel, “Representations of quasi-Newton matrices and their use in limited memory methods,” Mathematical Programming, vol. 63, no. 1–3, pp. 129–156, Jan. 1994, doi: 10.1007/bf01582063.
 ](https://doi.org/10.1007/bf01582063)
-[^2]: [R. H. Byrd, P. Lu, J. Nocedal, and C. Zhu, “A Limited Memory Algorithm for Bound Constrained Optimization,” SIAM J. Sci. Comput., vol. 16, no. 5, pp. 1190–1208, Sep. 1995, doi: 10.1137/0916069.](https://doi.org/10.1o137/0916069)
+[^2]: [R. H. Byrd, P. Lu, J. Nocedal, and C. Zhu, “A Limited Memory Algorithm for Bound Constrained Optimization,” SIAM J. Sci. Comput., vol. 16, no. 5, pp. 1190–1208, Sep. 1995, doi: 10.1137/0916069.](https://doi.org/10.1137/0916069)
