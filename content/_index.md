@@ -9,7 +9,7 @@
 
 ## Physics PhD Candidate studying glueballs at GlueX
 
-I'm currently a graduate student at Carnegie Mellon University studying the strong force through the GlueX collaboration. GlueX is a multinational collaboration located in Hall D at Jefferson Lab which collides high-energy photons with a proton target.
+I'm a recent physics PhD, formerly working at Carnegie Mellon University studying the strong force through the GlueX collaboration. GlueX is a multinational collaboration located in Hall D at Jefferson Lab which collides high-energy photons with a proton target.
 
 The main goal of GlueX is a search for particles with exotic quark content. Standard composite particles are identified in two main categories, mesons (made of a quark-antiquark pair) and baryons (three quarks). However, there has been recent experimental evidence of states with more than three quarks, dubbed tetraquarks, pentaquarks, etc. Computer simulations (Lattice QCD) predict additional states such as glueballs, which contain no quarks at all and are just bound states of the "gluons" that hold matter together, and hybrid mesons, where a valence gluon contributes to the total angular momentum to produce "forbidden" quantum numbers.
 
@@ -17,9 +17,7 @@ My thesis work consists of a study of $K_SK_S$ (pairs of K-short mesons) photopr
 
 However, the downside of this particular study is that there are lots of other particles present in the $K_SK_S$ channel, and many of them overlap each other. Hopefully my work at GlueX can provide a small step in disentangling this complex set of states and move us closer to understanding the complex physics of quantum chromodynamics.
 
-{% alert(important=true) %}
-I am defending my thesis soon and looking for jobs in related fields. Please contact me if you are looking for someone to join your group or if you have any questions!
-{% end %}
+I recently defended my thesis and am now focused on some software projects related to that work, particularly [`ganesh`](https://github.com/denehoffman/ganesh), an optimization library written in pure Rust. I hope to start a postdoc in the spring, but until then I am open to remote work.
 
 # Links
 
