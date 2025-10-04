@@ -1,0 +1,2 @@
+default:
+    zola serve --open
