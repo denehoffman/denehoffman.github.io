@@ -38,6 +38,7 @@ show_share_button = true
 show_backlinks = true
 katex = true
 card = true
+styles = ["overrides.css"]
 
 
 csp = [
