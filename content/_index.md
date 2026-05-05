@@ -7,7 +7,7 @@
   {{ image(url="prof_pic.jpg", no_hover=true) }}
 </aside>
 
-## Physics Postdoctoral Researcher studying glueballs at GlueX
+## Postdoctoral Research Associate studying glueballs at GlueX
 
 I'm currently a postdoctoral researcher at The College of William & Mary studying the strong force through the GlueX collaboration. GlueX is a multinational collaboration located in Hall D at Jefferson Lab which collides high-energy photons with a proton target.
 
@@ -23,6 +23,7 @@ I recently defended my thesis and am now focused on some software projects relat
 
 # Research Group
 [Dr. Meike Küßner](https://kuessner.gitlab.io) - PI
+
 Addison Kovats-Bernat - Graduate Student
 
 # Links
