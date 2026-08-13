@@ -15,14 +15,14 @@ default_language = "en"
 taxonomies = [{ name = "tags", feed = true }]
 
 [markdown]
-highlight_code = true
-highlight_theme = "css"
-highlight_themes_css = [
-  { theme = "solarized-dark", filename = "syntax-theme-dark.css" },
-  { theme = "solarized-light", filename = "syntax-theme-light.css" },
-]
 smart_punctuation = true
 bottom_footnotes = true
+github_alerts = true
+
+[markdown.highlighting]
+light_theme = "solarized-light"
+dark_theme = "solarized-dark"
+extra_grammars = ["syntaxes/math.json"]
 
 [search]
 index_format = "fuse_json"

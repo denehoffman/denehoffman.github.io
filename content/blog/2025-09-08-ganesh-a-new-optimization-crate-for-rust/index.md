@@ -70,53 +70,81 @@ let result = LBFGSB::default().process(
 )?;
 ```
 
-There are other algorithms which support bounds out of the box, but what if we want to use an algorithm which doesn't? This problem has also been solved (sort of) by projects like [`LMFIT`](https://lmfit.github.io/lmfit-py/) and [`MINUIT`](https://root.cern.ch/doc/master/Minuit2Page.html). To understand how they handle bounds, imagine the problem of fitting a Gaussian probability distribution to some data (imagine we set up a maximum likelihood problem). We might have two free parameters, a mean $\mu$ and a standard deviation $\sigma$:
+There are other algorithms which support bounds out of the box, but what if we want to use an algorithm which doesn't? This problem has also been solved (sort of) by projects like [`LMFIT`](https://lmfit.github.io/lmfit-py/) and [`MINUIT`](https://root.cern.ch/doc/master/Minuit2Page.html). To understand how they handle bounds, imagine the problem of fitting a Gaussian probability distribution to some data (imagine we set up a maximum likelihood problem). We might have two free parameters, a mean $`\mu`$ and a standard deviation $`\sigma`$:
 
-$$ f(\mu, \sigma) = \frac{1}{\sqrt{2\pi\sigma^2}}\exp\left(-\frac{1}{2}\frac{(x-\mu)^2}{\sigma^2}\right). $$
+```math
+f(\mu, \sigma) = \frac{1}{\sqrt{2\pi\sigma^2}}\exp\left(-\frac{1}{2}\frac{(x-\mu)^2}{\sigma^2}\right).
+```
 
-Now if we weren't looking at this equation and just thought about the parameters, it wouldn't make a lot of sense to have $\sigma < 0$. However, when we examine the problem, we find that this doesn't actually lead to invalid solutions, since we always square $\sigma$ anyway: we could perform our fit and just use the absolute value of $\sigma$. Similarly, if we ever had a problem where a parameter $x$ came with the constraint $x >= 0$, we could always rewrite our problem with $x \to \sqrt{x^2}$. This does have the downside of giving two ambiguous solutions to the problem, and more if there are multiple parameters defined this way, but we can get around this by defining a set of internal parameters $x_\text{int}$ which span an unbounded space and a set of transformations to external parameters $x_\text{ext}$ which preserve the given boundaries. There are infinite ways to define such transformations, but the ones which `LMFIT` and `MINUIT` use are as follows:
+Now if we weren't looking at this equation and just thought about the parameters, it wouldn't make a lot of sense to have $`\sigma < 0`$. However, when we examine the problem, we find that this doesn't actually lead to invalid solutions, since we always square $`\sigma`$ anyway: we could perform our fit and just use the absolute value of $`\sigma`$. Similarly, if we ever had a problem where a parameter $`x`$ came with the constraint $`x >= 0`$, we could always rewrite our problem with $`x \to \sqrt{x^2}`$. This does have the downside of giving two ambiguous solutions to the problem, and more if there are multiple parameters defined this way, but we can get around this by defining a set of internal parameters $`x_\text{int}`$ which span an unbounded space and a set of transformations to external parameters $`x_\text{ext}`$ which preserve the given boundaries. There are infinite ways to define such transformations, but the ones which `LMFIT` and `MINUIT` use are as follows:
 
 Upper and lower bounds:
 
-$$ x_\text{int} = \arcsin\left(2\frac{x_\text{ext} - x_\text{min}}{x_\text{max} - x_\text{min}} - 1\right) $$
+```math
+x_\text{int} = \arcsin\left(2\frac{x_\text{ext} - x_\text{min}}{x_\text{max} - x_\text{min}} - 1\right)
+```
 
-$$ x_\text{ext} = x_\text{min} + \left(\sin(x_\text{int}) + 1\right)\frac{x_\text{max} - x_\text{min}}{2} $$
+```math
+x_\text{ext} = x_\text{min} + \left(\sin(x_\text{int}) + 1\right)\frac{x_\text{max} - x_\text{min}}{2}
+```
 
 Upper bound only:
 
-$$ x_\text{int} = \sqrt{(x_\text{max} - x_\text{ext} + 1)^2 - 1} $$
+```math
+x_\text{int} = \sqrt{(x_\text{max} - x_\text{ext} + 1)^2 - 1}
+```
 
-$$ x_\text{ext} = x_\text{max} + 1 - \sqrt{x_\text{int}^2 + 1} $$
+```math
+x_\text{ext} = x_\text{max} + 1 - \sqrt{x_\text{int}^2 + 1}
+```
 
 Lower bound only:
 
-$$ x_\text{int} = \sqrt{(x_\text{ext} - x_\text{min} + 1)^2 - 1} $$
+```math
+x_\text{int} = \sqrt{(x_\text{ext} - x_\text{min} + 1)^2 - 1}
+```
 
-$$ x_\text{ext} = x_\text{min} - 1 + \sqrt{x_\text{int}^2 + 1} $$
+```math
+x_\text{ext} = x_\text{min} - 1 + \sqrt{x_\text{int}^2 + 1}
+```
 
 However, I've found these are actually quite difficult to work with at times. If you actually take the positive branch of the square roots, you'll find that the transformations are not actually inverses of each other! For this reason, I have switched to using a different set of transformations:
 
 Upper and lower bounds:
 
-$$ x_\text{int} = \frac{u}{\sqrt{1 - u^2}} $$
+```math
+x_\text{int} = \frac{u}{\sqrt{1 - u^2}}
+```
 
 where
 
-$$ u = \frac{x_\text{ext} - c}{w},\ c = \frac{x_\text{min} + x_\text{max}}{2},\ w = \frac{x_\text{max} - x_\text{min}}{2} $$
+```math
+u = \frac{x_\text{ext} - c}{w},\ c = \frac{x_\text{min} + x_\text{max}}{2},\ w = \frac{x_\text{max} - x_\text{min}}{2}
+```
 
-$$ x_\text{ext} = c + w \frac{x_\text{int}}{\sqrt{x_\text{int}^2 + 1}} $$
+```math
+x_\text{ext} = c + w \frac{x_\text{int}}{\sqrt{x_\text{int}^2 + 1}}
+```
 
 Upper bound only:
 
-$$ x_\text{int} = \frac{1}{2}\left(\frac{1}{(x_\text{max} - x_\text{ext})} - (x_\text{max} - x_\text{ext}) \right) $$
+```math
+x_\text{int} = \frac{1}{2}\left(\frac{1}{(x_\text{max} - x_\text{ext})} - (x_\text{max} - x_\text{ext}) \right)
+```
 
-$$ x_\text{ext} = x_\text{max} - (\sqrt{x_\text{int}^2 + 1} - x_\text{int}) $$
+```math
+x_\text{ext} = x_\text{max} - (\sqrt{x_\text{int}^2 + 1} - x_\text{int})
+```
 
 Lower bound only:
 
-$$ x_\text{int} = \frac{1}{2}\left((x_\text{ext} - x_\text{min}) - \frac{1}{(x_\text{ext} - x_\text{min})} \right) $$
+```math
+x_\text{int} = \frac{1}{2}\left((x_\text{ext} - x_\text{min}) - \frac{1}{(x_\text{ext} - x_\text{min})} \right)
+```
 
-$$ x_\text{ext} = x_\text{min} + (\sqrt{x_\text{int}^2 + 1} + x_\text{int}) $$
+```math
+x_\text{ext} = x_\text{min} + (\sqrt{x_\text{int}^2 + 1} + x_\text{int})
+```
 
 Now any algorithm which does not support bounds can simply operate on the internal parameters and the user can transform these into external parameters on which the function can be evaluated! `ganesh` provides methods for adding such transformations to an algorithm, at least in cases where it makes sense. Unfortunately, this method does not come without drawbacks. The transformation functions themselves add to the evaluation time, especially when it comes to computing gradients or Hessians, but even worse, they transform linear problems into nonlinear ones! This also leads to issues with correctly calculating covariance matrices, and the `MINUIT` documentation recommends running a fit without bounds after a bounded fit converges[^note_2].
 
@@ -212,19 +240,27 @@ if __name__ == '__main__':
 
 Now we should get on to fitting these data to a model. For this, we'll first define the probability distribution function for a multivariate Gaussian:
 
-$$ \Pr(\vec{x}; \vec{\mu}, \mathbf{\Sigma}) = \exp\left[-\frac{1}{2}(\vec{x} - \vec{\mu})^{\intercal} \mathbf{\Sigma}^{-1} (\vec{x} - \vec{\mu})\right] (2\pi)^{-k/2}|\mathbf{\Sigma}|^{-1/2}, $$
+```math
+\Pr(\vec{x}; \vec{\mu}, \mathbf{\Sigma}) = \exp\left[-\frac{1}{2}(\vec{x} - \vec{\mu})^{\intercal} \mathbf{\Sigma}^{-1} (\vec{x} - \vec{\mu})\right] (2\pi)^{-k/2}|\mathbf{\Sigma}|^{-1/2},
+```
 
-where $k$ is the dimension of the distribution. To actually perform the fit, we might instead want to maximize the likelihood function,
+where $`k`$ is the dimension of the distribution. To actually perform the fit, we might instead want to maximize the likelihood function,
 
-$$ \mathcal{L}(\vec{X}; \vec{\mu}, \mathbf{\Sigma}) = \prod_{i=0}^{N} \Pr(\vec{X}_i; \vec{\mu, \mathbf{\Sigma}}), $$
+```math
+\mathcal{L}(\mathbf{X}; \vec{\mu}, \mathbf{\Sigma}) = \prod_{i=0}^{N-1} \Pr(\vec{X}_i; \vec{\mu}, \mathbf{\Sigma}),
+```
 
-where $\vec{X}$ is our dataset of size $N$. For those familiar with this kind of problem, you'll know what to do next, but for those who aren't, note that the probability distribution function should give values between $0$ and $1$, so a product of a bunch of those numbers will tend towards a very small value, especially when you get more data. This is not very nice to deal with computationally, so we'll instead take the natural logarithm of this likelihood function. Since the natural log is strictly increasing, this mapping will not change the value of the parameters at the function's maximum, it will just rescale the problem from a range of $[0, 1]$ to a range of $(-\infty,0]$. Next, since most of our algorithms are intended for minimization rather than maximization, we will instead use $-2\ln(\mathcal{L})$, where the factor of $2$ is mostly convention and has to do with proper covariance scaling. This simplifies our function greatly:
+where $`\mathbf{X}`$ is our dataset of size $`N`$. For those familiar with this kind of problem, you'll know what to do next, but for those who aren't, note that the probability distribution function should give values between $`0`$ and $`1`$, so a product of a bunch of those numbers will tend towards a very small value, especially when you get more data. This is not very nice to deal with computationally, so we'll instead take the natural logarithm of this likelihood function. Since the natural log is strictly increasing, this mapping will not change the value of the parameters at the function's maximum, it will just rescale the problem from a range of $`[0, 1]`$ to a range of $`(-\infty,0]`$. Next, since most of our algorithms are intended for minimization rather than maximization, we will instead use $`-2\ln(\mathcal{L})`$, where the factor of $`2`$ is mostly convention and has to do with proper covariance scaling. This simplifies our function greatly:
 
-$$ -2\ln(\mathcal{L(\vec{X}; \vec{\mu}, \mathbf{\Sigma})}) = -\sum_{i=0}^{N} \left[(\vec{X}_i - \vec{\mu})^{\intercal} \mathbf{\Sigma}^{-1} (\vec{X}_i - \vec{\mu})\right] - N\left[k\ln(2\pi) + \ln|\mathbf{\Sigma}|\right]. $$
+```math
+-2\ln\mathcal{L}(\mathbf{X}; \vec{\mu}, \mathbf{\Sigma}) = \sum_{i=0}^{N-1} (\vec{X}_i - \vec{\mu})^{\intercal} \mathbf{\Sigma}^{-1} (\vec{X}_i - \vec{\mu}) + N\left[k\ln(2\pi) + \ln|\mathbf{\Sigma}|\right].
+```
 
-Next, note that any symmetric positive-definite matrix may be decomposed by Cholesky factorization into $\mathbf{\Sigma} = \mathbf{L}\mathbf{L}^{\intercal}$ where $\mathbf{L}$ is lower triangular with $L_{ii}>0$. This means that the determinant in that last term can be calculated as $|\mathbf{\Sigma}| = |\mathbf{L}||\mathbf{L}^\intercal| = |\mathbf{L}|^2 = \prod_{j=0}^k L_{jj}$, so $\ln|\mathbf{\Sigma}| = 2\sum_{j=0}^k \ln L_{jj} $. We will also find it convenient to calculate the term inside the sum via Cholesky factorization, but the general form we want to reproduce is now:
+Next, note that any symmetric positive-definite matrix may be decomposed by Cholesky factorization into $`\mathbf{\Sigma} = \mathbf{L}\mathbf{L}^{\intercal}`$ where $`\mathbf{L}`$ is lower triangular with $`L_{ii}>0`$. This means that the determinant in that last term can be calculated as $`|\mathbf{\Sigma}| = |\mathbf{L}||\mathbf{L}^{\intercal}| = |\mathbf{L}|^2 = \left(\prod_{j=0}^{k-1} L_{jj}\right)^2`$, so $`\ln|\mathbf{\Sigma}| = 2\sum_{j=0}^{k-1} \ln L_{jj}`$. We will also find it convenient to calculate the term inside the sum via Cholesky factorization, but the general form we want to reproduce is now:
 
-$$ -2\ln(\mathcal{L(\vec{X}; \vec{\mu}, \mathbf{\Sigma})}) = -\sum_{i=0}^{N} \left[(\vec{X}_i - \vec{\mu})^{\intercal} \mathbf{\Sigma}^{-1} (\vec{X}_i - \vec{\mu})\right] - N\left[k\ln(2\pi) + 2\sum\_{j=0}^k \ln L\_{jj} \right]. $$
+```math
+-2\ln\mathcal{L}(\mathbf{X}; \vec{\mu}, \mathbf{\Sigma}) = \sum_{i=0}^{N-1} (\vec{X}_i - \vec{\mu})^{\intercal} \mathbf{\Sigma}^{-1} (\vec{X}_i - \vec{\mu}) + N\left[k\ln(2\pi) + 2\sum_{j=0}^{k-1} \ln L_{jj}\right].
+```
 
 In code, this looks like,
 
@@ -279,11 +315,13 @@ let res = NelderMead::default()
 println!("{}", res);
 ```
 
-The default simplex construction method for a five-dimensional problem takes the given starting point and constructs five other points by scaling each coordinate by $1.05$, one at a time. This means that one of those starting points is
+The default simplex construction method for a five-dimensional problem takes the given starting point and constructs five other points by scaling each coordinate by $`1.05`$, one at a time. This means that one of those starting points is
 
-$$ \begin{bmatrix} 1.0 & 1.05 \\\\ 1.05 & 1.0 \end{bmatrix}, $$
+```math
+\begin{bmatrix} 1.0 & 1.05 \\\\ 1.05 & 1.0 \end{bmatrix},
+```
 
-which is not positive-semidefinite! And of course, even if we pick a nice starting point, there is no guarantee that we never hit such a point somewhere down the line, causing `sigma.cholesky().unwrap()` to panic. While we might just try to be careful about the first failure point in picking a good starting simplex, there is a neat way to get around the second issue: a change of variables. As it turns out, if instead operate on values of the lower-triangular matrix $\mathbf{L}$ described in the Cholesky decomposition, the only requirement we have is that the diagonal entries of the matrix are positive, which can be handled with some sort of constraint or a further change of variables. `ganesh` comes with an interface for creating these change-of-variables transformations, and we can simply construct a transformation that allows our algorithm to operate in more convenient space, such as the the space of lower-triangular matrices $\mathbf{L}$ such that $\mathbf{\Sigma} = \mathbf{L}\mathbf{L}^{\intercal}$. Any such lower-triangular matrix will work, provided the diagonal entries are positive (and nonzero), a property we can also ensure with a built-in transformation:
+which is not positive-semidefinite! And of course, even if we pick a nice starting point, there is no guarantee that we never hit such a point somewhere down the line, causing `sigma.cholesky().unwrap()` to panic. While we might just try to be careful about the first failure point in picking a good starting simplex, there is a neat way to get around the second issue: a change of variables. As it turns out, if instead operate on values of the lower-triangular matrix $`\mathbf{L}`$ described in the Cholesky decomposition, the only requirement we have is that the diagonal entries of the matrix are positive, which can be handled with some sort of constraint or a further change of variables. `ganesh` comes with an interface for creating these change-of-variables transformations, and we can simply construct a transformation that allows our algorithm to operate in more convenient space, such as the the space of lower-triangular matrices $`\mathbf{L}`$ such that $`\mathbf{\Sigma} = \mathbf{L}\mathbf{L}^{\intercal}`$. Any such lower-triangular matrix will work, provided the diagonal entries are positive (and nonzero), a property we can also ensure with a built-in transformation:
 
 ```rust
 #[derive(Clone)]
@@ -375,11 +413,15 @@ Note that this technically doesn't allow for matrices which are positive-semidef
 
 If we run this code, we get the result,
 
-$$ \vec{\mu} = \begin{bmatrix} 1.1958 \\\\ 2.3009 \end{bmatrix}, \quad \mathbf{\Sigma} = \begin{bmatrix} 0.5955 & 0.4896 \\\\ 0.4896 & 0.6814 \end{bmatrix}, $$
+```math
+\vec{\mu} = \begin{bmatrix} 1.1958 \\\\ 2.3009 \end{bmatrix}, \quad \mathbf{\Sigma} = \begin{bmatrix} 0.5955 & 0.4896 \\\\ 0.4896 & 0.6814 \end{bmatrix},
+```
 
 which is very close to our truth values of
 
-$$ \vec{\mu} = \begin{bmatrix} 1.2000 \\\\ 2.3000 \end{bmatrix}, \quad \mathbf{\Sigma} = \begin{bmatrix} 0.6000 & 0.5000 \\\\ 0.5000 & 0.7000 \end{bmatrix}. $$
+```math
+\vec{\mu} = \begin{bmatrix} 1.2000 \\\\ 2.3000 \end{bmatrix}, \quad \mathbf{\Sigma} = \begin{bmatrix} 0.6000 & 0.5000 \\\\ 0.5000 & 0.7000 \end{bmatrix}.
+```
 
 The question now becomes, how close? We didn't exactly calculate the uncertainties of the fit. Since Nelder-Mead is a gradient-free method, we didn't even define a way to calculate the Hessian. We could calculate the Hessian manually, but instead let's see how transformed algorithms can do this automatically. All we have to do is swap out our Nelder-Mead algorithm with a gradient-based algorithm like L-BFGS-B:
 
@@ -427,7 +469,7 @@ This time I'll just show you what that final print statement gives, since it's a
 
 Here we have some information about our fit, including the negative log-likelihood at the minimum, the number of times the function and its gradient are called, a message about how the algorithm converged, and a list of the parameters with their values at termination, the uncertainties on those values, the initial values, and information about bounds on those parameters (none here, this doesn't include bounds we placed using internal tranformations, just bounds on the external parameters via the algorithm itself). As you can see, this is nearly the same minimum as the one obtained via Nelder-Mead up to the first three decimal places.
 
-There is another way we can get parameter errors, and that's via MCMC. As mentioned, `ganesh` currently supports two major MCMC algorithms, AIES and ESS. These are technically very different algorithms, but in practice they both work well for most "normal" problems. I tend to like ESS because it has a guaranteed 100% step acceptance rate by construction, although more work goes into proposing a step in a chain. Both methods are ensemble samplers, so unlike a basic algorithm like Metropolis-Hastings, the next position of each walker depends on the positions of all walkers in the ensemble. This makes both of them better at problems where parameters exist on very different overall scales. I won't go through the details here, but you can read about them here[^2] and here[^3]. For this problem, we'll use the ESS algorithm. To determine when to stop the sampler, we could set a maximum number of steps, but for this example, we'll use a different metric, the autocorrelation time, $\tau$. Autocorrelation times measure how correlated a walker's chain of positions is with its past positions. Since we will chose an arbitrary starting distribution for our walkers, it is important that our final distributions do not depend on this initial distribution, so the autocorrelation time tells us how many steps we need to get rid of to satisfy this condition. Given that, we can use this as a stopping criterion. We will simply calculate $\tau$ every few steps and see if we have taken more than $M \tau$ steps total, where $M$ is at least $1$. We can then decide to burn (get rid of) the first $M_b \tau$ steps where $M_b < M$. Additionally, since we are not checking $\tau$ every step (we could, but it's not efficient), we also require the change in $\tau$ to be less than some threshold, ensuring that enough steps have been taken to effectively measure $\tau$. We also discard some fraction of steps at the beginning of the chain in this calculation, since we not only care about correlations with the initial position, we also care about correlations with any position the walker encountered sufficiently long ago. All of this logic is built into a `ganesh` `Terminator`, which provides useful defaults but is also fully customizable. The MCMC code looks something like this:
+There is another way we can get parameter errors, and that's via MCMC. As mentioned, `ganesh` currently supports two major MCMC algorithms, AIES and ESS. These are technically very different algorithms, but in practice they both work well for most "normal" problems. I tend to like ESS because it has a guaranteed 100% step acceptance rate by construction, although more work goes into proposing a step in a chain. Both methods are ensemble samplers, so unlike a basic algorithm like Metropolis-Hastings, the next position of each walker depends on the positions of all walkers in the ensemble. This makes both of them better at problems where parameters exist on very different overall scales. I won't go through the details here, but you can read about them here[^2] and here[^3]. For this problem, we'll use the ESS algorithm. To determine when to stop the sampler, we could set a maximum number of steps, but for this example, we'll use a different metric, the autocorrelation time, $`\tau`$. Autocorrelation times measure how correlated a walker's chain of positions is with its past positions. Since we will chose an arbitrary starting distribution for our walkers, it is important that our final distributions do not depend on this initial distribution, so the autocorrelation time tells us how many steps we need to get rid of to satisfy this condition. Given that, we can use this as a stopping criterion. We will simply calculate $`\tau`$ every few steps and see if we have taken more than $`M \tau`$ steps total, where $`M`$ is at least $`1`$. We can then decide to burn (get rid of) the first $`M_b \tau`$ steps where $`M_b < M`$. Additionally, since we are not checking $`\tau`$ every step (we could, but it's not efficient), we also require the change in $`\tau`$ to be less than some threshold, ensuring that enough steps have been taken to effectively measure $`\tau`$. We also discard some fraction of steps at the beginning of the chain in this calculation, since we not only care about correlations with the initial position, we also care about correlations with any position the walker encountered sufficiently long ago. All of this logic is built into a `ganesh` `Terminator`, which provides useful defaults but is also fully customizable. The MCMC code looks something like this:
 
 ```rust
 impl LogDensity<Vec<DVector<f64>>> for Problem {
@@ -556,7 +598,7 @@ plt.close()
 ```
 ![Corner plot](corner.svg)
 
-This last plot is probably the most interesting to look at, since it shows us the actual posterior distribution of our parameters. In blue, we have the truth values used to generate the data, and in red we have the values obtained in our fit. While we are within $3\sigma$ of each truth value, the fact that the fit is far away from the means of the MCMC samples is not great, but it just means the algorithm probably terminated too soon and gave us a less-accurate fit. We can also see here that the MCMC parameter errors are very close to the symmetric errors we obtained from L-BFGS-B. The difference is that the ESS algorithm didn't actually need a gradient to compute these, and due to some fun math, the transforms we applied were taken into account when L-BFGS-B directly calculated the Hessian.
+This last plot is probably the most interesting to look at, since it shows us the actual posterior distribution of our parameters. In blue, we have the truth values used to generate the data, and in red we have the values obtained in our fit. While we are within $`3\sigma`$ of each truth value, the fact that the fit is far away from the means of the MCMC samples is not great, but it just means the algorithm probably terminated too soon and gave us a less-accurate fit. We can also see here that the MCMC parameter errors are very close to the symmetric errors we obtained from L-BFGS-B. The difference is that the ESS algorithm didn't actually need a gradient to compute these, and due to some fun math, the transforms we applied were taken into account when L-BFGS-B directly calculated the Hessian.
 
 For my final act, I'll show off a neat library I found called [`matplotloom`](https://github.com/ali-ramadhan/matplotloom) which simplifies the process of making cool animations with `matplotlib`. I won't go into detail about how this code works, but it should be fairly straightforward:
 
@@ -601,7 +643,7 @@ This entire example can be found (in a slightly more condensed form) in the [`ex
 I hope this has been an informative look into `ganesh`. The current goal for a v1.0.0 release is to add a more diverse set of algorithms. Also, there is probably some low-hanging fruit in terms of algorithm optimizations. If you're interested in adding an algorithm, optimizing an existing algorithm, or adding a new feature, `ganesh` is open to contrigutions [on GitHub](https://github.com/denehoffman/ganesh). I will be posting some issues representing some of the more desired algorithms and features soon.
 
 
-[^note_1]: Nearly every other implementation I've come across uses `10`, although Liu and Nocedal[^1] recommend $3\leq m \leq 7$.
+[^note_1]: Nearly every other implementation I've come across uses `10`, although Liu and Nocedal[^1] recommend $`3\leq m \leq 7`$.
 [^note_2]: This is a bit silly, since `MINUIT` is essentially just the BFGS algorithm with this bounds transformation, so this could all be avoided by just using L-BFGS-B. The technical reason for this is that `MINUIT` doesn't bother to calculate higher-order derivatives of the transformation functions and uses a linear approximation instead. `ganesh` does include these higher-order derivatives for bounds transformations.
 [^note_3]: I've been avoiding this partially because the functions I use in my research are already parallelized over their underlying datasets, and nested parallel loops are a bit of a pain to get right.
 [^1]: D. C. Liu and J. Nocedal, “On the limited memory BFGS method for large scale optimization,” Mathematical Programming, vol. 45, no. 1–3, pp. 503–528, Aug. 1989, [doi: 10.1007/bf01589116](https://doi.org/10.1007/bf01589116).
