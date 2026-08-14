@@ -3,7 +3,6 @@ const { defineConfig, devices } = require("@playwright/test");
 module.exports = defineConfig({
   testDir: "./tests",
   outputDir: "test-results",
-  snapshotPathTemplate: "{testDir}/__screenshots__/{projectName}/{arg}{ext}",
   reporter: process.env.CI ? [["github"], ["html", { open: "never" }]] : "line",
   use: {
     baseURL: "http://127.0.0.1:8099",

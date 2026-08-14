@@ -2,9 +2,7 @@
   "name": "denehoffman-site-tests",
   "private": true,
   "scripts": {
-    "test": "playwright test tests/site.spec.js",
-    "test:visual": "playwright test tests/visual.spec.js",
-    "test:visual:update": "playwright test tests/visual.spec.js --update-snapshots=all"
+    "test": "playwright test tests/site.spec.js"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.13.0",

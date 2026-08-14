@@ -31,14 +31,6 @@ check-links:
 test-browser:
     npm test
 
-# Compare key pages with their checked-in visual baselines.
-test-visual:
-    npm run test:visual
-
-# Intentionally refresh visual baselines after reviewing the rendered pages.
-update-visual-baselines:
-    npm run test:visual:update
-
 # Create content/blog/YYYY-MM-DD-SLUG/index.md.
 new-post slug title:
     python3 scripts/new_content.py post "{{ slug }}" --title "{{ title }}"
