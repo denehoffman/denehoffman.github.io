@@ -49,12 +49,13 @@
 </nav>
 
 {% home_section(kind="research") %}
-<svg class="home-research__motif" viewBox="0 0 180 96" aria-hidden="true">
-  <path d="M4 48h54M58 48c31 0 38-35 86-35M58 48c31 0 40 34 86 34M58 48c37 0 49-9 116-9" />
-  <circle cx="58" cy="48" r="3" />
-  <circle cx="144" cy="13" r="2" />
-  <circle cx="144" cy="82" r="2" />
-  <circle cx="174" cy="39" r="2" />
+<svg class="home-research__motif" viewBox="0 0 200 112" aria-hidden="true">
+  <path class="home-research__photon" d="M4 32c5-7 10 7 15 0s10 7 15 0 10 7 15 0 10 7 15 0" />
+  <path d="M4 82h64M64 32c28-2 48-3 72-2M68 82c43 3 84 10 128 18M136 30c20-1 34-11 60-20M136 30c22 3 37 14 60 25" />
+  <path class="home-research__exchange" d="M64 32c14 15 15 35 4 50" />
+  <circle cx="64" cy="32" r="3" />
+  <circle cx="68" cy="82" r="3" />
+  <circle cx="136" cy="30" r="3" />
 </svg>
 <h2>Postdoctoral Research Associate studying glueballs at GlueX</h2>
 

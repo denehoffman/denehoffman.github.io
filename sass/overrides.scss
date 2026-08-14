@@ -310,6 +310,10 @@ main:has(> .home-projects) > h1:first-child + aside img {
   fill: none;
 }
 
+.home-research__motif .home-research__exchange {
+  stroke-dasharray: 3 3;
+}
+
 .home-research__glance {
   position: relative;
   display: grid;
