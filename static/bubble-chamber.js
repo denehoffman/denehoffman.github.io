@@ -716,15 +716,20 @@
     return makeDecayEvent();
   }
 
-  function makeDalitzEvent() {
+  function makeDalitzEvent(vertexOverride = null) {
     const parent = PARTICLES.pi0;
     const electron = PARTICLES["e-"];
     const positron = PARTICLES["e+"];
     const gamma = PARTICLES.gamma;
-    const vertex = {
-      x: randomBetween(width * 0.12, width * 0.88),
-      y: randomBetween(height * 0.12, height * 0.88),
-    };
+    const vertex = vertexOverride
+      ? {
+          x: Math.max(0, Math.min(width, vertexOverride.x)),
+          y: Math.max(0, Math.min(height, vertexOverride.y)),
+        }
+      : {
+          x: randomBetween(width * 0.12, width * 0.88),
+          y: randomBetween(height * 0.12, height * 0.88),
+        };
     const parentMomentum = momentumFromMagnitude(
       logUniform(0.035, 0.28),
       beamAngle + randomBetween(-0.8, 0.8),
@@ -764,22 +769,36 @@
     ];
   }
 
-  function spawnEvent(now) {
-    const choice = Math.random();
-    const tracks =
-      choice < 0.35
-        ? makeThroughTrack()
-        : choice < 0.7
-          ? makeDecayEvent()
-          : choice < 0.88
-            ? makeCascadeEvent()
-            : makeDalitzEvent();
+  function addEvent(now, tracks) {
     if (tracks.length === 0) return false;
     const lifetime = Math.max(
       ...tracks.map((track) => trackEndTime(track) + track.tailHold + track.tailFade),
     );
     events.push({ start: now, lifetime, tracks });
     return true;
+  }
+
+  function spawnEvent(now) {
+    const choice = Math.random();
+    return addEvent(
+      now,
+      choice < 0.35
+        ? makeThroughTrack()
+        : choice < 0.7
+          ? makeDecayEvent()
+          : choice < 0.88
+            ? makeCascadeEvent()
+            : makeDalitzEvent(),
+    );
+  }
+
+  function handleClick(event) {
+    if (event.defaultPrevented || event.button !== 0) return;
+    if (event.target.closest("a, button, input, summary, video, audio")) return;
+    if (window.getSelection()?.toString()) return;
+
+    while (events.length >= CONFIG.maximumConcurrentEvents) events.shift();
+    addEvent(performance.now(), makeDalitzEvent({ x: event.clientX, y: event.clientY }));
   }
 
   function lowerBound(values, target) {
@@ -885,6 +904,7 @@
   }
 
   window.addEventListener("resize", resize, { passive: true });
+  document.addEventListener("click", handleClick);
   document.addEventListener("visibilitychange", handleVisibility);
   reducedMotion.addEventListener("change", () => window.location.reload());
   resize();

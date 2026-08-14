@@ -1,0 +1,20 @@
+<section class="project-showcase">
+  {% if image %}
+    <div class="project-showcase__visual">
+      <img src="{{ image }}" alt="{{ title }} logo">
+    </div>
+  {% endif %}
+  <div class="project-showcase__body">
+    <p class="project-showcase__kicker">Project</p>
+    <h1>{{ title }}</h1>
+    <p class="project-showcase__summary">{{ summary }}</p>
+    <ul class="project-showcase__meta" aria-label="Project details">
+      {% for tag in tags %}<li>{{ tag }}</li>{% endfor %}
+    </ul>
+    <div class="project-showcase__actions">
+      <a href="{{ repository }}">Repository <span aria-hidden="true">↗</span></a>
+      {% if documentation %}<a href="{{ documentation }}">Documentation <span aria-hidden="true">↗</span></a>{% endif %}
+      {% if package %}<a href="{{ package }}">Package <span aria-hidden="true">↗</span></a>{% endif %}
+    </div>
+  </div>
+</section>

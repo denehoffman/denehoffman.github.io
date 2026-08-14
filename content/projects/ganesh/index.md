@@ -1,7 +1,8 @@
 +++
+title = "ganesh"
 +++
 <!-- markdownlint-disable MD034 -->
-{{ image(url="https://github.com/denehoffman/ganesh", url_min="ganesh_logo.png", no_hover=true) }}
+{{ project_header(title="ganesh", summary="Several common minimization algorithms with a straightforward, trait-based interface.", image="ganesh_logo.png", tags=["Rust", "Optimization", "Actively developed"], repository="https://github.com/denehoffman/ganesh", documentation="https://docs.rs/ganesh", package="https://crates.io/crates/ganesh") }}
 
 [`ganesh`](https://github.com/denehoffman/ganesh) (/ɡəˈneɪʃ/), named after the Hindu god of wisdom, provides several common minimization algorithms as well as a straightforward, trait-based interface to create your own extensions. This crate is intended to be as simple as possible. The user needs to implement the `Function` trait on some struct which will take a vector of parameters and return a single-valued `Result` ($`f(\mathbb{R}^n)\to\mathbb{R}`$). Users can optionally provide a gradient function to speed up some algorithms, but a default central finite-difference implementation is provided so that all algorithms will work out of the box.
 
