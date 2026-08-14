@@ -22,6 +22,7 @@
     maximumConcurrentEvents: 4,
   };
   const CURVATURE_GEV_PER_TESLA_METER = 0.299792458;
+  const PAUSE_STORAGE_KEY = "bubble-chamber-paused";
 
   const PARTICLES = {
     "pi+": { name: "π+", mass: 0.13957039, charge: 1, cTau: 7.804 },
@@ -130,13 +131,64 @@
     return;
   }
 
+  const controls = document.createElement("aside");
+  controls.className = "bubble-chamber-controls";
+  controls.setAttribute("aria-label", "Bubble chamber controls");
+  controls.innerHTML = `
+    <p class="bubble-chamber-status" role="status" aria-live="polite"></p>
+    <button class="bubble-chamber-control bubble-chamber-pause" type="button">
+      <span aria-hidden="true">Ⅱ</span>
+    </button>
+    <details class="bubble-chamber-info">
+      <summary class="bubble-chamber-control" aria-label="About the bubble chamber">
+        <span aria-hidden="true">?</span>
+      </summary>
+      <section class="bubble-chamber-explainer">
+        <p class="bubble-chamber-explainer__kicker">Background simulation</p>
+        <h2>Reading the chamber</h2>
+        <p>These tracks are simulated rather than recorded data.</p>
+        <ul>
+          <li><span class="bubble-chamber-key bubble-chamber-key--curve" aria-hidden="true"></span><span>Charged particles curve in a magnetic field. Tighter curves indicate lower momentum.</span></li>
+          <li><span class="bubble-chamber-key bubble-chamber-key--vertex" aria-hidden="true"></span><span>A fork or V marks a decay into charged daughter particles. Neutral parents leave no track.</span></li>
+          <li><span class="bubble-chamber-key bubble-chamber-key--drops" aria-hidden="true"></span><span>Broken, fading strokes mimic droplets forming along a particle path.</span></li>
+        </ul>
+        <p class="bubble-chamber-explainer__hint">Click or tap the page to create a π⁰ Dalitz decay: π⁰ → γe⁺e⁻.</p>
+        <p class="bubble-chamber-explainer__reference"><a href="https://home.cern/science/experiments/gargamelle/">Learn about CERN’s Gargamelle bubble chamber <span aria-hidden="true">↗</span></a></p>
+      </section>
+    </details>
+  `;
+  document.body.append(controls);
+
+  const pauseButton = controls.querySelector(".bubble-chamber-pause");
+  const infoPanel = controls.querySelector(".bubble-chamber-info");
+  const status = controls.querySelector(".bubble-chamber-status");
+
   const events = [];
   let width = 0;
   let height = 0;
   let pixelRatio = 1;
   let animationFrame = 0;
+  let paused = readPausedPreference();
+  let pausedAt = paused ? performance.now() : 0;
+  let statusTimeout = 0;
   let beamAngle = randomBetween(-0.18, 0.18);
   let nextEventCheckAt = performance.now() + CONFIG.eventCheckIntervalMilliseconds;
+
+  function readPausedPreference() {
+    try {
+      return window.localStorage.getItem(PAUSE_STORAGE_KEY) === "true";
+    } catch {
+      return false;
+    }
+  }
+
+  function storePausedPreference(value) {
+    try {
+      window.localStorage.setItem(PAUSE_STORAGE_KEY, String(value));
+    } catch {
+      // Storage can be unavailable in restricted browsing modes.
+    }
+  }
 
   function randomBetween(minimum, maximum) {
     return minimum + Math.random() * (maximum - minimum);
@@ -794,11 +846,67 @@
 
   function handleClick(event) {
     if (event.defaultPrevented || event.button !== 0) return;
-    if (event.target.closest("a, button, input, summary, video, audio")) return;
+    if (
+      event.target.closest(
+        ".bubble-chamber-controls, a, button, input, summary, video, audio",
+      )
+    ) return;
     if (window.getSelection()?.toString()) return;
+
+    if (paused) {
+      showStatus("Resume the chamber to generate an event.");
+      return;
+    }
 
     while (events.length >= CONFIG.maximumConcurrentEvents) events.shift();
     addEvent(performance.now(), makeDalitzEvent({ x: event.clientX, y: event.clientY }));
+    showEventFeedback();
+  }
+
+  function showStatus(message) {
+    window.clearTimeout(statusTimeout);
+    status.textContent = message;
+    status.classList.add("visible");
+    statusTimeout = window.setTimeout(() => status.classList.remove("visible"), 2400);
+  }
+
+  function showEventFeedback() {
+    showStatus("π⁰ Dalitz decay generated");
+  }
+
+  function updatePauseControl() {
+    const label = paused ? "Resume bubble chamber" : "Pause bubble chamber";
+    pauseButton.setAttribute("aria-label", label);
+    pauseButton.setAttribute("title", label);
+    pauseButton.setAttribute("aria-pressed", String(paused));
+    pauseButton.querySelector("span").textContent = paused ? "▶" : "Ⅱ";
+    controls.classList.toggle("paused", paused);
+  }
+
+  function setPaused(nextPaused) {
+    if (paused === nextPaused) return;
+    const now = performance.now();
+    paused = nextPaused;
+    storePausedPreference(paused);
+
+    if (paused) {
+      pausedAt = now;
+      window.cancelAnimationFrame(animationFrame);
+      animationFrame = 0;
+      draw(now);
+      showStatus("Bubble chamber paused");
+    } else {
+      const pauseDuration = Math.max(0, now - pausedAt);
+      for (const event of events) event.start += pauseDuration;
+      nextEventCheckAt += pauseDuration;
+      pausedAt = 0;
+      if (!document.hidden && !animationFrame) {
+        animationFrame = window.requestAnimationFrame(animate);
+      }
+      showStatus("Bubble chamber resumed");
+    }
+
+    updatePauseControl();
   }
 
   function lowerBound(values, target) {
@@ -895,7 +1003,7 @@
       animationFrame = 0;
       return;
     }
-    if (!animationFrame) {
+    if (!paused && !animationFrame) {
       events.length = 0;
       nextEventCheckAt =
         performance.now() + CONFIG.eventCheckIntervalMilliseconds;
@@ -904,9 +1012,18 @@
   }
 
   window.addEventListener("resize", resize, { passive: true });
+  pauseButton.addEventListener("click", () => setPaused(!paused));
+  document.addEventListener("click", (event) => {
+    if (infoPanel.open && !infoPanel.contains(event.target)) {
+      infoPanel.open = false;
+      event.preventDefault();
+    }
+  });
   document.addEventListener("click", handleClick);
   document.addEventListener("visibilitychange", handleVisibility);
   reducedMotion.addEventListener("change", () => window.location.reload());
   resize();
-  animationFrame = window.requestAnimationFrame(animate);
+  updatePauseControl();
+  if (paused) draw(pausedAt);
+  else animationFrame = window.requestAnimationFrame(animate);
 })();

@@ -483,6 +483,251 @@ body > #sidebar {
   }
 }
 
+.bubble-chamber-controls {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 998;
+  display: flex;
+  float: none;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0;
+  box-shadow: none;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  width: max-content;
+  max-width: none;
+  height: auto;
+  color: var(--fg-color);
+  font-family: var(--font-scholarly-sans);
+  hyphens: none;
+  text-align: left;
+}
+
+.bubble-chamber-control {
+  -webkit-backdrop-filter: var(--blur);
+  display: grid;
+  place-items: center;
+  appearance: none;
+  backdrop-filter: var(--blur);
+  transition: var(--transition);
+  cursor: pointer;
+  box-shadow: var(--edge-highlight), var(--shadow-glass);
+  border: 0;
+  border-radius: 999px;
+  background: var(--glass-bg);
+  padding: 0;
+  width: 2.4rem;
+  height: 2.4rem;
+  color: var(--fg-muted-5);
+  font-size: 0.85rem;
+  font-weight: 700;
+  line-height: 1;
+  list-style: none;
+}
+
+.bubble-chamber-control::-webkit-details-marker {
+  display: none;
+}
+
+.bubble-chamber-control:hover,
+.bubble-chamber-control:focus-visible,
+.bubble-chamber-info[open] > .bubble-chamber-control {
+  background: var(--accent-color);
+  color: var(--fg-contrast);
+}
+
+.bubble-chamber-pause span {
+  transform: translateY(-0.04em);
+  letter-spacing: -0.12em;
+}
+
+.bubble-chamber-controls.paused .bubble-chamber-pause {
+  color: var(--accent-color);
+}
+
+.bubble-chamber-controls.paused .bubble-chamber-pause:hover,
+.bubble-chamber-controls.paused .bubble-chamber-pause:focus-visible {
+  color: var(--fg-contrast);
+}
+
+.bubble-chamber-info {
+  position: relative;
+  margin: 0;
+  box-shadow: none;
+  border: 0;
+  background: transparent;
+  padding: 0;
+}
+
+.bubble-chamber-info[open] {
+  box-shadow: none;
+  border-radius: 0;
+  background: transparent;
+  padding: 0;
+}
+
+.bubble-chamber-info > summary.bubble-chamber-control {
+  box-shadow: var(--edge-highlight), var(--shadow-glass);
+  border-radius: 999px;
+  background: var(--glass-bg);
+  padding: 0;
+}
+
+.bubble-chamber-info > summary.bubble-chamber-control::before {
+  display: none;
+}
+
+.bubble-chamber-info[open] > summary.bubble-chamber-control {
+  background: var(--accent-color);
+}
+
+.bubble-chamber-explainer {
+  -webkit-backdrop-filter: var(--blur);
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 0.65rem);
+  backdrop-filter: var(--blur);
+  box-shadow: var(--edge-highlight), var(--shadow-glass);
+  border: 1px solid var(--fg-muted-2);
+  border-radius: 1rem;
+  background: var(--glass-bg);
+  padding: 1.15rem;
+  width: min(21rem, calc(100vw - 2rem));
+  font-size: 0.8rem;
+  line-height: 1.45;
+}
+
+.bubble-chamber-explainer__kicker {
+  margin: 0 0 0.2rem;
+  color: var(--accent-color);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.bubble-chamber-explainer h2 {
+  margin: 0 0 0.45rem;
+  font-family: var(--font-scholarly-serif);
+  font-size: 1.4rem;
+}
+
+.bubble-chamber-explainer > p {
+  margin: 0;
+}
+
+.bubble-chamber-explainer ul {
+  display: grid;
+  gap: 0.7rem;
+  margin: 0.9rem 0;
+  padding: 0;
+}
+
+.bubble-chamber-explainer li {
+  display: grid;
+  grid-template-columns: 2rem 1fr;
+  gap: 0.55rem;
+  align-items: center;
+  margin: 0;
+  list-style: none;
+}
+
+.bubble-chamber-key {
+  position: relative;
+  display: block;
+  width: 1.75rem;
+  height: 1.2rem;
+  color: var(--accent-color);
+}
+
+.bubble-chamber-key--curve {
+  transform: rotate(-12deg);
+  border-top: 2px solid currentcolor;
+  border-radius: 50%;
+}
+
+.bubble-chamber-key--vertex::before,
+.bubble-chamber-key--vertex::after {
+  position: absolute;
+  top: 0.48rem;
+  left: 0.2rem;
+  transform-origin: left center;
+  border-top: 2px solid currentcolor;
+  width: 1.45rem;
+  content: "";
+}
+
+.bubble-chamber-key--vertex::before {
+  transform: rotate(25deg);
+}
+
+.bubble-chamber-key--vertex::after {
+  transform: rotate(-25deg);
+}
+
+.bubble-chamber-key--drops {
+  top: 0.45rem;
+  border-top: 2px dotted currentcolor;
+}
+
+.bubble-chamber-explainer__hint {
+  border-top: 1px solid var(--fg-muted-2);
+  padding-top: 0.8rem;
+  color: var(--fg-muted-5);
+}
+
+.bubble-chamber-explainer > .bubble-chamber-explainer__reference {
+  margin-top: 0.55rem;
+  font-size: 0.72rem;
+}
+
+.bubble-chamber-status {
+  -webkit-backdrop-filter: var(--blur);
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 0.65rem);
+  transform: translateY(0.3rem);
+  opacity: 0;
+  backdrop-filter: var(--blur);
+  transition: var(--transition);
+  margin: 0;
+  box-shadow: var(--edge-highlight), var(--shadow-glass);
+  border-radius: 999px;
+  background: var(--glass-bg);
+  padding: 0.45rem 0.7rem;
+  width: max-content;
+  max-width: min(18rem, calc(100vw - 2rem));
+  pointer-events: none;
+  color: var(--fg-muted-5);
+  font-size: 0.7rem;
+  font-weight: 600;
+  line-height: 1.25;
+  text-align: center;
+}
+
+.bubble-chamber-status.visible {
+  transform: none;
+  opacity: 1;
+}
+
+.bubble-chamber-controls:has(.bubble-chamber-info[open]) .bubble-chamber-status {
+  opacity: 0;
+}
+
+@media only screen and (max-width: 600px) {
+  .bubble-chamber-controls {
+    right: 0.75rem;
+    bottom: 0.75rem;
+  }
+
+  .bubble-chamber-explainer {
+    width: calc(100vw - 1.5rem);
+  }
+}
+
 // Progressive mobile navigation. mobile-nav.js adds the toggle and ready class.
 #site-nav #mobile-nav-toggle {
   display: none;
