@@ -1,4 +1,4 @@
-<section class="project-showcase">
+<section class="project-showcase{% if not image %} project-showcase--text{% endif %}">
   {% if image %}
     <div class="project-showcase__visual">
       <img src="{{ image }}" alt="{{ title }} logo">

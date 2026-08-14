@@ -89,8 +89,8 @@ links = [
   { name = "Projects", menu = [
     { url = "@/projects/laddu/index.md", name = "laddu" },
     { url = "@/projects/ganesh/index.md", name = "ganesh" },
-    { url = "https://github.com/denehoffman/maryada", name = "maryada" },
-    { url = "https://github.com/denehoffman/gluex-rs", name = "gluex-rs" },
+    { url = "@/projects/maryada/index.md", name = "maryada" },
+    { url = "@/projects/gluex-rs/index.md", name = "gluex-rs" },
   ] },
 ]
 
