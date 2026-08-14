@@ -1,6 +1,7 @@
 (() => {
   const publications = {
     "10.1038/s41467-023-39602-2": {
+      topics: ["optics"],
       venue: "Nature Communications · 14, 3960",
       citation:
         "M. ElKabbash et al., “Fano resonant optical coatings platform for full gamut and high purity structural colors,” Nature Communications 14, 3960 (2023). https://doi.org/10.1038/s41467-023-39602-2",
@@ -15,6 +16,7 @@
 }`,
     },
     "10.1007/s11661-021-06182-z": {
+      topics: ["materials"],
       venue: "Metallurgical and Materials Transactions A · 52, 1551–1558",
       citation:
         "N. Hoffman and M. Widom, “Cluster variation method analysis of correlations and entropy in BCC solid solutions,” Metallurgical and Materials Transactions A 52, 1551–1558 (2021). https://doi.org/10.1007/s11661-021-06182-z",
@@ -30,6 +32,7 @@
 }`,
     },
     "10.1038/s41565-020-00841-9": {
+      topics: ["optics"],
       venue: "Nature Nanotechnology · 16, 440–446",
       citation:
         "M. ElKabbash et al., “Fano-resonant ultrathin film optical coatings,” Nature Nanotechnology 16, 440–446 (2021). https://doi.org/10.1038/s41565-020-00841-9",
@@ -45,6 +48,7 @@
 }`,
     },
     "10.1088/1361-6501/ab9fd8": {
+      topics: ["optics"],
       venue: "Measurement Science and Technology · 31, 115201",
       citation:
         "M. ElKabbash et al., “Ultrathin-film optical coating for angle-independent remote hydrogen sensing,” Measurement Science and Technology 31, 115201 (2020). https://doi.org/10.1088/1361-6501/ab9fd8",
@@ -60,6 +64,7 @@
 }`,
     },
     "10.1002/adom.201700617": {
+      topics: ["materials", "optics"],
       venue: "Advanced Optical Materials · 5, 1700617",
       citation:
         "M. ElKabbash et al., “Tunable black gold: Controlling the near-field coupling of immobilized Au nanoparticles embedded in mesoporous silica capsules,” Advanced Optical Materials 5, 1700617 (2017). https://doi.org/10.1002/adom.201700617",
@@ -75,6 +80,7 @@
 }`,
     },
     "10.1364/ol.42.003598": {
+      topics: ["optics"],
       venue: "Optics Letters · 42, 3598–3601",
       citation:
         "M. ElKabbash et al., “Iridescence-free and narrowband perfect light absorption in critically coupled metal high-index dielectric cavities,” Optics Letters 42, 3598–3601 (2017). https://doi.org/10.1364/OL.42.003598",
@@ -134,6 +140,7 @@
 
     const record = document.createElement("article");
     record.className = "publication-record";
+    record.dataset.topics = publication.topics.join(" ");
     heading.before(record);
 
     let node = heading;
@@ -187,4 +194,62 @@
     if (abstract) abstract.before(actions);
     else record.append(actions);
   });
+
+  const filters = document.querySelector(".publication-filters");
+  if (!filters) return;
+
+  const buttons = [...filters.querySelectorAll("[data-publication-filter]")];
+  const records = [...document.querySelectorAll(".publication-record")];
+  const collaborationSection = document.querySelector(".collaboration-publications");
+  const collaborationRecords = collaborationSection
+    ? [...collaborationSection.querySelectorAll(".collaboration-publication")]
+    : [];
+  const yearHeadings = [...document.querySelectorAll("main > h1[id]")];
+  const selectedHeading = document.querySelector(".publication-section-heading");
+  const status = filters.querySelector(".publication-filters__status");
+
+  const matchesTopic = (element, topic) =>
+    topic === "all" || element.dataset.topics?.split(" ").includes(topic);
+
+  const setFilter = (topic) => {
+    buttons.forEach((button) => {
+      button.setAttribute("aria-pressed", String(button.dataset.publicationFilter === topic));
+    });
+
+    records.forEach((record) => {
+      record.classList.toggle("is-filtered-out", !matchesTopic(record, topic));
+    });
+
+    yearHeadings.forEach((heading) => {
+      let node = heading.nextElementSibling;
+      let hasVisibleRecord = false;
+      while (node && node.nodeName !== "H1" && !node.matches(".collaboration-publications")) {
+        if (node.matches(".publication-record:not(.is-filtered-out)")) hasVisibleRecord = true;
+        node = node.nextElementSibling;
+      }
+      heading.classList.toggle("is-filtered-out", !hasVisibleRecord);
+      document
+        .querySelector(`.publication-years a[href="#${heading.id}"]`)
+        ?.classList.toggle("is-filtered-out", !hasVisibleRecord);
+    });
+
+    const showCollaboration = matchesTopic(collaborationSection, topic);
+    collaborationSection?.classList.toggle("is-filtered-out", !showCollaboration);
+
+    const selectedCount = records.filter((record) => !record.classList.contains("is-filtered-out")).length;
+    const collaborationCount = showCollaboration ? collaborationRecords.length : 0;
+    selectedHeading?.classList.toggle("is-filtered-out", selectedCount === 0);
+    document.querySelector(".publication-years")?.classList.toggle("is-filtered-out", selectedCount === 0);
+
+    const total = selectedCount + collaborationCount;
+    if (status) {
+      status.textContent = `${total} publication${total === 1 ? "" : "s"}`;
+    }
+  };
+
+  buttons.forEach((button) => {
+    button.addEventListener("click", () => setFilter(button.dataset.publicationFilter));
+  });
+
+  setFilter("all");
 })();

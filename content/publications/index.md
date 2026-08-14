@@ -12,6 +12,17 @@ title = "Publications"
 
 {{ scholar_overview() }}
 
+<nav class="publication-filters" aria-label="Filter publications by topic">
+  <span>View by topic</span>
+  <div role="group" aria-label="Publication topics">
+    <button type="button" data-publication-filter="all" aria-pressed="true">All</button>
+    <button type="button" data-publication-filter="particle-physics" aria-pressed="false">Particle physics</button>
+    <button type="button" data-publication-filter="materials" aria-pressed="false">Materials</button>
+    <button type="button" data-publication-filter="optics" aria-pressed="false">Optics</button>
+  </div>
+  <p class="publication-filters__status" aria-live="polite"></p>
+</nav>
+
 <div class="publication-section-heading">
   <p class="publication-eyebrow">Selected publications</p>
   <p>Papers I worked on directly.</p>
@@ -81,7 +92,7 @@ Efficient light-to-heat conversion is central for various applications such as t
 Perfect light absorption in the visible and near-infrared (NIR) was demonstrated using metamaterials, plasmonic nanostructures, and thin films. Thin film absorbers offer a simple and low-cost design as they can be produced on large areas and without lithography. Light is strongly absorbed in thin film metal-dielectric-metal (MDM) cavities at their resonance frequencies. However, a major drawback of MDM absorbers is their strong resonance iridescence, i.e., angle dependence. Here, we solve the iridescence problem by achieving angle-insensitive narrowband perfect and near-perfect light absorption. In particular, we show analytically that using a high-index dielectric in MDM cavities is sufficient to achieve angle-insensitive cavity resonance. We demonstrate experimentally angle-insensitive perfect and near-perfect absorbers in the NIR and visible regimes up to ±60°. By overcoming the iridescence problem, we open the door for practical applications of MDM absorbers at optical frequencies.
 </details>
 
-<section class="collaboration-publications" aria-labelledby="collaboration-publications-title">
+<section class="collaboration-publications" data-topics="particle-physics" aria-labelledby="collaboration-publications-title">
   <header>
     <p class="publication-eyebrow">Broader research record</p>
     <h2 id="collaboration-publications-title">Collaboration publications</h2>

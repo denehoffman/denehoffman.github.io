@@ -1761,6 +1761,67 @@ main:has(> .publication-years) > h1[id] {
   margin-block-end: 1.5rem;
 }
 
+.publication-filters {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-block: -1.25rem 2.75rem;
+  border-block-end: 1px solid var(--fg-muted-2);
+  padding-block-end: 1rem;
+  font-family: var(--font-scholarly-sans);
+}
+
+.publication-filters > span {
+  color: var(--fg-muted-5);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.publication-filters > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.publication-filters button {
+  appearance: none;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: transparent;
+  padding: 0.42rem 0.65rem;
+  color: var(--fg-muted-5);
+  font: 650 0.7rem/1 var(--font-scholarly-sans);
+  cursor: pointer;
+  transition: border-color 140ms ease, color 140ms ease, background-color 140ms ease;
+}
+
+.publication-filters button:hover,
+.publication-filters button:focus-visible {
+  border-color: var(--fg-muted-2);
+  color: var(--accent-color);
+}
+
+.publication-filters button[aria-pressed="true"] {
+  border-color: color-mix(in srgb, var(--accent-color) 35%, transparent);
+  background: color-mix(in srgb, var(--accent-color) 10%, transparent);
+  color: var(--accent-color);
+}
+
+.publication-filters__status {
+  margin: 0 0 0 auto;
+  color: var(--fg-muted-5);
+  font-size: 0.68rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.is-filtered-out {
+  display: none !important;
+}
+
 .publication-section-heading > p:last-child {
   margin: 0;
   color: var(--fg-muted-5);
@@ -1959,6 +2020,22 @@ main:has(> .publication-years) > h1[id] {
 
   .publication-section-heading > p:last-child {
     margin-block-start: 0.3rem;
+  }
+
+  .publication-filters {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    margin-block-start: -1.5rem;
+  }
+
+  .publication-filters > div {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  .publication-filters__status {
+    grid-column: 2;
+    grid-row: 1;
   }
 
   .citation-chart ol {
