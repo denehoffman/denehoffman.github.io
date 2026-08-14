@@ -49,7 +49,21 @@
 </nav>
 
 {% home_section(kind="research") %}
-## Postdoctoral Research Associate studying glueballs at GlueX
+<svg class="home-research__motif" viewBox="0 0 180 96" aria-hidden="true">
+  <path d="M4 48h54M58 48c31 0 38-35 86-35M58 48c31 0 40 34 86 34M58 48c37 0 49-9 116-9" />
+  <circle cx="58" cy="48" r="3" />
+  <circle cx="144" cy="13" r="2" />
+  <circle cx="144" cy="82" r="2" />
+  <circle cx="174" cy="39" r="2" />
+</svg>
+<h2>Postdoctoral Research Associate studying glueballs at GlueX</h2>
+
+<div class="home-research__glance" aria-label="Research at a glance">
+  <p><span>Experiment</span><strong>GlueX</strong></p>
+  <p><span>Method</span><strong>Amplitude analysis</strong></p>
+  <p><span>Physics</span><strong>Exotic hadrons</strong></p>
+  <p><span>Tools</span><strong>Scientific Rust</strong></p>
+</div>
 
 I'm currently a postdoctoral researcher at The College of William & Mary studying the strong force through the GlueX collaboration. GlueX is a multinational collaboration located in Hall D at Jefferson Lab which collides high-energy photons with a proton target.
 
