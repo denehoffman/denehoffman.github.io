@@ -1,0 +1,15 @@
+<figure class="article-figure" data-article-figure>
+  <div class="article-figure__media">
+    <img class="no-hover" src="{{ src }}" alt="{{ alt }}" loading="lazy" decoding="async">
+  </div>
+  <figcaption>
+    <span class="article-figure__number" aria-hidden="true"></span>
+    <span class="article-figure__caption">{{ body | markdown(inline=true) | safe }}</span>
+    {% if source or data %}
+      <span class="article-figure__links" aria-label="Figure resources">
+        {% if source %}<a href="{{ source }}">{{ source_label | default(value="Source") }}</a>{% endif %}
+        {% if data %}<a href="{{ data }}">{{ data_label | default(value="Data") }}</a>{% endif %}
+      </span>
+    {% endif %}
+  </figcaption>
+</figure>

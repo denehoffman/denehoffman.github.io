@@ -236,7 +236,9 @@ if __name__ == '__main__':
     plt.close()
 
 ```
-![Our toy dataset](data.svg)
+{% figure(src="data.svg", alt="A two-dimensional histogram of the sampled toy dataset", source="https://github.com/denehoffman/ganesh/tree/90f145ee1dc66bb61f234fd9be2d857e6078cebe/examples/multivariate_normal_fit", source_label="Example code") %}
+The sampled two-dimensional toy dataset used for the Gaussian fit.
+{% end %}
 
 Now we should get on to fitting these data to a model. For this, we'll first define the probability distribution function for a multivariate Gaussian:
 
@@ -559,7 +561,9 @@ for i in range(n_parameters):
 plt.savefig('traces.svg')
 plt.close()
 ```
-![The entire MCMC traces](traces.svg)
+{% figure(src="traces.svg", alt="Parameter traces for every MCMC walker, including burn-in", source="https://github.com/denehoffman/ganesh/tree/90f145ee1dc66bb61f234fd9be2d857e6078cebe/examples/multivariate_normal_fit", source_label="Example code") %}
+The complete MCMC parameter traces, including the dashed burn-in region.
+{% end %}
 
 ```python
 _, ax = plt.subplots(nrows=n_parameters, sharex=True, figsize=(10, 50))
@@ -575,7 +579,9 @@ for i in range(n_parameters):
 plt.savefig('traces_burned.svg')
 plt.close()
 ```
-![Traces excluding burn-in](traces_burned.svg)
+{% figure(src="traces_burned.svg", alt="Parameter traces for every MCMC walker after burn-in", source="https://github.com/denehoffman/ganesh/tree/90f145ee1dc66bb61f234fd9be2d857e6078cebe/examples/multivariate_normal_fit", source_label="Example code") %}
+The MCMC parameter traces after discarding burn-in.
+{% end %}
 
 ```python
 flat_chain = np.array(pickle.load(Path.open('flat_chain.pkl', 'rb')))
@@ -596,7 +602,9 @@ overplot_lines(
 plt.savefig('corner.svg')
 plt.close()
 ```
-![Corner plot](corner.svg)
+{% figure(src="corner.svg", alt="Corner plot of the posterior parameter distributions", source="https://github.com/denehoffman/ganesh/tree/90f145ee1dc66bb61f234fd9be2d857e6078cebe/examples/multivariate_normal_fit", source_label="Example code") %}
+The posterior parameter distributions and pairwise correlations from the flattened MCMC chain.
+{% end %}
 
 This last plot is probably the most interesting to look at, since it shows us the actual posterior distribution of our parameters. In blue, we have the truth values used to generate the data, and in red we have the values obtained in our fit. While we are within $`3\sigma`$ of each truth value, the fact that the fit is far away from the means of the MCMC samples is not great, but it just means the algorithm probably terminated too soon and gave us a less-accurate fit. We can also see here that the MCMC parameter errors are very close to the symmetric errors we obtained from L-BFGS-B. The difference is that the ESS algorithm didn't actually need a gradient to compute these, and due to some fun math, the transforms we applied were taken into account when L-BFGS-B directly calculated the Hessian.
 
@@ -636,7 +644,9 @@ with Loom('walkers_corner.gif', fps=20, parallel=True) as loom:
         delayed(make_frame)(i, burned_chain, parameter_labels, ranges, loom) for i in range(n_steps)
     )
 ```
-![Animated Walkers](walkers_corner.gif)
+{% figure(src="walkers_corner.gif", alt="Animated corner plot following the ensemble walkers", source="https://github.com/denehoffman/ganesh/tree/90f145ee1dc66bb61f234fd9be2d857e6078cebe/examples/multivariate_normal_fit", source_label="Example code") %}
+The ensemble walkers exploring the posterior parameter space after burn-in.
+{% end %}
 
 This entire example can be found (in a slightly more condensed form) in the [`examples/`](https://github.com/denehoffman/ganesh/tree/90f145ee1dc66bb61f234fd9be2d857e6078cebe/examples/multivariate_normal_fit) directory of `ganesh`. See the [`.justfile`](https://github.com/denehoffman/ganesh/blob/90f145ee1dc66bb61f234fd9be2d857e6078cebe/examples/multivariate_normal_fit/.justfile) in that directory for more information about how to run this and other examples.
 

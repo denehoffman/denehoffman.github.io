@@ -329,14 +329,20 @@ We'll be implementing Algorithms 3.5 and 3.6 from ["Numerical Optimization"](htt
 
 In each loop, we are first checking to see if the function is sufficiently decreasing. If it isn't, we know that the step size overshoots. Imagine we are just minimizing into a 1D parabola. If we are sitting to the left of the minimum, the optimal step length $`\alpha_\text{opt}`$ would put us right at the minimum. If we pick a step $`\alpha < \alpha_\text{opt}`$ would be fine, but it would mean we converge slower than optimal. The same can be said for a step length $`\alpha > \alpha_\text{opt}`$, but at a certain point, we will be stepping to a point higher up the parabola than where we began, even though we are moving in the right direction! Step 2.1 ensures that if this happens, we will do a more refined search (`zoom`) between the current and previous step lengths (note that $`\alpha_{i-1} = 0`$ when $`i=1`$ on the first loop). This will happen a lot if we pick a starting step length that is too large (see the following diagram).
 
-![Taking a step that is too large](line_search_increase.svg)
+{% figure(src="line_search_increase.svg", alt="A trial step overshooting a one-dimensional minimum") %}
+A step that is too large overshoots the minimum and fails the Armijo condition.
+{% end %}
 If we are decreasing, we are in that region where we are converging, but we might not be converging at an optimal rate. This is where the strong Wolfe condition comes in. We first project the gradients at the original and stepped positions onto the step direction. If the gradient *is* the step direction (well, opposite to it), then we can ignore $`\vec{p}`$ here and think of this in terms of a change in gradient magnitude. If the gradient decreases by at least a factor of $`c_2`$, we accept the step (see the following diagram).
 
-![An acceptable step](line_search_accept.svg)
+{% figure(src="line_search_accept.svg", alt="A trial step in the acceptable region around a one-dimensional minimum") %}
+An acceptable step satisfies both the Armijo and strong Wolfe conditions.
+{% end %}
 
 If we are decreasing sufficiently, but the magnitude of the projected gradient isn't (the gray region in the previous plots), we are either undershooting the optimal step, in which case we should increase the step size and run the loop again (Step 4) or we are overshooting, in which case we should run `zoom` between the current step and the previous one. How do we tell? Well, if we overshoot, the gradient on the next step will tell us to move in the opposite direction, but if we undershoot, we should still be moving in the same direction. This is what the if-statement of Step 3. checks for.
 
-![A step that would result in the final condition being checked](line_search_armijo.svg)
+{% figure(src="line_search_armijo.svg", alt="Two Armijo-valid steps on opposite sides of a one-dimensional minimum") %}
+Two steps reach the final direction check: the left point undershoots, while the right point overshoots.
+{% end %}
 
 In the above plot, both points meet the Armijo condition, but they fail to meet the strong Wolfe condition. This means they make it to Step 3 in our line search algorithm. For the left-most point, the gradient points in the $`-x`$ direction while the step was in the $`+x`$ direction, so the condition at Step 3 is not satisfied, and we increase our step size (hopefully landing in the green region). For the right-most point, the gradient now points in the $`+x`$ direction, so Step 3 is satisfied and we again `zoom` between this step size and the previous. Note that the arguments to `zoom` are switched here. In the definition of the `zoom` algorithm, we will refer to the first argument as $`\alpha_{\text{lo}}`$ and the second as $`\alpha_{\text{hi}}`$. However, since $`\alpha_i`$ is strictly increasing in Algorithm 3.5, we shouldn't think of one of these values as larger than the other, but rather that the function evaluations at these points are lower or higher. Here, $`\alpha_\text{lo}`$ will always refer to a step length which satisfied the Armijo condition, which means that the function value with this step length is the lower of the two. $`\alpha_\text{hi}`$ will be the previous step if the current one is the first to satisfy the Armijo condition (Step 2.3) or it will be the current step if the previous step gave a smaller function evaluation (Step 2.1). In either case, we know that the optimal step length is in the given range.
 
