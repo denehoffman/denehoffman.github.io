@@ -152,8 +152,28 @@
           <li><span class="bubble-chamber-key bubble-chamber-key--vertex" aria-hidden="true"></span><span>A fork or V marks a decay into charged daughter particles. Neutral parents leave no track.</span></li>
           <li><span class="bubble-chamber-key bubble-chamber-key--drops" aria-hidden="true"></span><span>Broken, fading strokes mimic droplets forming along a particle path.</span></li>
         </ul>
-        <p class="bubble-chamber-explainer__hint">Click or tap the page to create a π⁰ Dalitz decay: π⁰ → γe⁺e⁻.</p>
+        <p class="bubble-chamber-explainer__hint">Choose a topology in the event explorer, then click or tap the page to generate it. The default is a π⁰ Dalitz decay.</p>
         <p class="bubble-chamber-explainer__reference"><a href="https://home.cern/science/experiments/gargamelle/">Learn about CERN’s Gargamelle bubble chamber <span aria-hidden="true">↗</span></a></p>
+      </section>
+    </details>
+    <details class="bubble-chamber-explorer">
+      <summary class="bubble-chamber-control" aria-label="Open the decay explorer">
+        <span aria-hidden="true">⌁</span>
+      </summary>
+      <section class="bubble-chamber-explorer-panel">
+        <p class="bubble-chamber-explainer__kicker">Event explorer</p>
+        <h2>Build a decay</h2>
+        <p>Generate one event at a time, then compare its decay chain with the tracks in the chamber.</p>
+        <div class="bubble-chamber-event-types" role="group" aria-label="Event topology">
+          <button type="button" data-event-kind="decay"><span class="bubble-chamber-topology" aria-hidden="true">V</span>Single decay</button>
+          <button type="button" data-event-kind="cascade"><span class="bubble-chamber-topology" aria-hidden="true">Y</span>Cascade decay</button>
+          <button type="button" data-event-kind="dalitz"><span class="bubble-chamber-topology" aria-hidden="true">γ*</span>Dalitz decay</button>
+          <button type="button" data-event-kind="track"><span class="bubble-chamber-topology" aria-hidden="true">↝</span>Single track</button>
+        </div>
+        <article class="bubble-chamber-event-readout" aria-live="polite">
+          <p class="bubble-chamber-event-readout__empty">Choose a topology to inspect its particles.</p>
+        </article>
+        <p class="bubble-chamber-explorer-note"><span aria-hidden="true">○</span> Neutral particles leave no track; charged particles bend in opposite directions according to charge.</p>
       </section>
     </details>
   `;
@@ -161,7 +181,16 @@
 
   const pauseButton = controls.querySelector(".bubble-chamber-pause");
   const infoPanel = controls.querySelector(".bubble-chamber-info");
+  const explorer = controls.querySelector(".bubble-chamber-explorer");
+  const eventReadout = controls.querySelector(".bubble-chamber-event-readout");
   const status = controls.querySelector(".bubble-chamber-status");
+
+  const TOPOLOGY_LATEX = {
+    decay: "X \\to a+b",
+    cascade: "\\Xi \\to \\Lambda\\pi,\\; \\Lambda \\to p\\pi",
+    dalitz: "\\pi^0 \\to \\gamma e^+e^-",
+    track: "q^{\\pm}",
+  };
 
   const events = [];
   let width = 0;
@@ -171,6 +200,7 @@
   let paused = readPausedPreference();
   let pausedAt = paused ? performance.now() : 0;
   let statusTimeout = 0;
+  let selectedEventKind = "dalitz";
   let beamAngle = randomBetween(-0.18, 0.18);
   let nextEventCheckAt = performance.now() + CONFIG.eventCheckIntervalMilliseconds;
 
@@ -269,6 +299,17 @@
       x: width + 18,
       y: randomBetween(height * 0.08, height * 0.92),
       angle: Math.PI + beamAngle + randomBetween(-0.035, 0.035),
+    };
+  }
+
+  function clickStart(point) {
+    const x = Math.max(0, Math.min(width, point.x));
+    const y = Math.max(0, Math.min(height, point.y));
+    const centerAngle = Math.atan2(height / 2 - y, width / 2 - x);
+    return {
+      x,
+      y,
+      angle: centerAngle + randomBetween(-0.65, 0.65),
     };
   }
 
@@ -609,7 +650,60 @@
     return track.delay + track.times[track.times.length - 1];
   }
 
-  function makeThroughTrack() {
+  function particleLatex(particle) {
+    const names = {
+      "π+": "\\pi^+",
+      "π−": "\\pi^-",
+      "π0": "\\pi^0",
+      "μ+": "\\mu^+",
+      "μ−": "\\mu^-",
+      "e+": "e^+",
+      "e−": "e^-",
+      "γ": "\\gamma",
+      "ν": "\\nu",
+      "p": "p",
+      "p̄": "\\bar{p}",
+      "n": "n",
+      "n̄": "\\bar{n}",
+      "K⁰S": "K^0_{S}",
+      "Λ": "\\Lambda",
+      "Λ̄": "\\bar{\\Lambda}",
+      "K+": "K^+",
+      "K−": "K^-",
+      "Ξ−": "\\Xi^-",
+      "Ξ̄+": "\\bar{\\Xi}^{+}",
+      "γ*": "\\gamma^*",
+    };
+    return names[particle.name] || `\\mathrm{${particle.name}}`;
+  }
+
+  function renderLatex(source, target, fallback = source) {
+    if (typeof window.katex === "undefined") {
+      target.textContent = fallback;
+      return;
+    }
+    window.katex.render(source, target, {
+      displayMode: false,
+      throwOnError: false,
+      strict: false,
+    });
+  }
+
+  function particleEntry(particle, role) {
+    return {
+      name: particle.name,
+      latex: particleLatex(particle),
+      role,
+      charge: particle.charge,
+      visible: particle.charge !== 0,
+    };
+  }
+
+  function makeEventRecord(kind, label, reaction, reactionLatex, explanation, particles, tracks) {
+    return { kind, label, reaction, reactionLatex, explanation, particles, tracks };
+  }
+
+  function makeThroughTrack(startOverride = null) {
     const particle = PARTICLES[chooseWeighted([
       { weight: 4, value: "pi+" },
       { weight: 4, value: "pi-" },
@@ -618,12 +712,20 @@
       { weight: 1, value: "mu+" },
       { weight: 1, value: "mu-" },
     ]).value];
-    const start = beamStart();
+    const start = startOverride ? clickStart(startOverride) : beamStart();
     const momentum = momentumFromMagnitude(throughTrackMomentum(), start.angle);
-    return [makeTrack(transportCharged(particle, start, momentum))];
+    return makeEventRecord(
+      "track",
+      "Through-going particle",
+      `${particle.name} crosses the chamber`,
+      `${particleLatex(particle)}\\;\\text{through-going}`,
+      "A lone charged particle enters from outside the frame. Its curvature reveals the sign of its charge and its transverse momentum.",
+      [particleEntry(particle, "incoming")],
+      [makeTrack(transportCharged(particle, start, momentum))],
+    );
   }
 
-  function makeDecayEvent() {
+  function makeDecayEvent(startOverride = null) {
     const parent = PARTICLES[chooseWeighted([
       { weight: 3.2, value: "KS" },
       { weight: 1.5, value: "Lambda" },
@@ -631,7 +733,7 @@
       { weight: 1, value: "K+" },
       { weight: 1, value: "K-" },
     ]).value];
-    const start = inwardStart();
+    const start = startOverride ? clickStart(startOverride) : inwardStart();
     const parentMomentumMagnitude =
       parent.charge === 0 ? logUniform(0.22, 1.25) : logUniform(0.25, 1.05);
     let vertex;
@@ -641,13 +743,13 @@
 
     if (parent.charge === 0) {
       vertex = selectNeutralDecay(parent, start, start.angle, parentMomentumMagnitude);
-      if (!vertex) return makeThroughTrack();
+      if (!vertex) return makeThroughTrack(startOverride);
       parentMomentum = momentumFromMagnitude(parentMomentumMagnitude, start.angle);
     } else {
       const initialMomentum = momentumFromMagnitude(parentMomentumMagnitude, start.angle);
       const parentTransport = transportCharged(parent, start, initialMomentum);
       const decayIndex = selectChargedDecayState(parent, parentTransport);
-      if (decayIndex === null) return makeThroughTrack();
+      if (decayIndex === null) return makeThroughTrack(startOverride);
       const state = parentTransport.states[decayIndex];
       vertex = { x: state.x, y: state.y };
       parentMomentum = { px: state.px, py: state.py };
@@ -655,7 +757,13 @@
       daughterDelay = trackEndTime(parentTrack);
     }
 
-    const channel = chooseWeighted(parent.channels);
+    // Condition on an observable chamber topology. The relative branching
+    // fractions among channels with at least one charged daughter are kept.
+    const channel = chooseWeighted(
+      parent.channels.filter((candidate) =>
+        candidate.daughters.some((name) => PARTICLES[name].charge !== 0),
+      ),
+    );
     const daughters = channel.daughters.map((name) => PARTICLES[name]);
     const daughterVectors =
       daughters.length === 2
@@ -678,14 +786,24 @@
       });
       tracks.push(makeTrack(daughterTransport, daughterDelay));
     }
-    return tracks;
+    return makeEventRecord(
+      "decay",
+      "Single decay",
+      `${parent.name} → ${daughters.map((particle) => particle.name).join(" + ")}`,
+      `${particleLatex(parent)} \\to ${daughters.map(particleLatex).join(" + ")}`,
+      parent.charge === 0
+        ? "The neutral parent travels invisibly before producing charged tracks at a displaced vertex."
+        : "The charged parent leaves a track up to the decay vertex, where its daughter tracks begin.",
+      [particleEntry(parent, "parent"), ...daughters.map((particle) => particleEntry(particle, "daughter"))],
+      tracks,
+    );
   }
 
-  function makeCascadeEvent() {
+  function makeCascadeEvent(startOverride = null) {
     const parent = PARTICLES[Math.random() < 0.5 ? "Xi-" : "XiBar"];
 
     for (let attempt = 0; attempt < 10; attempt += 1) {
-      const start = inwardStart();
+      const start = startOverride ? clickStart(startOverride) : inwardStart();
       const initialMomentum = momentumFromMagnitude(logUniform(0.32, 1.15), start.angle);
       const parentTransport = transportCharged(parent, start, initialMomentum);
       const cascadeIndex = selectChargedDecayState(parent, parentTransport);
@@ -732,7 +850,11 @@
         ),
       ];
 
-      const lambdaChannel = chooseWeighted(lambda.channels);
+      const lambdaChannel = chooseWeighted(
+        lambda.channels.filter((candidate) =>
+          candidate.daughters.some((name) => PARTICLES[name].charge !== 0),
+        ),
+      );
       const lambdaDaughters = lambdaChannel.daughters.map((name) => PARTICLES[name]);
       const lambdaVectors =
         lambdaDaughters.length === 2
@@ -762,10 +884,24 @@
           ),
         );
       }
-      return tracks;
+      const finalDaughters = lambdaDaughters.map((particle) => particleEntry(particle, "daughter"));
+      return makeEventRecord(
+        "cascade",
+        "Ξ cascade",
+        `${parent.name} → ${lambda.name} + ${bachelorPion.name}; ${lambda.name} → ${lambdaDaughters.map((particle) => particle.name).join(" + ")}`,
+        `${particleLatex(parent)} \\to ${particleLatex(lambda)} + ${particleLatex(bachelorPion)},\\quad ${particleLatex(lambda)} \\to ${lambdaDaughters.map(particleLatex).join(" + ")}`,
+        "The charged cascade parent produces a neutral Λ, which travels unseen before decaying at a second, separated vertex.",
+        [
+          particleEntry(parent, "parent"),
+          particleEntry(lambda, "intermediate"),
+          particleEntry(bachelorPion, "daughter"),
+          ...finalDaughters,
+        ],
+        tracks,
+      );
     }
 
-    return makeDecayEvent();
+    return makeDecayEvent(startOverride);
   }
 
   function makeDalitzEvent(vertexOverride = null) {
@@ -805,7 +941,7 @@
       electron,
       positron,
     );
-    return [
+    const tracks = [
       makeTrack(
         transportCharged(electron, vertex, {
           px: electronVector.px,
@@ -819,14 +955,30 @@
         }),
       ),
     ];
+    return makeEventRecord(
+      "dalitz",
+      "Dalitz conversion",
+      "π0 → γ + γ* → γ + e+ + e−",
+      "\\pi^0 \\to \\gamma\\gamma^*,\\quad \\gamma^* \\to e^+e^-",
+      "The real photon and short-lived virtual photon are invisible. The electron–positron pair appears as two tight, oppositely curving tracks from one vertex.",
+      [
+        particleEntry(parent, "parent"),
+        particleEntry(gamma, "daughter"),
+        { name: "γ*", latex: "\\gamma^*", role: "intermediate", charge: 0, visible: false },
+        particleEntry(positron, "daughter"),
+        particleEntry(electron, "daughter"),
+      ],
+      tracks,
+    );
   }
 
-  function addEvent(now, tracks) {
+  function addEvent(now, eventRecord) {
+    const { tracks } = eventRecord;
     if (tracks.length === 0) return false;
     const lifetime = Math.max(
       ...tracks.map((track) => trackEndTime(track) + track.tailHold + track.tailFade),
     );
-    events.push({ start: now, lifetime, tracks });
+    events.push({ start: now, lifetime, tracks, record: eventRecord });
     return true;
   }
 
@@ -844,6 +996,85 @@
     );
   }
 
+  function chargeLabel(charge) {
+    if (charge > 0) return `charge +${charge}`;
+    if (charge < 0) return `charge ${charge}`;
+    return "neutral";
+  }
+
+  function renderEventReadout(eventRecord) {
+    const heading = document.createElement("p");
+    heading.className = "bubble-chamber-event-readout__label";
+    heading.textContent = eventRecord.label;
+
+    const reaction = document.createElement("h3");
+    renderLatex(eventRecord.reactionLatex, reaction, eventRecord.reaction);
+
+    const explanation = document.createElement("p");
+    explanation.textContent = eventRecord.explanation;
+
+    const particleList = document.createElement("ul");
+    for (const particle of eventRecord.particles) {
+      const item = document.createElement("li");
+      const name = document.createElement("strong");
+      const details = document.createElement("span");
+      renderLatex(particle.latex, name, particle.name);
+      details.textContent = `${particle.role} · ${chargeLabel(particle.charge)} · ${particle.visible ? "visible track" : "no track"}`;
+      item.className = particle.visible ? "is-visible" : "is-invisible";
+      item.append(name, details);
+      particleList.append(item);
+    }
+
+    eventReadout.replaceChildren(heading, reaction, explanation, particleList);
+  }
+
+  function updateEventKindControls() {
+    for (const button of explorer.querySelectorAll("[data-event-kind]")) {
+      const selected = button.dataset.eventKind === selectedEventKind;
+      button.classList.toggle("is-selected", selected);
+      button.setAttribute("aria-pressed", String(selected));
+    }
+  }
+
+  function makeSelectedEvent(kind, vertexOverride = null) {
+    const factories = {
+      decay: () => makeDecayEvent(vertexOverride),
+      cascade: () => makeCascadeEvent(vertexOverride),
+      dalitz: () => makeDalitzEvent(vertexOverride),
+      track: () => makeThroughTrack(vertexOverride),
+    };
+    const factory = factories[kind];
+    if (!factory) return null;
+
+    let eventRecord = factory();
+    for (let attempt = 0; attempt < 6 && eventRecord.kind !== kind; attempt += 1) {
+      eventRecord = factory();
+    }
+    return eventRecord.kind === kind ? eventRecord : null;
+  }
+
+  function generateExploredEvent(kind) {
+    selectedEventKind = kind;
+    updateEventKindControls();
+    if (paused) {
+      showStatus("Resume the chamber to generate an event.");
+      return;
+    }
+
+    const eventRecord = makeSelectedEvent(kind);
+    if (!eventRecord) {
+      showStatus("That topology could not be placed. Try again.");
+      return;
+    }
+    events.length = 0;
+    if (!addEvent(performance.now(), eventRecord)) {
+      showStatus("No visible tracks were generated. Try again.");
+      return;
+    }
+    renderEventReadout(eventRecord);
+    showStatus(`${eventRecord.label} generated`);
+  }
+
   function handleClick(event) {
     if (event.defaultPrevented || event.button !== 0) return;
     if (
@@ -859,8 +1090,16 @@
     }
 
     while (events.length >= CONFIG.maximumConcurrentEvents) events.shift();
-    addEvent(performance.now(), makeDalitzEvent({ x: event.clientX, y: event.clientY }));
-    showEventFeedback();
+    const eventRecord = makeSelectedEvent(selectedEventKind, {
+      x: event.clientX,
+      y: event.clientY,
+    });
+    if (!eventRecord || !addEvent(performance.now(), eventRecord)) {
+      showStatus("That topology could not be placed. Try again.");
+      return;
+    }
+    if (explorer.open) renderEventReadout(eventRecord);
+    showEventFeedback(eventRecord);
   }
 
   function showStatus(message) {
@@ -870,8 +1109,8 @@
     statusTimeout = window.setTimeout(() => status.classList.remove("visible"), 2400);
   }
 
-  function showEventFeedback() {
-    showStatus("π⁰ Dalitz decay generated");
+  function showEventFeedback(eventRecord) {
+    showStatus(`${eventRecord.label} generated`);
   }
 
   function updatePauseControl() {
@@ -1013,15 +1252,30 @@
 
   window.addEventListener("resize", resize, { passive: true });
   pauseButton.addEventListener("click", () => setPaused(!paused));
+  explorer.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-event-kind]");
+    if (button) generateExploredEvent(button.dataset.eventKind);
+  });
+  explorer.addEventListener("toggle", () => {
+    if (explorer.open) infoPanel.open = false;
+  });
+  infoPanel.addEventListener("toggle", () => {
+    if (infoPanel.open) explorer.open = false;
+  });
   document.addEventListener("click", (event) => {
     if (infoPanel.open && !infoPanel.contains(event.target)) {
       infoPanel.open = false;
-      event.preventDefault();
     }
+    if (explorer.open && !explorer.contains(event.target)) explorer.open = false;
   });
   document.addEventListener("click", handleClick);
   document.addEventListener("visibilitychange", handleVisibility);
   reducedMotion.addEventListener("change", () => window.location.reload());
+  for (const button of explorer.querySelectorAll("[data-event-kind]")) {
+    const topology = button.querySelector(".bubble-chamber-topology");
+    renderLatex(TOPOLOGY_LATEX[button.dataset.eventKind], topology, topology.textContent);
+  }
+  updateEventKindControls();
   resize();
   updatePauseControl();
   if (paused) draw(pausedAt);
