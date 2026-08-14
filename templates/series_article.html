@@ -4,7 +4,9 @@
 {%- set date_format = macros_translate::translate(key="date_format", default="%B %d, %Y", language_strings=language_strings) -%}
 {%- set date_locale = macros_translate::translate(key="date_locale", default="en_US", language_strings=language_strings) -%}
 {%- set rel_attributes = macros_rel_attributes::rel_attributes() | trim -%}
-{%- set series_section = get_section(path=page.extra.series_section) -%}
+{%- if page.extra.series_section -%}
+	{%- set_global series_section = get_section(path=page.extra.series_section) -%}
+{%- endif -%}
 
 {%- if page.extra.toc_ordered or section.extra.toc_ordered or config.extra.toc_ordered -%}
 	{%- set list_element = "ol" -%}
@@ -134,9 +136,27 @@
 		{%- include "partials/toc.html" -%}
 	{%- endif -%}
 
-	{%- include "partials/article_series_top.html" -%}
-	{{ page.content | safe }}
-	{%- include "partials/article_series_bottom.html" -%}
+	{%- if page.extra.series_section -%}
+		{%- include "partials/article_series_top.html" -%}
+	{%- endif -%}
+
+	{%- if page.toc | length > 1 -%}
+		<div class="article-reading-progress" data-reading-progress aria-hidden="true">
+			<span></span>
+		</div>
+		<div class="article-reading-layout">
+			{%- include "partials/article_toc.html" -%}
+			<div class="article-reading-content" data-reading-content>
+				{{ page.content | safe }}
+			</div>
+		</div>
+	{%- else -%}
+		{{ page.content | safe }}
+	{%- endif -%}
+
+	{%- if page.extra.series_section -%}
+		{%- include "partials/article_series_bottom.html" -%}
+	{%- endif -%}
 </article>
 
 {%- if page.extra.comments.id -%}
