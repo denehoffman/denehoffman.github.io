@@ -2,6 +2,13 @@
 title = "Publications"
 +++
 
+<nav class="publication-years" aria-label="Publication years">
+  <span>Jump to year</span>
+  <a href="#2023">2023</a>
+  <a href="#2021">2021</a>
+  <a href="#2020">2020</a>
+  <a href="#2017">2017</a>
+</nav>
 
 # 2023
 

@@ -35,7 +35,7 @@
         <circle cx="30" cy="12" r="1.8" />
       </svg>
       <strong>maryada</strong>
-      <span>GitHub repository</span>
+      <span>Interval arithmetic · Rust</span>
     </a>
     <a class="home-project home-project--gluex" href="/projects/gluex-rs/">
       <svg class="home-project__motif" viewBox="0 0 64 40" aria-hidden="true">
@@ -43,7 +43,7 @@
         <circle cx="26" cy="21" r="2.2" />
       </svg>
       <strong>gluex-rs</strong>
-      <span>GitHub repository</span>
+      <span>GlueX analysis tools · Rust + Python</span>
     </a>
   </div>
 </nav>

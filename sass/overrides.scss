@@ -1559,3 +1559,69 @@ main:has(> .project-showcase) > h1:first-child {
     margin-inline: -0.5rem;
   }
 }
+
+.publication-years {
+  position: sticky;
+  top: 0.75rem;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-block: 0.5rem 2.5rem;
+  border: 1px solid var(--fg-muted-2);
+  border-radius: 999px;
+  background: var(--glass-bg);
+  padding: 0.35rem;
+  width: fit-content;
+  max-width: 100%;
+  font-family: var(--font-scholarly-sans);
+  font-size: 0.72rem;
+  line-height: 1;
+  box-shadow: 0 0.35rem 1.25rem rgb(32 44 59 / 0.08);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.publication-years > span {
+  padding-inline: 0.65rem 0.45rem;
+  color: var(--fg-muted-5);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.publication-years a {
+  border-radius: 999px;
+  padding: 0.5rem 0.7rem;
+  color: var(--fg-muted-5);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background-color 140ms ease, color 140ms ease;
+}
+
+.publication-years a:hover,
+.publication-years a:focus-visible {
+  background: var(--fg-muted-1);
+  color: var(--accent-color);
+}
+
+.publication-years a.is-current {
+  background: var(--accent-color);
+  color: var(--fg-contrast);
+}
+
+main:has(> .publication-years) > h1[id] {
+  scroll-margin-top: 5rem;
+}
+
+@media only screen and (max-width: 480px) {
+  .publication-years {
+    width: 100%;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .publication-years::-webkit-scrollbar {
+    display: none;
+  }
+}
