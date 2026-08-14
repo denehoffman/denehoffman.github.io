@@ -2,17 +2,24 @@
 title = "Publications"
 +++
 
-<nav class="publication-years" aria-label="Publication years">
-  <span>Jump to year</span>
+<nav class="publication-years" aria-label="Selected publication years">
+  <span>Selected years</span>
   <a href="#2023">2023</a>
   <a href="#2021">2021</a>
   <a href="#2020">2020</a>
   <a href="#2017">2017</a>
 </nav>
 
+{{ scholar_overview() }}
+
+<div class="publication-section-heading">
+  <p class="publication-eyebrow">Selected publications</p>
+  <p>Papers I worked on directly.</p>
+</div>
+
 # 2023
 
-## [**Fano Resonant Optical coatings platform for Full Gamut and High Purity Structural Colors**](https://doi.org/10.21203/rs.3.rs-2078826/v1)
+## [**Fano Resonant Optical coatings platform for Full Gamut and High Purity Structural Colors**](https://doi.org/10.1038/s41467-023-39602-2)
 
 *Mohamed ElKabbash, **Nathaniel Hoffman**, Andrew Lininger, Sohail Jalil, Theodore Letsou, Michael Hinczewski, Giuseppe Strangi, Chunlei Guo*
 
@@ -73,3 +80,76 @@ Efficient light-to-heat conversion is central for various applications such as t
   <summary>Abstract</summary>
 Perfect light absorption in the visible and near-infrared (NIR) was demonstrated using metamaterials, plasmonic nanostructures, and thin films. Thin film absorbers offer a simple and low-cost design as they can be produced on large areas and without lithography. Light is strongly absorbed in thin film metal-dielectric-metal (MDM) cavities at their resonance frequencies. However, a major drawback of MDM absorbers is their strong resonance iridescence, i.e., angle dependence. Here, we solve the iridescence problem by achieving angle-insensitive narrowband perfect and near-perfect light absorption. In particular, we show analytically that using a high-index dielectric in MDM cavities is sufficient to achieve angle-insensitive cavity resonance. We demonstrate experimentally angle-insensitive perfect and near-perfect absorbers in the NIR and visible regimes up to ±60°. By overcoming the iridescence problem, we open the door for practical applications of MDM absorbers at optical frequencies.
 </details>
+
+<section class="collaboration-publications" aria-labelledby="collaboration-publications-title">
+  <header>
+    <p class="publication-eyebrow">Broader research record</p>
+    <h2 id="collaboration-publications-title">Collaboration publications</h2>
+    <p>Papers published as a member of a larger experimental collaboration, visually separated from work I contributed to directly.</p>
+  </header>
+
+  <div class="collaboration-publications__list">
+    <article class="collaboration-publication">
+      <time datetime="2026">2026</time>
+      <div><h3><a href="https://doi.org/10.1103/jsfs-nq46">Search for the Y(2175) in the photoproduction cross section measurement of γp → ϕπ⁺π⁻p at GlueX</a></h3><p>GlueX Collaboration · Physical Review Letters 136, 251902</p></div>
+      <span>Collaboration</span>
+    </article>
+    <article class="collaboration-publication">
+      <time datetime="2026">2026</time>
+      <div><h3><a href="https://doi.org/10.1103/h197-l9dw">Baryon–antibaryon photoproduction cross sections off the proton</a></h3><p>GlueX Collaboration · Physical Review C 113, 045207</p></div>
+      <span>Collaboration</span>
+    </article>
+    <article class="collaboration-publication">
+      <time datetime="2025">2025</time>
+      <div><h3><a href="https://doi.org/10.1016/j.physletb.2025.139914">Measurement of the total Compton scattering cross section between 6.5 and 11 GeV</a></h3><p>GlueX Collaboration · Physics Letters B 870, 139914</p></div>
+      <span>Collaboration</span>
+    </article>
+    <article class="collaboration-publication">
+      <time datetime="2025">2025</time>
+      <div><h3><a href="https://doi.org/10.1103/2tdc-5by6">Measurement of spin-density matrix elements in ϕ(1020) → K⁰<sub>S</sub>K⁰<sub>L</sub> photoproduction with a linearly polarized photon beam</a></h3><p>GlueX Collaboration · Physical Review C 112, 025203</p></div>
+      <span>Collaboration</span>
+    </article>
+    <article class="collaboration-publication">
+      <time datetime="2025">2025</time>
+      <div><h3><a href="https://doi.org/10.1103/jfzb-rfl4">First measurement of a⁰<sub>2</sub>(1320) polarized photoproduction cross section</a></h3><p>GlueX Collaboration · Physical Review C 112, 015204</p></div>
+      <span>Collaboration</span>
+    </article>
+    <article class="collaboration-publication">
+      <time datetime="2025">2025</time>
+      <div><h3><a href="https://doi.org/10.1016/j.physletb.2025.139368">Measurement of spin-density matrix elements in Δ⁺⁺(1232) photoproduction</a></h3><p>GlueX Collaboration · Physics Letters B 863, 139368</p></div>
+      <span>Collaboration</span>
+    </article>
+    <article class="collaboration-publication">
+      <time datetime="2024">2024</time>
+      <div><h3><a href="https://doi.org/10.1016/j.physletb.2024.138790">Search for axion-like particles through nuclear Primakoff production using the GlueX detector</a></h3><p>GlueX Collaboration · Physics Letters B 855, 138790</p></div>
+      <span>Collaboration</span>
+    </article>
+    <article class="collaboration-publication">
+      <time datetime="2024">2024</time>
+      <div><h3><a href="https://doi.org/10.1103/PhysRevLett.133.261903">Upper limit on the photoproduction cross section of the spin-exotic π₁(1600)</a></h3><p>GlueX Collaboration · Physical Review Letters 133, 261903</p></div>
+      <span>Collaboration</span>
+    </article>
+    <article class="collaboration-publication">
+      <time datetime="2023">2023</time>
+      <div><h3><a href="https://doi.org/10.1103/PhysRevC.108.055204">Measurement of spin-density matrix elements in ρ(770) production with a linearly polarized photon beam</a></h3><p>GlueX Collaboration · Physical Review C 108, 055204</p></div>
+      <span>Collaboration</span>
+    </article>
+    <article class="collaboration-publication">
+      <time datetime="2023">2023</time>
+      <div><h3><a href="https://doi.org/10.1103/PhysRevC.108.025201">Measurement of the J/ψ photoproduction cross section over the full near-threshold kinematic region</a></h3><p>GlueX Collaboration · Physical Review C 108, 025201</p></div>
+      <span>Collaboration</span>
+    </article>
+    <article class="collaboration-publication">
+      <time datetime="2022">2022</time>
+      <div><h3><a href="https://doi.org/10.1103/PhysRevD.105.052007">Search for photoproduction of axionlike particles at GlueX</a></h3><p>GlueX Collaboration · Physical Review D 105, 052007</p></div>
+      <span>Collaboration</span>
+    </article>
+    <article class="collaboration-publication">
+      <time datetime="2022">2022</time>
+      <div><h3><a href="https://doi.org/10.1103/PhysRevC.105.035201">Measurement of spin density matrix elements in Λ(1520) photoproduction at 8.2–8.8 GeV</a></h3><p>GlueX Collaboration · Physical Review C 105, 035201</p></div>
+      <span>Collaboration</span>
+    </article>
+  </div>
+
+  <a class="collaboration-publications__more" href="https://scholar.google.com/citations?user=39-XmFUAAAAJ&hl=en">See the complete record on Google Scholar <span aria-hidden="true">↗</span></a>
+</section>

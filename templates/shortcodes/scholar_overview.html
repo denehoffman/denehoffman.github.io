@@ -1,0 +1,22 @@
+{% set scholar = load_data(path="data/scholar.json") %}
+<section class="scholar-overview" aria-labelledby="scholar-overview-title">
+  <div class="scholar-overview__summary">
+    <p class="publication-eyebrow">Google Scholar snapshot</p>
+    <h2 id="scholar-overview-title">Citation record</h2>
+    <div class="scholar-overview__metrics">
+      <div><strong>{{ scholar.citations }}</strong><span>Citations</span></div>
+      <div><strong>{{ scholar.h_index }}</strong><span>h-index</span></div>
+      <div><strong>{{ scholar.i10_index }}</strong><span>i10-index</span></div>
+    </div>
+    <p class="scholar-overview__note">Across selected and collaboration publications · {{ scholar.updated }}</p>
+    <a class="scholar-overview__link" href="{{ scholar.profile_url }}">View the live profile <span aria-hidden="true">↗</span></a>
+  </div>
+  <figure class="citation-chart">
+    <figcaption>Citations by year</figcaption>
+    <ol>
+      {% for year in scholar.history %}
+      <li style="--citation-height: {{ year.height }}"><span aria-hidden="true"></span><strong>{{ year.citations }}</strong><small>{{ year.year }}</small></li>
+      {% endfor %}
+    </ol>
+  </figure>
+</section>

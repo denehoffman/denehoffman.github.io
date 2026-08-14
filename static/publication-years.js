@@ -3,6 +3,7 @@
   if (!rail) return;
 
   const links = [...rail.querySelectorAll("a[href^='#']")];
+  const collaborationSection = document.querySelector(".collaboration-publications");
   const sections = links
     .map((link) => document.getElementById(link.hash.slice(1)))
     .filter(Boolean);
@@ -19,8 +20,13 @@
   };
 
   const updateCurrentYear = () => {
-    const threshold = Math.min(rail.getBoundingClientRect().bottom + 24, 180);
+    const threshold = Math.min(rail.getBoundingClientRect().bottom + 40, 180);
     let current = sections[0];
+
+    if (collaborationSection) {
+      const pastSelected = collaborationSection.getBoundingClientRect().top <= threshold;
+      rail.classList.toggle("is-past-selected", pastSelected);
+    }
 
     sections.forEach((heading) => {
       if (heading.getBoundingClientRect().top <= threshold) current = heading;
