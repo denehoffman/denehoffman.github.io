@@ -1,0 +1,9 @@
+<figure class="algorithm-flow">
+  <figcaption class="algorithm-flow__header">
+    <span class="algorithm-flow__label">{{ label | default(value="Algorithm") }}</span>
+    {% if title %}<strong>{{ title }}</strong>{% endif %}
+  </figcaption>
+  <div class="algorithm-flow__body">
+    {{ body | markdown | safe }}
+  </div>
+</figure>

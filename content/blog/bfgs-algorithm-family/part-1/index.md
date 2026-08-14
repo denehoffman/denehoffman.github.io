@@ -299,6 +299,8 @@ We'll be implementing Algorithms 3.5 and 3.6 from ["Numerical Optimization"](htt
 
 #### Algorithm 3.5
 
+{% algorithm(label="Algorithm 3.5", title="Strong Wolfe line search") %}
+
 1. $`\alpha_0 \gets 0`$, $`\alpha_\text{max} > 0`$, $`\alpha_1 \in (0, \alpha_\text{max})`$, $`i \gets 1`$
 2. `loop`
    1. `if`
@@ -323,6 +325,8 @@ We'll be implementing Algorithms 3.5 and 3.6 from ["Numerical Optimization"](htt
    4. $`\alpha_{i+1} \in (\alpha_i, \alpha_\text{max})`$ (choose some larger step that is smaller than the max step)
    5. $`i \gets i + 1`$
 
+{% end %}
+
 In each loop, we are first checking to see if the function is sufficiently decreasing. If it isn't, we know that the step size overshoots. Imagine we are just minimizing into a 1D parabola. If we are sitting to the left of the minimum, the optimal step length $`\alpha_\text{opt}`$ would put us right at the minimum. If we pick a step $`\alpha < \alpha_\text{opt}`$ would be fine, but it would mean we converge slower than optimal. The same can be said for a step length $`\alpha > \alpha_\text{opt}`$, but at a certain point, we will be stepping to a point higher up the parabola than where we began, even though we are moving in the right direction! Step 2.1 ensures that if this happens, we will do a more refined search (`zoom`) between the current and previous step lengths (note that $`\alpha_{i-1} = 0`$ when $`i=1`$ on the first loop). This will happen a lot if we pick a starting step length that is too large (see the following diagram).
 
 ![Taking a step that is too large](line_search_increase.svg)
@@ -337,6 +341,8 @@ If we are decreasing sufficiently, but the magnitude of the projected gradient i
 In the above plot, both points meet the Armijo condition, but they fail to meet the strong Wolfe condition. This means they make it to Step 3 in our line search algorithm. For the left-most point, the gradient points in the $`-x`$ direction while the step was in the $`+x`$ direction, so the condition at Step 3 is not satisfied, and we increase our step size (hopefully landing in the green region). For the right-most point, the gradient now points in the $`+x`$ direction, so Step 3 is satisfied and we again `zoom` between this step size and the previous. Note that the arguments to `zoom` are switched here. In the definition of the `zoom` algorithm, we will refer to the first argument as $`\alpha_{\text{lo}}`$ and the second as $`\alpha_{\text{hi}}`$. However, since $`\alpha_i`$ is strictly increasing in Algorithm 3.5, we shouldn't think of one of these values as larger than the other, but rather that the function evaluations at these points are lower or higher. Here, $`\alpha_\text{lo}`$ will always refer to a step length which satisfied the Armijo condition, which means that the function value with this step length is the lower of the two. $`\alpha_\text{hi}`$ will be the previous step if the current one is the first to satisfy the Armijo condition (Step 2.3) or it will be the current step if the previous step gave a smaller function evaluation (Step 2.1). In either case, we know that the optimal step length is in the given range.
 
 #### Algorithm 3.6 (`zoom`)
+
+{% algorithm(label="Algorithm 3.6", title="Zoom into a valid interval") %}
 
 1. loop
    1. Choose $`\alpha_j`$ between $`\alpha_{\text{lo}}`$ and $`\alpha_{\text{hi}}`$ (it's possible for $`\alpha_\text{lo} > \alpha_\text{hi}`$).
@@ -362,6 +368,8 @@ In the above plot, both points meet the Armijo condition, but they fail to meet 
 
             `then` $`\alpha_\text{hi} \gets \alpha_\text{lo}`$
          3. $`\alpha_\text{lo} \gets \alpha_j`$
+
+{% end %}
 
 There are only a few possible outcomes of this loop. The "middle" outcome is to return $`\alpha_j`$ if it satisfies the Strong Wolfe and Armijo conditions. We check first for Armijo (remember, this is generally less restrictive), and if it's not satisfied, or if the evaluation is worse than $`\alpha_{\text{lo}}`$, we move $`\alpha_{\text{hi}}`$ to $`\alpha_j`$. Remember, the subscripts represent the relative value of the function evaluated at that step, and we know that [Algorithm 3.5](#algorithm-3-5) will guarantee that the two steps given will surround the "green" region of optimal step size. If Armijo is satisfied but Wolfe is not, we will always move $`\alpha_{\text{lo}}`$ up to $`\alpha_j`$, but if the condition in 2.2 is met, this implies that either the order of $`\alpha_{\text{hi}}`$ and $`\alpha_{\text{lo}}`$ is opposite what we think it should be (because in reality these functions are not always smooth minima like the previous diagrams) or the step $`\alpha_j`$ no longer goes in the direction of steepest descent. In either case, we then need move our $`\alpha_{\text{hi}}`$ endpoint to $`\alpha_{\text{lo}}`$ first. I'd recommend drawing out several minima scenarios to get a handle on this algorithm, but eventually it will start to make some sense.
 
