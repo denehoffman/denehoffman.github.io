@@ -28,8 +28,8 @@ extra_grammars = ["syntaxes/math.json"]
 index_format = "fuse_json"
 
 [extra]
-accent_color = "#fe640b"
-accent_color_dark = "#fab387"
+accent_color = "#a04b24"
+accent_color_dark = "#e59668"
 issues_url = "https://github.com/denehoffman/denehoffman.github.io/issues"
 source_url = "https://github.com/denehoffman/denehoffman.github.io"
 show_copy_button = true
@@ -39,6 +39,7 @@ show_backlinks = true
 katex = true
 card = true
 styles = ["overrides.css"]
+scripts = ["home-links.js"]
 
 
 csp = [
@@ -88,8 +89,8 @@ links = [
   { name = "Projects", menu = [
     { url = "@/projects/laddu/index.md", name = "laddu" },
     { url = "@/projects/ganesh/index.md", name = "ganesh" },
-    { url = "@/projects/modak/index.md", name = "modak" },
-    { url = "@/projects/rustitude/index.md", name = "rustitude" },
+    { url = "https://github.com/denehoffman/maryada", name = "maryada" },
+    { url = "https://github.com/denehoffman/gluex-rs", name = "gluex-rs" },
   ] },
 ]
 
