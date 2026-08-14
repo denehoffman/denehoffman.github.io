@@ -452,6 +452,28 @@ main:has(> .home-projects) > h1:first-child + aside img {
   }
 }
 
+// Let the primary research feature carry the card treatment. Supporting
+// homepage sections use spacing and a short, deliberately inset marker.
+.home-section.home-section--writing,
+.home-section.home-section--group,
+.home-section.home-section--links {
+  position: relative;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.home-section.home-section--writing::before,
+.home-section.home-section--group::before,
+.home-section.home-section--links::before {
+  display: block;
+  margin-block-end: 1.25rem;
+  background: linear-gradient(90deg, var(--fg-muted-3), transparent);
+  width: min(8rem, 35%);
+  height: 1px;
+  content: "";
+}
+
 @media only screen and (max-width: 720px) {
   body {
     text-align: left;
