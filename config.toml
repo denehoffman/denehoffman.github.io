@@ -39,7 +39,7 @@ show_backlinks = true
 katex = true
 card = true
 styles = ["overrides.css"]
-scripts = ["home-links.js", "mobile-nav.js", "bubble-chamber.js"]
+scripts = ["home-links.js", "mobile-nav.js", "bubble-chamber.js", "laddu-interference.js"]
 
 
 csp = [

@@ -848,7 +848,7 @@
     if (event.defaultPrevented || event.button !== 0) return;
     if (
       event.target.closest(
-        ".bubble-chamber-controls, a, button, input, summary, video, audio",
+        ".bubble-chamber-controls, .laddu-spectrum, a, button, input, summary, video, audio",
       )
     ) return;
     if (window.getSelection()?.toString()) return;
