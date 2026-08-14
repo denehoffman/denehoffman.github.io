@@ -1,8 +1,14 @@
 +++
 title = "The BFGS Algorithm Family in Rust (Part 1)"
 description = "Intro to line searches"
+date = 2024-09-08
+weight = 1
+path = "blog/the-bfgs-algorithm-family-in-rust-part-1"
 [taxonomies]
 tags = ["rust", "algorithms", "programming"]
+[extra]
+series_label = "Line searches"
+series_section = "blog/bfgs-algorithm-family/_index.md"
 +++
 
 The BFGS (Broyden-Fletcher-Goldfarb-Shanno) algorithm and its derivatives were (and for the most part still are) the gold standard methods for quasi-Newton optimization. In this post, I want to give a brief overview of the main idea, the limited-memory adaptation (L-BFGS), and the bounded version (L-BFGS-B) and how I implemented them in a Rust crate I'm developing called [`ganesh`](https://github.com/denehoffman/ganesh). The full algorithm can be seen there, and I will mainly be focusing on the main methodology, since the actual literature on it is rather old and difficult to parse (and even has a few typos!).
@@ -511,6 +517,6 @@ where
 }
 ```
 
-The full implementation (with a nicer API and some other features I'm not going to mention in these blog posts) can be found [here](https://github.com/denehoffman/ganesh/blob/604a8ebd47c519fe07104439e87e22b2425e9f62/src/algorithms/line_search.rs). In the [next post](@/blog/2024-12-15-the-bfgs-algorithm-family-in-rust-part-2/index.md), I will describe the first of the BFGS family of algorithms, the standard BFGS algorithm (no bounds, no limited-memory optimizations).
+The full implementation (with a nicer API and some other features I'm not going to mention in these blog posts) can be found [here](https://github.com/denehoffman/ganesh/blob/604a8ebd47c519fe07104439e87e22b2425e9f62/src/algorithms/line_search.rs). In the [next post](@/blog/bfgs-algorithm-family/part-2/index.md), I will describe the first of the BFGS family of algorithms, the standard BFGS algorithm (no bounds, no limited-memory optimizations).
 
 [^1]: In the full code, there are additional clauses for updating outside `Observer`s, which can monitor the `Algorithm` at each step.

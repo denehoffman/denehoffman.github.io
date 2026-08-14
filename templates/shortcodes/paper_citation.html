@@ -1,0 +1,23 @@
+{% set citation_text = authors ~ ", “" ~ title ~ ",” " ~ venue ~ " (" ~ year ~ "). https://doi.org/" ~ doi %}
+{% set bibtex_text = "@article{" ~ key ~ ",\n  author = {" ~ bibtex_authors ~ "},\n  title = {" ~ title ~ "},\n  journal = {" ~ journal ~ "},\n  year = {" ~ year ~ "},\n  doi = {" ~ doi ~ "}" %}
+{% set volume_value = volume | default(value="") %}
+{% set number_value = number | default(value="") %}
+{% set pages_value = pages | default(value="") %}
+{% if volume_value %}{% set bibtex_text = bibtex_text ~ ",\n  volume = {" ~ volume_value ~ "}" %}{% endif %}
+{% if number_value %}{% set bibtex_text = bibtex_text ~ ",\n  number = {" ~ number_value ~ "}" %}{% endif %}
+{% if pages_value %}{% set bibtex_text = bibtex_text ~ ",\n  pages = {" ~ pages_value ~ "}" %}{% endif %}
+{% set bibtex_text = bibtex_text ~ "\n}" %}
+
+<span class="paper-citation" data-citation-copy="{{ citation_text }}" data-bibtex-copy="{{ bibtex_text }}">
+  <span class="paper-citation__mark" aria-hidden="true">ref</span>
+  <span class="paper-citation__body">
+    <strong>{{ title }}</strong>
+    <span>{{ authors }}</span>
+    <span>{{ venue }} · {{ year }}</span>
+  </span>
+  <span class="paper-citation__actions" aria-label="Paper links and citation actions">
+    <a href="https://doi.org/{{ doi }}">DOI</a>
+    <button type="button" data-copy-paper="citation">Copy citation</button>
+    <button type="button" data-copy-paper="bibtex">Copy BibTeX</button>
+  </span>
+</span>

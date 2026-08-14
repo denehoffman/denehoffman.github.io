@@ -1,12 +1,18 @@
 +++
 title = "The BFGS Algorithm Family in Rust (Part 2)"
 description = "The BFGS implementation"
+date = 2024-12-15
+weight = 2
+path = "blog/the-bfgs-algorithm-family-in-rust-part-2"
 [taxonomies]
 tags = ["rust", "algorithms", "programming"]
+[extra]
+series_label = "BFGS"
+series_section = "blog/bfgs-algorithm-family/_index.md"
 +++
 
 {% alert(note=true) %}
-Since writing the [previous post](@/blog/2024-09-08-the-bfgs-algorithm-family-in-rust-part-1/index.md), I have made several simplifications to the library that will change how some structs and traits are used here. The biggest change is that I've abandoned generic floats in favor of a feature gate:
+Since writing the [previous post](@/blog/bfgs-algorithm-family/part-1/index.md), I have made several simplifications to the library that will change how some structs and traits are used here. The biggest change is that I've abandoned generic floats in favor of a feature gate:
 
  ```rust
  #[cfg(not(feature = "f32"))]

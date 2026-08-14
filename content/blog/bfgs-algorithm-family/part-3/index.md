@@ -1,11 +1,17 @@
 +++
 title = "The BFGS Algorithm Family in Rust (Part 3)"
 description = "The L-BFGS-B implementation"
+date = 2025-06-18
+weight = 3
+path = "blog/the-bfgs-algorithm-family-in-rust-part-3"
 [taxonomies]
 tags = ["rust", "algorithms", "programming"]
+[extra]
+series_label = "L-BFGS-B"
+series_section = "blog/bfgs-algorithm-family/_index.md"
 +++
 
-In my previous posts ([here](@/blog/2024-09-08-the-bfgs-algorithm-family-in-rust-part-1/index.md) and [here](@/blog/2024-12-15-the-bfgs-algorithm-family-in-rust-part-2/index.md)), I discussed line searches and the original BFGS algorithm. The next improvement on this algorithm is a limited memory version, called L-BFGS, but rather than explicitly constructing it, we will instead skip to the limited memory version with parameter bounds, L-BFGS-B. However, we should start by understanding why there even is an L-BFGS algorithm at all.
+In my previous posts ([here](@/blog/bfgs-algorithm-family/part-1/index.md) and [here](@/blog/bfgs-algorithm-family/part-2/index.md)), I discussed line searches and the original BFGS algorithm. The next improvement on this algorithm is a limited memory version, called L-BFGS, but rather than explicitly constructing it, we will instead skip to the limited memory version with parameter bounds, L-BFGS-B. However, we should start by understanding why there even is an L-BFGS algorithm at all.
 
 In the BFGS algorithm, we start with a guess for the inverse Hessian $`B_0^{-1}`$ and then improve this guess at each step by defining
 
@@ -388,6 +394,5 @@ There are likely several places where I could optimize the code, but I haven't r
 
 This is the last post in my first series of blog posts on this site. As you might be able to tell, I'm still getting used to writing regularly, and I've been a bit preoccupied with my PhD thesis lately, but I hope to have more interesting posts in the future (which will hopefully be written with a bit more forethought than these have been). I hope anyone reading this has enjoyed it, and I hope it clears up some of the general ideas of each algorithm. If anyone is interested in a more in-depth review, check out the cited papers here or any of the citations in the previous posts, as they are full of interesting notes and insights.
 
-[^1]: [R. H. Byrd, J. Nocedal, and R. B. Schnabel, “Representations of quasi-Newton matrices and their use in limited memory methods,” Mathematical Programming, vol. 63, no. 1–3, pp. 129–156, Jan. 1994, doi: 10.1007/bf01582063.
-](https://doi.org/10.1007/bf01582063)
-[^2]: [R. H. Byrd, P. Lu, J. Nocedal, and C. Zhu, “A Limited Memory Algorithm for Bound Constrained Optimization,” SIAM J. Sci. Comput., vol. 16, no. 5, pp. 1190–1208, Sep. 1995, doi: 10.1137/0916069.](https://doi.org/10.1137/0916069)
+[^1]: {{ paper_citation(key="Byrd1994", authors="R. H. Byrd, J. Nocedal, and R. B. Schnabel", bibtex_authors="Byrd, Richard H. and Nocedal, Jorge and Schnabel, Robert B.", title="Representations of quasi-Newton matrices and their use in limited memory methods", journal="Mathematical Programming", venue="Mathematical Programming 63(1–3), 129–156", volume="63", number="1–3", pages="129–156", year="1994", doi="10.1007/bf01582063") }}
+[^2]: {{ paper_citation(key="Byrd1995", authors="R. H. Byrd, P. Lu, J. Nocedal, and C. Zhu", bibtex_authors="Byrd, Richard H. and Lu, Peihuang and Nocedal, Jorge and Zhu, Ciyou", title="A Limited Memory Algorithm for Bound Constrained Optimization", journal="SIAM Journal on Scientific Computing", venue="SIAM Journal on Scientific Computing 16(5), 1190–1208", volume="16", number="5", pages="1190–1208", year="1995", doi="10.1137/0916069") }}

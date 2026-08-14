@@ -1,0 +1,25 @@
+{% set_global current_part = 0 %}
+{% for entry in series_section.pages %}
+  {% if entry.permalink == page.permalink %}{% set_global current_part = loop.index %}{% endif %}
+{% endfor %}
+
+<nav class="article-series" aria-label="{{ series_section.title }} series">
+  <header class="article-series__header">
+    <div>
+      <span>Article series</span>
+      <strong>{{ series_section.title }}</strong>
+    </div>
+    <span>Part {{ current_part }} of {{ series_section.pages | length }}</span>
+  </header>
+  <ol class="article-series__steps" style="--series-parts: {{ series_section.pages | length }}">
+    {% for entry in series_section.pages %}
+      <li class="{% if loop.index <= current_part %}is-reached{% endif %}">
+        {% if entry.permalink == page.permalink %}
+          <span aria-current="step"><b>{% if loop.index < 10 %}0{% endif %}{{ loop.index }}</b>{{ entry.extra.series_label }}</span>
+        {% else %}
+          <a href="{{ entry.permalink }}"><b>{% if loop.index < 10 %}0{% endif %}{{ loop.index }}</b>{{ entry.extra.series_label }}</a>
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ol>
+</nav>
