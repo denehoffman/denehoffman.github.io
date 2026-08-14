@@ -1,0 +1,101 @@
+{
+  "featured": ["laddu", "ganesh", "maryada", "gluex-rs"],
+  "order": ["laddu", "ganesh", "maryada", "gluex-rs", "yamloom", "pdg-rs", "splotrs", "see", "hddm-rs", "modak", "rustitude"],
+  "projects": {
+    "laddu": {
+      "title": "laddu",
+      "summary": "A library for analysis of particle physics data, written in Rust with bindings to Python.",
+      "card_summary": "Amplitude analysis · Python + Rust",
+      "image": "/projects/laddu/laddu_logo.svg",
+      "tags": ["Rust", "Python", "Amplitude analysis"],
+      "repository": "https://github.com/denehoffman/laddu",
+      "documentation": "https://denehoffman.github.io/laddu/",
+      "package": "https://pypi.org/project/laddu/"
+    },
+    "ganesh": {
+      "title": "ganesh",
+      "summary": "Several common minimization algorithms with a straightforward, trait-based interface.",
+      "card_summary": "Optimization · Rust",
+      "image": "/projects/ganesh/ganesh_logo.svg",
+      "tags": ["Rust", "Optimization"],
+      "repository": "https://github.com/denehoffman/ganesh",
+      "documentation": "https://docs.rs/ganesh",
+      "package": "https://crates.io/crates/ganesh"
+    },
+    "maryada": {
+      "title": "maryada",
+      "summary": "A no_std binary64 interval arithmetic library conforming to IEEE Std 1788.1-2017.",
+      "card_summary": "Interval arithmetic · Rust",
+      "tags": ["Rust", "Interval arithmetic", "no_std", "IEEE 1788.1"],
+      "repository": "https://github.com/denehoffman/maryada",
+      "documentation": "https://docs.rs/maryada",
+      "package": "https://crates.io/crates/maryada"
+    },
+    "gluex-rs": {
+      "title": "gluex-rs",
+      "summary": "Tools for GlueX analyses written in Rust and Python.",
+      "card_summary": "GlueX analysis tools · Rust + Python",
+      "tags": ["Rust", "Python", "GlueX", "Data analysis"],
+      "repository": "https://github.com/denehoffman/gluex-rs"
+    },
+    "yamloom": {
+      "title": "yamloom",
+      "summary": "A Python API backed by Rust for generating, validating, and synchronizing GitHub Actions workflows without hand-writing YAML.",
+      "card_summary": "GitHub Actions · Python + Rust",
+      "tags": ["Python", "Rust", "GitHub Actions", "CI/CD"],
+      "repository": "https://github.com/denehoffman/yamloom",
+      "package": "https://pypi.org/project/yamloom/"
+    },
+    "pdg-rs": {
+      "title": "pdg-rs",
+      "summary": "A Rust library and command-line interface for programmatic access to the Particle Data Group database of particle-physics measurements.",
+      "card_summary": "PDG database · Rust",
+      "tags": ["Rust", "CLI", "Particle physics", "SQLite"],
+      "status": "Experimental",
+      "repository": "https://github.com/denehoffman/pdg-rs",
+      "documentation": "https://docs.rs/pdg-rs",
+      "package": "https://crates.io/crates/pdg-rs"
+    },
+    "splotrs": {
+      "title": "splotrs",
+      "summary": "A Rust and Python library for joint mixture fits and per-event sWeights, including shared shape parameters and signed event weights.",
+      "card_summary": "sWeights · Python + Rust",
+      "tags": ["Rust", "Python", "Statistics", "Data analysis"],
+      "repository": "https://github.com/denehoffman/splotrs",
+      "documentation": "https://docs.rs/splotrs",
+      "package": "https://pypi.org/project/splotrs/"
+    },
+    "see": {
+      "title": "see",
+      "summary": "A lightweight terminal image viewer using native Kitty, iTerm2, and SIXEL graphics protocols instead of character approximations.",
+      "card_summary": "Terminal graphics · Rust",
+      "tags": ["Rust", "CLI", "Terminal", "Graphics"],
+      "repository": "https://github.com/denehoffman/see",
+      "package": "https://crates.io/crates/see-cli"
+    },
+    "hddm-rs": {
+      "title": "hddm-rs",
+      "summary": "Rust tooling for reading and writing GlueX HDDM data and generating strongly typed bindings from HDDM models.",
+      "card_summary": "GlueX data formats · Rust",
+      "tags": ["Rust", "GlueX", "Data formats", "Code generation"],
+      "repository": "https://github.com/denehoffman/hddm-rs"
+    },
+    "modak": {
+      "title": "modak",
+      "summary": "An opinionated task queue with dependency management, resource allocation, and isolation control.",
+      "card_summary": "Task queues · Python + Rust",
+      "tags": ["Python", "Rust", "Task queues"],
+      "status": "Archived",
+      "repository": "https://github.com/denehoffman/modak"
+    },
+    "rustitude": {
+      "title": "rustitude",
+      "summary": "A one-stop shop for amplitude analysis and the predecessor to laddu.",
+      "card_summary": "Amplitude analysis · Python + Rust",
+      "image": "/projects/rustitude/rustitude_logo.png",
+      "tags": ["Rust", "Python", "Amplitude analysis"],
+      "status": "Archived",
+      "repository": "https://github.com/denehoffman/rustitude"
+    }
+  }
+}

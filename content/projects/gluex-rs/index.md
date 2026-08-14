@@ -2,7 +2,7 @@
 title = "gluex-rs"
 +++
 <!-- markdownlint-disable MD034 -->
-{{ project_header(title="gluex-rs", summary="Tools for GlueX analyses written in Rust and Python.", tags=["Rust", "Python", "GlueX", "Data analysis"], repository="https://github.com/denehoffman/gluex-rs") }}
+{{ project_header(project="gluex-rs") }}
 
 [`gluex-rs`](https://github.com/denehoffman/gluex-rs) collects tools for GlueX analyses in a single Rust workspace with a unified Python package. It covers shared physics constants and run-period metadata, database access, luminosity calculations, generated-event output, and command-line utilities.
 

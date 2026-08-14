@@ -1,5 +1,7 @@
 +++
 title = "Publications"
+[extra]
+scripts = ["publication-years.js", "publication-records.js", "paper-citations.js"]
 +++
 
 <nav class="publication-years" aria-label="Selected publication years">

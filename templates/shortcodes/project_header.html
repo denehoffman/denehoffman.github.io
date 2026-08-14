@@ -1,20 +1,23 @@
-<section class="project-showcase{% if not image %} project-showcase--text{% endif %}">
-  {% if image %}
+{% set project_data = load_data(path="data/projects.json") %}
+{% set item = project_data.projects[project] %}
+<section class="project-showcase{% if not item.image %} project-showcase--text{% endif %}">
+  {% if item.image %}
     <div class="project-showcase__visual">
-      <img src="{{ image }}" alt="{{ title }} logo">
+      <img src="{{ item.image }}" alt="{{ item.title }} logo">
     </div>
   {% endif %}
   <div class="project-showcase__body">
     <p class="project-showcase__kicker">Project</p>
-    <h1>{{ title }}</h1>
-    <p class="project-showcase__summary">{{ summary }}</p>
+    <h1>{{ item.title }}</h1>
+    <p class="project-showcase__summary">{{ item.summary }}</p>
     <ul class="project-showcase__meta" aria-label="Project details">
-      {% for tag in tags %}<li>{{ tag }}</li>{% endfor %}
+      {% for tag in item.tags %}<li>{{ tag }}</li>{% endfor %}
+      {% if item.status %}<li>{{ item.status }}</li>{% endif %}
     </ul>
     <div class="project-showcase__actions">
-      <a href="{{ repository }}">Repository <span aria-hidden="true">↗</span></a>
-      {% if documentation %}<a href="{{ documentation }}">Documentation <span aria-hidden="true">↗</span></a>{% endif %}
-      {% if package %}<a href="{{ package }}">Package <span aria-hidden="true">↗</span></a>{% endif %}
+      <a href="{{ item.repository }}">Repository <span aria-hidden="true">↗</span></a>
+      {% if item.documentation %}<a href="{{ item.documentation }}">Documentation <span aria-hidden="true">↗</span></a>{% endif %}
+      {% if item.package %}<a href="{{ item.package }}">Package <span aria-hidden="true">↗</span></a>{% endif %}
     </div>
   </div>
 </section>

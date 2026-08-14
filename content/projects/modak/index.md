@@ -1,7 +1,7 @@
 +++
 title = "modak"
 +++
-{{ project_header(title="modak", summary="A simple-to-use, opinionated task queue system with dependency management, resource allocation, and isolation control.", tags=["Python", "Rust", "Task queues"], repository="https://github.com/denehoffman/modak") }}
+{{ project_header(project="modak") }}
 
 [`modak`](https://github.com/denehoffman/modak) is a simple-to-use, opinionated task queue system with dependency management, resource allocation, and isolation control. Tasks are run respecting topological dependencies, resource limits, and optional isolation.
 

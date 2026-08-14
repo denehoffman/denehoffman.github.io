@@ -27,6 +27,13 @@ extra_grammars = ["syntaxes/math.json"]
 [search]
 index_format = "fuse_json"
 
+[link_checker]
+# These endpoints reject automated HEAD requests even though they work in a browser.
+skip_prefixes = [
+  "https://math.stackexchange.com/a/2785578/127253",
+  "https://doi.org/10.1137/0916069",
+]
+
 [extra]
 accent_color = "#a04b24"
 accent_color_dark = "#e59668"
@@ -39,7 +46,7 @@ show_backlinks = true
 katex = true
 card = true
 styles = ["overrides.css"]
-scripts = ["home-links.js", "mobile-nav.js", "bubble-chamber.js", "laddu-interference.js", "publication-years.js", "publication-records.js", "paper-citations.js", "article-reading.js"]
+scripts = ["mobile-nav.js", "bubble-chamber.js"]
 
 
 csp = [
@@ -86,12 +93,7 @@ links = [
   { url = "@/blog/_index.md", name = "Blog" },
   { url = "@/publications/index.md", name = "Publications" },
   { url = "https://github.com/denehoffman/CV/blob/main/cv.pdf", name = "CV" },
-  { name = "Projects", menu = [
-    { url = "@/projects/laddu/index.md", name = "laddu" },
-    { url = "@/projects/ganesh/index.md", name = "ganesh" },
-    { url = "@/projects/maryada/index.md", name = "maryada" },
-    { url = "@/projects/gluex-rs/index.md", name = "gluex-rs" },
-  ] },
+  { url = "@/projects/_index.md", name = "Projects" },
 ]
 
 [extra.footer]

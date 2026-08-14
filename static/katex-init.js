@@ -75,4 +75,8 @@ document.addEventListener("DOMContentLoaded", function () {
 			{ left: "$", right: "$", display: false },
 		],
 	});
+
+	document.querySelectorAll(".katex-display").forEach(function (equation) {
+		equation.tabIndex = 0;
+	});
 });

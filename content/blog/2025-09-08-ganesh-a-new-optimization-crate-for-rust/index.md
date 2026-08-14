@@ -3,6 +3,8 @@ title = "ganesh: A New Optimization Crate for Rust"
 description = "A different approach to optimization in Rust"
 [taxonomies]
 tags = ["rust", "programming", "algorithms", "ganesh", "optimization", "minimization"]
+[extra]
+scripts = ["article-reading.js"]
 +++
 
 For the last year or so, I've been working on a new optimization crate for Rust, called [`ganesh`](https://github.com/denehoffman/ganesh). In this blog post, I'd like to introduce the project, give a quick overview of its features, a neat example of what it can do, and why you might use it instead of popular crates like [`argmin`](https://github.com/argmin-rs/argmin).
@@ -236,7 +238,7 @@ if __name__ == '__main__':
     plt.close()
 
 ```
-{% figure(src="data.svg", alt="A two-dimensional histogram of the sampled toy dataset", source="https://github.com/denehoffman/ganesh/tree/90f145ee1dc66bb61f234fd9be2d857e6078cebe/examples/multivariate_normal_fit", source_label="Example code") %}
+{% figure(src="data.webp", alt="A two-dimensional histogram of the sampled toy dataset", source="https://github.com/denehoffman/ganesh/tree/90f145ee1dc66bb61f234fd9be2d857e6078cebe/examples/multivariate_normal_fit", source_label="Example code") %}
 The sampled two-dimensional toy dataset used for the Gaussian fit.
 {% end %}
 
@@ -561,7 +563,7 @@ for i in range(n_parameters):
 plt.savefig('traces.svg')
 plt.close()
 ```
-{% figure(src="traces.svg", alt="Parameter traces for every MCMC walker, including burn-in", source="https://github.com/denehoffman/ganesh/tree/90f145ee1dc66bb61f234fd9be2d857e6078cebe/examples/multivariate_normal_fit", source_label="Example code") %}
+{% figure(src="traces.webp", alt="Parameter traces for every MCMC walker, including burn-in", source="https://github.com/denehoffman/ganesh/tree/90f145ee1dc66bb61f234fd9be2d857e6078cebe/examples/multivariate_normal_fit", source_label="Example code") %}
 The complete MCMC parameter traces, including the dashed burn-in region.
 {% end %}
 
@@ -579,7 +581,7 @@ for i in range(n_parameters):
 plt.savefig('traces_burned.svg')
 plt.close()
 ```
-{% figure(src="traces_burned.svg", alt="Parameter traces for every MCMC walker after burn-in", source="https://github.com/denehoffman/ganesh/tree/90f145ee1dc66bb61f234fd9be2d857e6078cebe/examples/multivariate_normal_fit", source_label="Example code") %}
+{% figure(src="traces_burned.webp", alt="Parameter traces for every MCMC walker after burn-in", source="https://github.com/denehoffman/ganesh/tree/90f145ee1dc66bb61f234fd9be2d857e6078cebe/examples/multivariate_normal_fit", source_label="Example code") %}
 The MCMC parameter traces after discarding burn-in.
 {% end %}
 
@@ -602,7 +604,7 @@ overplot_lines(
 plt.savefig('corner.svg')
 plt.close()
 ```
-{% figure(src="corner.svg", alt="Corner plot of the posterior parameter distributions", source="https://github.com/denehoffman/ganesh/tree/90f145ee1dc66bb61f234fd9be2d857e6078cebe/examples/multivariate_normal_fit", source_label="Example code") %}
+{% figure(src="corner.webp", alt="Corner plot of the posterior parameter distributions", source="https://github.com/denehoffman/ganesh/tree/90f145ee1dc66bb61f234fd9be2d857e6078cebe/examples/multivariate_normal_fit", source_label="Example code") %}
 The posterior parameter distributions and pairwise correlations from the flattened MCMC chain.
 {% end %}
 
@@ -644,7 +646,7 @@ with Loom('walkers_corner.gif', fps=20, parallel=True) as loom:
         delayed(make_frame)(i, burned_chain, parameter_labels, ranges, loom) for i in range(n_steps)
     )
 ```
-{% figure(src="walkers_corner.gif", alt="Animated corner plot following the ensemble walkers", source="https://github.com/denehoffman/ganesh/tree/90f145ee1dc66bb61f234fd9be2d857e6078cebe/examples/multivariate_normal_fit", source_label="Example code") %}
+{% figure(src="walkers_corner.webm", video=true, alt="Animated corner plot following the ensemble walkers", source="https://github.com/denehoffman/ganesh/tree/90f145ee1dc66bb61f234fd9be2d857e6078cebe/examples/multivariate_normal_fit", source_label="Example code") %}
 The ensemble walkers exploring the posterior parameter space after burn-in.
 {% end %}
 

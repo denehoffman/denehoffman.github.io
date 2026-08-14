@@ -1,52 +1,15 @@
 +++
+[extra]
+scripts = ["home-links.js"]
 +++
 
 # Dr. Dene Hoffman
 
 <aside>
-  {{ image(url="prof_pic.jpg", no_hover=true) }}
+  {{ image(url="prof_pic.jpg", alt="Portrait of Dene Hoffman", no_hover=true) }}
 </aside>
 
-<nav class="home-projects" aria-label="Featured projects">
-  <p>Featured projects</p>
-  <div>
-    <a class="home-project home-project--featured home-project--laddu" href="/projects/laddu/">
-      <svg class="home-project__motif" viewBox="0 0 64 40" aria-hidden="true">
-        <path d="M2 22c8-18 16 18 24 0s16 18 24 0 10-5 12-2" />
-        <path d="M2 29c8-10 16 10 24 0s16 10 24 0 10-3 12-1" />
-      </svg>
-      <strong>laddu</strong>
-      <span>Amplitude analysis · Python + Rust</span>
-    </a>
-    <a class="home-project home-project--ganesh" href="/projects/ganesh/">
-      <svg class="home-project__motif" viewBox="0 0 64 40" aria-hidden="true">
-        <ellipse cx="34" cy="20" rx="26" ry="14" />
-        <ellipse cx="34" cy="20" rx="17" ry="9" />
-        <ellipse cx="34" cy="20" rx="8" ry="4" />
-        <circle cx="34" cy="20" r="1.8" />
-      </svg>
-      <strong>ganesh</strong>
-      <span>Optimization · Rust</span>
-    </a>
-    <a class="home-project home-project--maryada" href="/projects/maryada/">
-      <svg class="home-project__motif" viewBox="0 0 64 40" aria-hidden="true">
-        <path d="M17 5h-6v30h6M47 5h6v30h-6" />
-        <path d="M22 27 30 12l7 17 6-10" />
-        <circle cx="30" cy="12" r="1.8" />
-      </svg>
-      <strong>maryada</strong>
-      <span>Interval arithmetic · Rust</span>
-    </a>
-    <a class="home-project home-project--gluex" href="/projects/gluex-rs/">
-      <svg class="home-project__motif" viewBox="0 0 64 40" aria-hidden="true">
-        <path d="M4 21h22M26 21c12 0 12-15 30-15M26 21c12 0 13 14 30 14M26 21c13 0 17-5 34-4" />
-        <circle cx="26" cy="21" r="2.2" />
-      </svg>
-      <strong>gluex-rs</strong>
-      <span>GlueX analysis tools · Rust + Python</span>
-    </a>
-  </div>
-</nav>
+{{ project_grid(featured=true) }}
 
 {% home_section(kind="research") %}
 <svg class="home-research__motif" viewBox="0 0 200 112" aria-hidden="true">

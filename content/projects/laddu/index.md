@@ -1,8 +1,10 @@
 +++
 title = "laddu"
+[extra]
+scripts = ["laddu-interference.js"]
 +++
 <!-- markdownlint-disable MD034 -->
-{{ project_header(title="laddu", summary="A library for analysis of particle physics data, written in Rust with bindings to Python.", image="laddu_logo.svg", tags=["Rust", "Python", "Amplitude analysis", "Active"], repository="https://github.com/denehoffman/laddu", documentation="https://denehoffman.github.io/laddu/", package="https://pypi.org/project/laddu/") }}
+{{ project_header(project="laddu") }}
 
 [`laddu`](https://github.com/denehoffman/laddu) (/ˈlʌduː/) is a library for analysis of particle physics data. It is intended to be a simple and efficient alternative to some of the other tools out there. `laddu` is written in Rust with bindings to Python via `PyO3` and `maturin` and is the spiritual successor to `rustitude`, one of my first Rust projects. The goal of this project is to allow users to perform complex amplitude analyses (like partial-wave analyses) without complex code or configuration files.
 

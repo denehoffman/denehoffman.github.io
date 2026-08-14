@@ -1,6 +1,10 @@
 <figure class="article-figure" data-article-figure>
   <div class="article-figure__media">
-    <img class="no-hover" src="{{ src }}" alt="{{ alt }}" loading="lazy" decoding="async">
+    {% if video | default(value=false) %}
+      <video src="{{ src }}" aria-label="{{ alt }}" autoplay loop muted playsinline controls preload="metadata"></video>
+    {% else %}
+      <img class="no-hover" src="{{ src }}" alt="{{ alt }}" loading="lazy" decoding="async">
+    {% endif %}
   </div>
   <figcaption>
     <span class="article-figure__number" aria-hidden="true"></span>

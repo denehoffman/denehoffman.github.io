@@ -49,6 +49,7 @@
   --fg-muted-5: rgb(233 229 220 / 0.72);
   --glass-bg: rgb(23 33 44 / 0.84);
   --accent-color-alpha: rgb(229 150 104 / var(--color-opacity));
+  --red-fg: #ff776a;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -63,6 +64,7 @@
     --fg-muted-5: rgb(233 229 220 / 0.72);
     --glass-bg: rgb(23 33 44 / 0.84);
     --accent-color-alpha: rgb(229 150 104 / var(--color-opacity));
+    --red-fg: #ff776a;
   }
 }
 
@@ -75,6 +77,23 @@ body {
   font-family: var(--font-scholarly-serif);
   font-size: 1.075rem;
   line-height: 1.68;
+}
+
+// Let long-form pages shrink inside the theme's grid instead of allowing a
+// wide heading, equation, or code sample to define the viewport width.
+main#main-content {
+  min-width: 0;
+}
+
+.katex-display {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.article-reading-progress {
+  inset-inline: 0 auto;
+  width: 100vw;
 }
 
 // Structured pseudocode used in long-form algorithm explanations.
@@ -323,7 +342,8 @@ article {
   overflow: hidden;
 }
 
-.article-figure__media img {
+.article-figure__media img,
+.article-figure__media video {
   display: block;
   transform: none;
   margin: 0 auto;
@@ -336,6 +356,10 @@ article {
   object-fit: contain;
   cursor: default;
   transition: none;
+}
+
+.article-figure__media video {
+  width: 100%;
 }
 
 .article-figure figcaption {
@@ -1559,6 +1583,134 @@ body > #sidebar {
   }
 }
 
+// Generated project directory. Content and links come from data/projects.json.
+.project-directory {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin-block: 2rem;
+  font-family: var(--font-scholarly-sans);
+}
+
+.project-directory__card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #d8cdbd;
+  border-radius: 1rem;
+  background: rgb(255 250 241 / 0.5);
+  overflow: hidden;
+}
+
+.project-directory__main {
+  position: relative;
+  flex: 1;
+  padding: 1.35rem;
+  overflow: hidden;
+  color: inherit;
+  text-decoration: none;
+}
+
+.project-directory__main:hover {
+  background: rgb(160 75 36 / 0.055);
+  color: inherit;
+}
+
+.project-directory__main h2 {
+  margin: 0.55rem 0 0.4rem;
+  font-family: var(--font-scholarly-serif);
+  font-size: 1.75rem;
+}
+
+.project-directory__main p {
+  position: relative;
+  z-index: 1;
+  margin: 0 0 1rem;
+  max-width: 32rem;
+  color: var(--fg-muted-5);
+  font-size: 0.85rem;
+  line-height: 1.55;
+}
+
+.project-directory__main ul {
+  display: flex;
+  position: relative;
+  z-index: 1;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+}
+
+.project-directory__main li,
+.project-directory__status {
+  border-radius: 999px;
+  background: var(--fg-muted-1);
+  padding: 0.22rem 0.5rem;
+  font-size: 0.65rem;
+  font-weight: 650;
+  list-style: none;
+}
+
+.project-directory__status {
+  display: inline-block;
+  color: var(--accent-color);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.project-directory__motif {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  opacity: 0.13;
+  width: 8rem;
+  color: var(--accent-color);
+}
+
+.project-directory__motif .home-project__motif {
+  width: 100%;
+  height: auto;
+  fill: none;
+  stroke: currentcolor;
+  stroke-width: 1.2;
+}
+
+.project-directory__motif circle {
+  fill: currentcolor;
+  stroke: none;
+}
+
+.project-directory__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  border-top: 1px solid var(--fg-muted-2);
+  padding: 0.75rem 1.35rem;
+}
+
+.project-directory__links a {
+  color: var(--fg-muted-5);
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.project-directory__links a:hover {
+  color: var(--accent-color);
+}
+
+[data-theme="dark"] .project-directory__card {
+  border-color: #3c4a58;
+  background: rgb(255 255 255 / 0.025);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .project-directory__card {
+    border-color: #3c4a58;
+    background: rgb(255 255 255 / 0.025);
+  }
+}
+
 // Shared project-page showcase.
 main:has(> .project-showcase) > h1:first-child {
   display: none;
@@ -1695,6 +1847,20 @@ main:has(> .project-showcase) > h1:first-child {
 
   .project-showcase__visual {
     min-height: 7rem;
+  }
+
+  .project-directory {
+    grid-template-columns: 1fr;
+  }
+
+  article #heading h1 {
+    font-size: clamp(2.35rem, 12vw, 3.5rem);
+    overflow-wrap: anywhere;
+  }
+
+  article #heading .tags {
+    display: flex;
+    max-width: 100%;
   }
 }
 

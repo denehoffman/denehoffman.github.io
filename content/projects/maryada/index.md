@@ -2,7 +2,7 @@
 title = "maryada"
 +++
 <!-- markdownlint-disable MD034 -->
-{{ project_header(title="maryada", summary="A no_std binary64 interval arithmetic library conforming to IEEE Std 1788.1-2017.", tags=["Rust", "Interval arithmetic", "no_std", "IEEE 1788.1"], repository="https://github.com/denehoffman/maryada", documentation="https://docs.rs/maryada", package="https://crates.io/crates/maryada") }}
+{{ project_header(project="maryada") }}
 
 [`maryada`](https://github.com/denehoffman/maryada) is a `no_std` binary64 interval arithmetic library conforming to IEEE Std 1788.1-2017. It provides bare and decorated real intervals, outward-rounded elementary operations, and text and binary interchange. Rectangular complex intervals are available through an optional feature.
 

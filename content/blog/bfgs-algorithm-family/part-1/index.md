@@ -9,6 +9,7 @@ tags = ["rust", "algorithms", "programming"]
 [extra]
 series_label = "Line searches"
 series_section = "blog/bfgs-algorithm-family/_index.md"
+scripts = ["article-reading.js"]
 +++
 
 The BFGS (Broyden-Fletcher-Goldfarb-Shanno) algorithm and its derivatives were (and for the most part still are) the gold standard methods for quasi-Newton optimization. In this post, I want to give a brief overview of the main idea, the limited-memory adaptation (L-BFGS), and the bounded version (L-BFGS-B) and how I implemented them in a Rust crate I'm developing called [`ganesh`](https://github.com/denehoffman/ganesh). The full algorithm can be seen there, and I will mainly be focusing on the main methodology, since the actual literature on it is rather old and difficult to parse (and even has a few typos!).

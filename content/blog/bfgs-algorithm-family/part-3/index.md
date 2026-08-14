@@ -9,6 +9,7 @@ tags = ["rust", "algorithms", "programming"]
 [extra]
 series_label = "L-BFGS-B"
 series_section = "blog/bfgs-algorithm-family/_index.md"
+scripts = ["article-reading.js"]
 +++
 
 In my previous posts ([here](@/blog/bfgs-algorithm-family/part-1/index.md) and [here](@/blog/bfgs-algorithm-family/part-2/index.md)), I discussed line searches and the original BFGS algorithm. The next improvement on this algorithm is a limited memory version, called L-BFGS, but rather than explicitly constructing it, we will instead skip to the limited memory version with parameter bounds, L-BFGS-B. However, we should start by understanding why there even is an L-BFGS algorithm at all.

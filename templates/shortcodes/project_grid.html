@@ -1,0 +1,40 @@
+{% set project_data = load_data(path="data/projects.json") %}
+{% set show_featured = featured | default(value=false) %}
+{% set slugs = project_data.order %}
+{% if show_featured %}{% set_global slugs = project_data.featured %}{% endif %}
+
+{% if show_featured %}
+<nav class="home-projects" aria-label="Featured projects">
+  <p>Featured projects</p>
+  <div>
+    {% for slug in slugs %}
+      {% set item = project_data.projects[slug] %}
+      <a class="home-project{% if loop.first %} home-project--featured{% endif %} home-project--{{ slug }}" href="/projects/{{ slug }}/">
+        {% include "partials/project_motif.html" %}
+        <strong>{{ item.title }}</strong>
+        <span>{{ item.card_summary }}</span>
+      </a>
+    {% endfor %}
+  </div>
+</nav>
+{% else %}
+<div class="project-directory" aria-label="Software projects">
+  {% for slug in slugs %}
+    {% set item = project_data.projects[slug] %}
+    <article class="project-directory__card project-directory__card--{{ slug }}">
+      <a class="project-directory__main" href="/projects/{{ slug }}/">
+        <span class="project-directory__motif">{% include "partials/project_motif.html" %}</span>
+        {% if item.status %}<span class="project-directory__status">{{ item.status }}</span>{% endif %}
+        <h2>{{ item.title }}</h2>
+        <p>{{ item.summary }}</p>
+        <ul aria-label="Technologies and topics">{% for tag in item.tags %}<li>{{ tag }}</li>{% endfor %}</ul>
+      </a>
+      <div class="project-directory__links">
+        <a href="{{ item.repository }}">Repository <span aria-hidden="true">↗</span></a>
+        {% if item.documentation %}<a href="{{ item.documentation }}">Documentation <span aria-hidden="true">↗</span></a>{% endif %}
+        {% if item.package %}<a href="{{ item.package }}">Package <span aria-hidden="true">↗</span></a>{% endif %}
+      </div>
+    </article>
+  {% endfor %}
+</div>
+{% endif %}

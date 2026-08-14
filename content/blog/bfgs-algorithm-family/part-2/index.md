@@ -9,6 +9,7 @@ tags = ["rust", "algorithms", "programming"]
 [extra]
 series_label = "BFGS"
 series_section = "blog/bfgs-algorithm-family/_index.md"
+scripts = ["article-reading.js"]
 +++
 
 {% alert(note=true) %}
