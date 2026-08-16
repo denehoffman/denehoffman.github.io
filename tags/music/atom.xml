@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
+    <title>Dene Hoffman - music</title>
+    <subtitle>My personal website and blog</subtitle>
+    <link rel="self" type="application/atom+xml" href="https://denehoffman.com/tags/music/atom.xml"/>
+    <link rel="alternate" type="text/html" href="https://denehoffman.com"/>
+    <generator uri="https://www.getzola.org/">Zola</generator>
+    <updated>2025-06-16T00:00:00+00:00</updated>
+    <id>https://denehoffman.com/tags/music/atom.xml</id>
+    <entry xml:lang="en">
+        <title>Tzigane</title>
+        <published>2025-06-16T00:00:00+00:00</published>
+        <updated>2025-06-16T00:00:00+00:00</updated>
+        
+        <author>
+          <name>
+            
+              Dene Hoffman
+            
+          </name>
+        </author>
+        
+        <link rel="alternate" type="text/html" href="https://denehoffman.com/blog/tzigane/"/>
+        <id>https://denehoffman.com/blog/tzigane/</id>
+        
+        <content type="html" xml:base="https://denehoffman.com/blog/tzigane/">&lt;iframe
+	class=&quot;youtube-embed&quot;
+	src=&quot;https:&#x2F;&#x2F;www.youtube-nocookie.com&#x2F;embed&#x2F;-YHAq9Rw3w8&quot;
+	allow=&quot;accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share&quot;
+	referrerpolicy=&quot;strict-origin-when-cross-origin&quot; allowfullscreen&gt;
+&lt;&#x2F;iframe&gt;
+&lt;p&gt;I was given an opportunity to perform Ravel’s &lt;em&gt;Tzigane&lt;&#x2F;em&gt; with the All University Orchestra in the fall of 2024 after winning the previous year’s concerto competition. It took a bit to get the microphone audio, but I finally have a complete recording!&lt;&#x2F;p&gt;
+</content>
+        
+    </entry>
+</feed>

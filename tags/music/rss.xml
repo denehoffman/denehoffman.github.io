@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+      <title>Dene Hoffman - music</title>
+      <link>https://denehoffman.com</link>
+      <description>My personal website and blog</description>
+      <generator>Zola</generator>
+      <language>en</language>
+      <atom:link href="https://denehoffman.com/tags/music/rss.xml" rel="self" type="application/rss+xml"/>
+      <lastBuildDate>Mon, 16 Jun 2025 00:00:00 +0000</lastBuildDate>
+      <item>
+          <title>Tzigane</title>
+          <pubDate>Mon, 16 Jun 2025 00:00:00 +0000</pubDate>
+          <author>Dene Hoffman</author>
+          <link>https://denehoffman.com/blog/tzigane/</link>
+          <guid>https://denehoffman.com/blog/tzigane/</guid>
+          <description xml:base="https://denehoffman.com/blog/tzigane/">&lt;iframe
+	class=&quot;youtube-embed&quot;
+	src=&quot;https:&#x2F;&#x2F;www.youtube-nocookie.com&#x2F;embed&#x2F;-YHAq9Rw3w8&quot;
+	allow=&quot;accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share&quot;
+	referrerpolicy=&quot;strict-origin-when-cross-origin&quot; allowfullscreen&gt;
+&lt;&#x2F;iframe&gt;
+&lt;p&gt;I was given an opportunity to perform Ravel’s &lt;em&gt;Tzigane&lt;&#x2F;em&gt; with the All University Orchestra in the fall of 2024 after winning the previous year’s concerto competition. It took a bit to get the microphone audio, but I finally have a complete recording!&lt;&#x2F;p&gt;
+</description>
+      </item>
+    </channel>
+</rss>
