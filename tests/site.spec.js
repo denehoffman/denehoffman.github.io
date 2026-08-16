@@ -5,6 +5,7 @@ const pages = [
   ["/", "Dr. Dene Hoffman"],
   ["/projects/", "Projects"],
   ["/projects/laddu/", "laddu"],
+  ["/projects/maryada/", "maryada"],
   ["/projects/yamloom/", "yamloom"],
   ["/projects/pdg-rs/", "pdg-rs"],
   ["/projects/splotrs/", "splotrs"],
@@ -85,4 +86,24 @@ test("custom scripts are loaded only on relevant pages", async ({ page }) => {
   await page.goto("/projects/laddu/");
   expect(await scriptNames()).toContain("laddu-interference.js");
   expect(await scriptNames()).not.toContain("publication-records.js");
+
+  await page.goto("/projects/maryada/");
+  expect(await scriptNames()).toContain("maryada-branch-and-bound.js");
+  expect(await scriptNames()).not.toContain("laddu-interference.js");
+});
+
+test("Maryada branch-and-bound explorer exposes inspectable bounds", async ({ page }) => {
+  await page.goto("/projects/maryada/");
+  const demo = page.locator("[data-maryada-bnb]");
+
+  await expect(demo.getByRole("button", { name: /Take next step/ })).toBeEnabled();
+  await expect(demo.locator("tbody [data-maryada-branch-select]")).toHaveCount(1);
+
+  await demo.getByRole("button", { name: /Take next step/ }).click();
+  await expect(demo.locator("tbody [data-maryada-branch-select]")).toHaveCount(3);
+  await expect(demo.locator("[data-maryada-branches]")).toContainText("pruned");
+
+  await demo.locator('tbody [data-maryada-branch-select="branch-2"]').click();
+  await expect(demo.locator(".maryada-bnb__inspector h3")).toContainText("B2");
+  await expect(demo.locator(".maryada-bnb__inspector code")).toContainText("f(X)");
 });

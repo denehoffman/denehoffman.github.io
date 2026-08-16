@@ -3119,3 +3119,608 @@ main:has(> .publication-years) > h1[id] {
     transition: none;
   }
 }
+
+// An interactive interval branch-and-bound explorer for the maryada project page.
+.maryada-bnb {
+  --maryada-bnb-blue: #173f73;
+  --maryada-bnb-blue-alpha: rgb(23 63 115 / 0.14);
+  --maryada-bnb-quiet: #766c5e;
+  --maryada-bnb-quiet-alpha: rgb(118 108 94 / 0.12);
+  --maryada-bnb-green: #2f6f5e;
+  margin-block: 2.25rem;
+  border-block: 1px solid var(--fg-muted-2);
+  padding-block: 1.75rem;
+  font-family: var(--font-scholarly-sans);
+  text-align: left;
+  hyphens: none;
+}
+
+.maryada-bnb__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 1.5rem;
+  margin-block-end: 0.65rem;
+}
+
+.maryada-bnb__kicker,
+.maryada-bnb__inspector-kicker {
+  margin: 0 0 0.15rem;
+  color: var(--accent-color);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.maryada-bnb h2,
+.maryada-bnb h3 {
+  margin: 0;
+  font-family: var(--font-scholarly-serif);
+}
+
+.maryada-bnb h2 {
+  font-size: clamp(1.65rem, 4vw, 2.1rem);
+}
+
+.maryada-bnb h3 {
+  font-size: 1.25rem;
+}
+
+.maryada-bnb__note {
+  margin: 0;
+  max-width: 15rem;
+  color: var(--fg-muted-5);
+  font-size: 0.7rem;
+  line-height: 1.4;
+}
+
+.maryada-bnb__intro {
+  margin: 0 0 1.35rem;
+  max-width: 43rem;
+  color: var(--fg-muted-5);
+  font-size: 0.86rem;
+  line-height: 1.55;
+}
+
+.maryada-bnb__formula {
+  display: grid;
+  grid-template-columns: 1.4fr 0.8fr 1fr;
+  gap: 0;
+  margin-block: 1rem 1.25rem;
+  border-block: 1px solid var(--fg-muted-2);
+}
+
+.maryada-bnb__formula > div {
+  padding: 0.75rem 1rem;
+}
+
+.maryada-bnb__formula > div + div {
+  border-inline-start: 1px solid var(--fg-muted-2);
+}
+
+.maryada-bnb__formula span,
+.maryada-bnb__stats dt,
+.maryada-bnb__inspector dt {
+  color: var(--fg-muted-5);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.maryada-bnb__formula p {
+  margin: 0.2rem 0 0;
+  color: var(--fg-color);
+  font-family: var(--font-scholarly-serif);
+  font-size: clamp(0.9rem, 2.5vw, 1.08rem);
+  line-height: 1.35;
+  white-space: nowrap;
+}
+
+.maryada-bnb__controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-block-end: 0.9rem;
+}
+
+.maryada-bnb__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.maryada-bnb__actions button {
+  appearance: none;
+  cursor: pointer;
+  border: 1px solid var(--fg-muted-3);
+  border-radius: 0.35rem;
+  background: var(--fg-muted-1);
+  padding: 0.55rem 0.8rem;
+  color: var(--fg-muted-5);
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1;
+  transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease, transform 140ms ease;
+}
+
+.maryada-bnb__actions button:hover,
+.maryada-bnb__actions button:focus-visible {
+  border-color: var(--accent-color);
+  background: var(--fg-muted-2);
+  color: var(--fg-color);
+}
+
+.maryada-bnb__actions button:active {
+  transform: translateY(1px);
+}
+
+.maryada-bnb__actions button.colored {
+  border-color: var(--accent-color);
+  background: var(--accent-color);
+  color: var(--fg-contrast);
+}
+
+.maryada-bnb__actions button.colored:hover,
+.maryada-bnb__actions button.colored:focus-visible {
+  background: color-mix(in srgb, var(--accent-color) 84%, var(--fg-color));
+  color: var(--fg-contrast);
+}
+
+.maryada-bnb__actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.maryada-bnb__status {
+  flex: 1 1 auto;
+  margin: 0;
+  color: var(--fg-muted-5);
+  font-size: 0.72rem;
+  line-height: 1.45;
+  text-align: right;
+}
+
+.maryada-bnb__stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.55rem;
+  margin: 0 0 1rem;
+}
+
+.maryada-bnb__stats > div {
+  border: 1px solid var(--fg-muted-2);
+  border-radius: 0.45rem;
+  background: var(--fg-muted-1);
+  padding: 0.65rem 0.75rem;
+}
+
+.maryada-bnb__stats dt {
+  line-height: 1.35;
+}
+
+.maryada-bnb__stats dd {
+  margin: 0.2rem 0 0;
+  color: var(--accent-color);
+  font-size: 1.05rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+
+.maryada-bnb__workbench {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(14rem, 0.75fr);
+  gap: 1rem;
+  align-items: start;
+}
+
+.maryada-bnb__plot {
+  min-width: 0;
+  margin: 0;
+  border: 1px solid var(--fg-muted-2);
+  border-radius: 0.65rem;
+  background: var(--fg-muted-1);
+  padding: 0.45rem;
+  overflow: hidden;
+}
+
+.maryada-bnb__plot svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.maryada-bnb__plot figcaption {
+  margin: 0.4rem 0.25rem 0;
+  color: var(--fg-muted-5);
+  font-family: var(--font-scholarly-serif);
+  font-size: 0.72rem;
+  line-height: 1.4;
+}
+
+.maryada-bnb__grid {
+  stroke: var(--fg-muted-2);
+  stroke-width: 1;
+}
+
+.maryada-bnb__axes {
+  fill: var(--fg-muted-5);
+  stroke: var(--fg-muted-4);
+  stroke-width: 1;
+}
+
+.maryada-bnb__axes text {
+  stroke: none;
+  font-family: var(--font-scholarly-sans);
+  font-size: 11px;
+  text-anchor: middle;
+}
+
+.maryada-bnb__axes .maryada-bnb__x-label,
+.maryada-bnb__axes .maryada-bnb__y-label {
+  fill: var(--fg-muted-5);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.maryada-bnb__curve {
+  fill: none;
+  stroke: var(--fg-color);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2.6;
+}
+
+.maryada-bnb__bound {
+  cursor: pointer;
+  stroke-width: 1.2;
+  transition: fill 140ms ease, stroke 140ms ease, stroke-width 140ms ease;
+}
+
+.maryada-bnb__bound--active {
+  fill: var(--maryada-bnb-blue-alpha);
+  stroke: var(--maryada-bnb-blue);
+}
+
+.maryada-bnb__bound--pruned {
+  fill: var(--maryada-bnb-quiet-alpha);
+  stroke: var(--maryada-bnb-quiet);
+  stroke-dasharray: 4 3;
+}
+
+.maryada-bnb__bound.is-selected,
+.maryada-bnb__bound:focus-visible {
+  stroke: var(--accent-color);
+  stroke-width: 3;
+}
+
+.maryada-bnb__incumbent-line {
+  stroke: var(--accent-color);
+  stroke-dasharray: 5 4;
+  stroke-width: 1.2;
+}
+
+.maryada-bnb__incumbent-dot {
+  fill: var(--accent-color);
+  stroke: var(--bg-color);
+  stroke-width: 2;
+}
+
+.maryada-bnb__incumbent-label {
+  fill: var(--accent-color);
+  font-family: var(--font-scholarly-sans);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.maryada-bnb__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  margin: 0.75rem 0.25rem 0.1rem;
+  padding: 0;
+}
+
+.maryada-bnb__legend li {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0;
+  color: var(--fg-muted-5);
+  font-size: 0.65rem;
+  list-style: none;
+}
+
+.maryada-bnb__key {
+  display: block;
+  width: 1rem;
+  height: 0.55rem;
+}
+
+.maryada-bnb__key--active {
+  border: 1px solid var(--maryada-bnb-blue);
+  background: var(--maryada-bnb-blue-alpha);
+}
+
+.maryada-bnb__key--pruned {
+  border: 1px dashed var(--maryada-bnb-quiet);
+  background: var(--maryada-bnb-quiet-alpha);
+}
+
+.maryada-bnb__key--candidate {
+  border-radius: 50%;
+  background: var(--accent-color);
+  width: 0.6rem;
+  height: 0.6rem;
+}
+
+.maryada-bnb__inspector {
+  float: none;
+  width: auto;
+  min-width: 0;
+  margin: 0;
+  border: 1px solid var(--fg-muted-2);
+  border-radius: 0.65rem;
+  background: var(--fg-muted-1);
+  padding: 1rem;
+}
+
+.maryada-bnb__selected-path {
+  margin: 0.2rem 0 0.85rem;
+  color: var(--fg-muted-5);
+  font-size: 0.7rem;
+  line-height: 1.35;
+}
+
+.maryada-bnb__inspector dl {
+  margin: 0;
+}
+
+.maryada-bnb__inspector dl > div {
+  border-top: 1px solid var(--fg-muted-2);
+  padding-block: 0.65rem;
+}
+
+.maryada-bnb__inspector dl > div:last-child {
+  padding-block-end: 0;
+}
+
+.maryada-bnb__inspector dd {
+  margin: 0.25rem 0 0;
+  color: var(--fg-color);
+  font-size: 0.78rem;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.maryada-bnb__inspector code,
+.maryada-bnb__table-wrap code {
+  border: 1px solid var(--fg-muted-2);
+  border-radius: 0.25rem;
+  background: var(--fg-muted-1);
+  padding: 0.1em 0.3em;
+  color: var(--maryada-bnb-blue);
+  font-size: 0.9em;
+  font-variant-numeric: tabular-nums;
+}
+
+.maryada-bnb__inspector-note {
+  margin: 0.85rem 0 0;
+  border-top: 1px solid var(--fg-muted-2);
+  padding-top: 0.7rem;
+  color: var(--fg-muted-5);
+  font-family: var(--font-scholarly-serif);
+  font-size: 0.76rem;
+  line-height: 1.45;
+}
+
+.maryada-bnb__ledger {
+  margin-block-start: 1rem;
+}
+
+.maryada-bnb__ledger-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 1rem;
+  margin-block-end: 0.55rem;
+}
+
+.maryada-bnb__ledger-header > p {
+  margin: 0;
+  color: var(--fg-muted-5);
+  font-size: 0.7rem;
+  line-height: 1.4;
+  text-align: right;
+}
+
+.maryada-bnb__table-wrap {
+  max-width: 100%;
+  border: 1px solid var(--fg-muted-2);
+  border-radius: 0.55rem;
+  overflow-x: auto;
+}
+
+.maryada-bnb__table-wrap table {
+  margin: 0;
+  min-width: 43rem;
+  width: 100%;
+  border: 0;
+  border-collapse: collapse;
+  font-family: var(--font-scholarly-sans);
+  text-align: left;
+}
+
+.maryada-bnb__table-wrap th,
+.maryada-bnb__table-wrap td {
+  border: 0;
+  border-bottom: 1px solid var(--fg-muted-2);
+  padding: 0.6rem 0.65rem;
+  font-size: 0.7rem;
+  vertical-align: middle;
+}
+
+.maryada-bnb__table-wrap thead th {
+  background: var(--fg-muted-1);
+  color: var(--fg-muted-5);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.maryada-bnb__table-wrap tbody tr:last-child th,
+.maryada-bnb__table-wrap tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.maryada-bnb__table-wrap tbody tr.is-selected {
+  background: var(--maryada-bnb-blue-alpha);
+}
+
+.maryada-bnb__table-wrap tbody tr:hover {
+  background: var(--fg-muted-1);
+}
+
+.maryada-bnb__table-wrap tbody tr.is-selected:hover {
+  background: var(--maryada-bnb-blue-alpha);
+}
+
+.maryada-bnb__table-wrap th[scope="row"] {
+  width: 4rem;
+}
+
+.maryada-bnb__table-wrap th[scope="row"] button {
+  appearance: none;
+  cursor: pointer;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  padding: 0.18rem 0.38rem;
+  min-width: 1.8rem;
+  background: var(--maryada-bnb-blue);
+  color: var(--fg-contrast);
+  font: inherit;
+  font-weight: 750;
+  text-align: center;
+}
+
+.maryada-bnb__table-wrap th[scope="row"] button:hover,
+.maryada-bnb__table-wrap th[scope="row"] button:focus-visible {
+  background: var(--accent-color);
+  color: var(--fg-contrast);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.maryada-bnb__table-wrap code {
+  white-space: nowrap;
+}
+
+.maryada-bnb__state {
+  display: inline-block;
+  border-radius: 999px;
+  padding: 0.18rem 0.42rem;
+  font-size: 0.62rem;
+  font-weight: 700;
+  line-height: 1;
+  text-transform: capitalize;
+}
+
+.maryada-bnb__state--active {
+  background: var(--maryada-bnb-blue-alpha);
+  color: var(--maryada-bnb-blue);
+}
+
+.maryada-bnb__state--pruned {
+  background: var(--maryada-bnb-quiet-alpha);
+  color: var(--maryada-bnb-quiet);
+}
+
+.maryada-bnb__state--split {
+  background: rgb(47 111 94 / 0.12);
+  color: var(--maryada-bnb-green);
+}
+
+.maryada-bnb__caption {
+  margin: 0.7rem 0 0;
+  color: var(--fg-muted-5);
+  font-family: var(--font-scholarly-serif);
+  font-size: 0.76rem;
+  line-height: 1.45;
+}
+
+[data-theme="dark"] .maryada-bnb {
+  --maryada-bnb-blue: #a9caee;
+  --maryada-bnb-blue-alpha: rgb(169 202 238 / 0.13);
+  --maryada-bnb-quiet: #c0b5a2;
+  --maryada-bnb-quiet-alpha: rgb(192 181 162 / 0.13);
+  --maryada-bnb-green: #91c3a4;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .maryada-bnb {
+    --maryada-bnb-blue: #a9caee;
+    --maryada-bnb-blue-alpha: rgb(169 202 238 / 0.13);
+    --maryada-bnb-quiet: #c0b5a2;
+    --maryada-bnb-quiet-alpha: rgb(192 181 162 / 0.13);
+    --maryada-bnb-green: #91c3a4;
+  }
+}
+
+@media only screen and (max-width: 760px) {
+  .maryada-bnb__header,
+  .maryada-bnb__controls,
+  .maryada-bnb__ledger-header {
+    display: block;
+  }
+
+  .maryada-bnb__note {
+    margin-block-start: 0.35rem;
+    max-width: none;
+  }
+
+  .maryada-bnb__status {
+    margin-block-start: 0.65rem;
+    text-align: left;
+  }
+
+  .maryada-bnb__workbench {
+    grid-template-columns: 1fr;
+  }
+
+  .maryada-bnb__ledger-header > p {
+    margin-block-start: 0.3rem;
+    text-align: left;
+  }
+}
+
+@media only screen and (max-width: 580px) {
+  .maryada-bnb__formula {
+    grid-template-columns: 1fr;
+  }
+
+  .maryada-bnb__formula > div + div {
+    border-block-start: 1px solid var(--fg-muted-2);
+    border-inline-start: 0;
+  }
+
+  .maryada-bnb__stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .maryada-bnb__formula p {
+    white-space: normal;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .maryada-bnb__actions button,
+  .maryada-bnb__bound {
+    transition: none;
+  }
+}
