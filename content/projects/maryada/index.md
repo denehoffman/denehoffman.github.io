@@ -4,7 +4,7 @@ title = "maryada"
 scripts = ["maryada-branch-and-bound.js"]
 +++
 <!-- markdownlint-disable MD034 -->
-{{ project_header(project="maryada") }}
+{{ <project_header project="maryada" /> }}
 
 [`maryada`](https://github.com/denehoffman/maryada) is a `no_std` binary64 interval arithmetic library conforming to IEEE Std 1788.1-2017. It provides bare and decorated real intervals, outward-rounded elementary operations, and text and binary interchange. Rectangular complex intervals are available through an optional feature.
 

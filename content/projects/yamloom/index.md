@@ -1,7 +1,7 @@
 +++
 title = "yamloom"
 +++
-{{ project_header(project="yamloom") }}
+{{ <project_header project="yamloom" /> }}
 
 [`yamloom`](https://github.com/denehoffman/yamloom) generates GitHub Actions workflows from Python objects. Its goal is to make workflow authoring feel like normal typed programming: constructors expose the allowed workflow keys, reusable actions provide focused interfaces, and Python functions and loops replace repeated YAML.
 

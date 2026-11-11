@@ -1,4 +1,5 @@
-{% set scholar = load_data(path="data/scholar.json") %}
+{%- component scholar_overview() -%}
+{%- set scholar = load_data(path="data/scholar.json") -%}
 <section class="scholar-overview" aria-labelledby="scholar-overview-title">
   <div class="scholar-overview__summary">
     <p class="publication-eyebrow">Google Scholar snapshot</p>
@@ -14,9 +15,11 @@
   <figure class="citation-chart">
     <figcaption>Citations by year</figcaption>
     <ol>
-      {% for year in scholar.history %}
+{%- for year in scholar.history -%}
       <li style="--citation-height: {{ year.height }}"><span aria-hidden="true"></span><strong>{{ year.citations }}</strong><small>{{ year.year }}</small></li>
-      {% endfor %}
+{%- endfor -%}
     </ol>
   </figure>
 </section>
+
+{%- endcomponent scholar_overview -%}

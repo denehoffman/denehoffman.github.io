@@ -6,12 +6,12 @@ scripts = ["home-links.js"]
 # Dr. Dene Hoffman
 
 <aside>
-  {{ image(url="prof_pic.jpg", alt="Portrait of Dene Hoffman", no_hover=true) }}
+  {{ <image url="prof_pic.jpg" alt="Portrait of Dene Hoffman" no_hover={true} /> }}
 </aside>
 
-{{ project_grid(featured=true) }}
+{{ <project_grid featured={true} /> }}
 
-{% home_section(kind="research") %}
+{% <home_section kind="research"> %}
 <svg class="home-research__motif" viewBox="0 0 200 112" aria-hidden="true">
   <path class="home-research__photon" d="M4 32c5-7 10 7 15 0s10 7 15 0 10 7 15 0 10 7 15 0" />
   <path d="M4 82h64M64 32c28-2 48-3 72-2M68 82c43 3 84 10 128 18M136 30c20-1 34-11 60-20M136 30c22 3 37 14 60 25" />
@@ -34,9 +34,9 @@ I'm currently a postdoctoral researcher at The College of William & Mary studyin
 My current work consists of a study of $`K_SK_S`$ (pairs of K-short mesons) photoproduction. This gives us access to even-spin $`f`$ and $`a`$ mesons (light, flavorless particles with isospin $`0`$ and $`1`$ respectively), the former of which are interesting for several reasons. First, they share many of the same quantum numbers, the values we use to classify particles, with glueballs, hypothetical particles that contain only gluons, the force-carrier of the strong interaction. The lightest of these glueballs is predicted to look nearly identical to some of the $`f_0`$ mesons (spin-$`0`$ $`f`$ mesons), and it turns out that there are too many of these $`f_0`$ mesons seen in experiments for them to all be compatible with the quark model.
 
 [Read more about my research.](@/research/index.md)
-{% end %}
+{% </home_section> %}
 
-{% home_section(kind="writing") %}
+{% <home_section kind="writing"> %}
 <div class="home-section__heading">
   <h1>Latest writing</h1>
   <a href="/blog/">All posts</a>
@@ -58,17 +58,17 @@ My current work consists of a study of $`K_SK_S`$ (pairs of K-short mesons) phot
     <span>Performance by me with the All University Orchestra</span>
   </a>
 </div>
-{% end %}
+{% </home_section> %}
 
-{% home_section(kind="group") %}
+{% <home_section kind="group"> %}
 # Research Group
 <div class="home-roster">
   <p><a href="https://kuessner.gitlab.io"><strong>Dr. Meike Küßner</strong></a><span>Principal Investigator</span></p>
   <p><strong>Addison Kovats-Bernat</strong><span>Graduate Student</span></p>
 </div>
-{% end %}
+{% </home_section> %}
 
-{% home_section(kind="links") %}
+{% <home_section kind="links"> %}
 # Links
 
 <div class="home-links">
@@ -94,4 +94,4 @@ My current work consists of a study of $`K_SK_S`$ (pairs of K-short mesons) phot
   </a>
 </div>
 <noscript><p class="home-email-fallback">Email: nhoffman at wm dot edu</p></noscript>
-{% end %}
+{% </home_section> %}

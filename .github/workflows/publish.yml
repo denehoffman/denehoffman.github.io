@@ -24,7 +24,7 @@ jobs:
       - name: Install Zola and just
         uses: taiki-e/install-action@v2
         with:
-          tool: zola@0.22.1,just
+          tool: zola@0.23.6,just
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -48,6 +48,6 @@ jobs:
         with:
           submodules: recursive
       - name: Build and deploy
-        uses: shalzz/zola-deploy-action@v0.22.1
+        uses: shalzz/zola-deploy-action@v0.23.6
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

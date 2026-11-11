@@ -12,7 +12,7 @@ scripts = ["publication-years.js", "publication-records.js", "paper-citations.js
   <a href="#2017">2017</a>
 </nav>
 
-{{ scholar_overview() }}
+{{ <scholar_overview  /> }}
 
 <nav class="publication-filters" aria-label="Filter publications by topic">
   <span>View by topic</span>
@@ -98,69 +98,124 @@ Perfect light absorption in the visible and near-infrared (NIR) was demonstrated
   <header>
     <p class="publication-eyebrow">Broader research record</p>
     <h2 id="collaboration-publications-title">Collaboration publications</h2>
-    <p>Papers published as a member of a larger experimental collaboration, visually separated from work I contributed to directly.</p>
+    <p>Papers and preprints from the GlueX and BESIII collaborations.</p>
   </header>
 
   <div class="collaboration-publications__list">
-    <article class="collaboration-publication">
+    <article class="collaboration-publication" data-collaboration="besiii">
+      <time datetime="2026">2026</time>
+      <div><h3><a href="https://doi.org/10.1103/ml3k-2pss">Improved search for ψ(3770) → γη<sub>c</sub>(1S,2S) radiative transitions</a></h3><p>BESIII Collaboration · Physical Review D 114, 092001</p></div>
+      <span>Published</span>
+    </article>
+    <article class="collaboration-publication" data-collaboration="besiii">
+      <time datetime="2026">2026</time>
+      <div><h3><a href="https://arxiv.org/abs/2610.38406">Amplitude analysis of the charmed baryon decay Λ<sub>c</sub>⁺ → pK<sub>S</sub>⁰π⁰</a></h3><p>BESIII Collaboration · arXiv:2610.38406</p></div>
+      <span>Preprint</span>
+    </article>
+    <article class="collaboration-publication" data-collaboration="besiii">
+      <time datetime="2026">2026</time>
+      <div><h3><a href="https://arxiv.org/abs/2610.36916">Search for e⁺e⁻ → π⁰K⁺K⁻J/ψ at √s = 4.26–4.95 GeV</a></h3><p>BESIII Collaboration · arXiv:2610.36916</p></div>
+      <span>Preprint</span>
+    </article>
+    <article class="collaboration-publication" data-collaboration="besiii">
+      <time datetime="2026">2026</time>
+      <div><h3><a href="https://arxiv.org/abs/2610.34311">Search for the rare decay η′ → 3γ</a></h3><p>BESIII Collaboration · arXiv:2610.34311</p></div>
+      <span>Preprint</span>
+    </article>
+    <article class="collaboration-publication" data-collaboration="besiii">
+      <time datetime="2026">2026</time>
+      <div><h3><a href="https://arxiv.org/abs/2610.31291">Precise Measurement of the Inclusive Cross Sections of Open-Charm Mesons at Energies from 3.80 to 4.95 GeV</a></h3><p>BESIII Collaboration · arXiv:2610.31291</p></div>
+      <span>Preprint</span>
+    </article>
+    <article class="collaboration-publication" data-collaboration="besiii">
+      <time datetime="2026">2026</time>
+      <div><h3><a href="https://arxiv.org/abs/2610.13101">Determination of U-spin breaking parameters with an amplitude analysis of the decay D⁰ → K<sub>S,L</sub>⁰π⁺π⁻</a></h3><p>BESIII Collaboration · arXiv:2610.13101</p></div>
+      <span>Preprint</span>
+    </article>
+    <article class="collaboration-publication" data-collaboration="besiii">
+      <time datetime="2026">2026</time>
+      <div><h3><a href="https://arxiv.org/abs/2609.15053">Improved amplitude analysis of η′ → π⁺π⁻π⁰ and η′ → π⁰π⁰π⁰</a></h3><p>BESIII Collaboration · arXiv:2609.15053</p></div>
+      <span>Preprint</span>
+    </article>
+    <article class="collaboration-publication" data-collaboration="besiii">
+      <time datetime="2026">2026</time>
+      <div><h3><a href="https://arxiv.org/abs/2609.08266">Search for the doubly Cabibbo-suppressed decays D⁰ → K⁺π⁻η′ and D⁺ → K⁺π⁰η′</a></h3><p>BESIII Collaboration · arXiv:2609.08266</p></div>
+      <span>Preprint</span>
+    </article>
+    <article class="collaboration-publication" data-collaboration="besiii">
+      <time datetime="2026">2026</time>
+      <div><h3><a href="https://arxiv.org/abs/2609.05829">Measurement of CP Asymmetry Parameters and Polarization Correlations in Ω⁻Ω̄⁺ Pairs</a></h3><p>BESIII Collaboration · arXiv:2609.05829</p></div>
+      <span>Preprint</span>
+    </article>
+    <article class="collaboration-publication" data-collaboration="besiii">
+      <time datetime="2026">2026</time>
+      <div><h3><a href="https://arxiv.org/abs/2607.20366">Lightest 0<sup>−+</sup> Glueball as Dominant Constituent of X(2370)</a></h3><p>BESIII Collaboration · arXiv:2607.20366</p></div>
+      <span>Preprint</span>
+    </article>
+    <article class="collaboration-publication" data-collaboration="besiii">
+      <time datetime="2026">2026</time>
+      <div><h3><a href="https://arxiv.org/abs/2606.29141">Study of the e⁺e⁻ → π⁺π⁻D<sub>s</sub>⁺D<sub>s</sub>⁻ process from √s = 4.42 to 4.95 GeV at BESIII</a></h3><p>BESIII Collaboration · arXiv:2606.29141</p></div>
+      <span>Preprint</span>
+    </article>
+    <article class="collaboration-publication" data-collaboration="gluex">
       <time datetime="2026">2026</time>
       <div><h3><a href="https://doi.org/10.1103/jsfs-nq46">Search for the Y(2175) in the photoproduction cross section measurement of γp → ϕπ⁺π⁻p at GlueX</a></h3><p>GlueX Collaboration · Physical Review Letters 136, 251902</p></div>
-      <span>Collaboration</span>
+      <span>Published</span>
     </article>
-    <article class="collaboration-publication">
+    <article class="collaboration-publication" data-collaboration="gluex">
       <time datetime="2026">2026</time>
       <div><h3><a href="https://doi.org/10.1103/h197-l9dw">Baryon–antibaryon photoproduction cross sections off the proton</a></h3><p>GlueX Collaboration · Physical Review C 113, 045207</p></div>
-      <span>Collaboration</span>
+      <span>Published</span>
     </article>
-    <article class="collaboration-publication">
+    <article class="collaboration-publication" data-collaboration="gluex">
       <time datetime="2025">2025</time>
       <div><h3><a href="https://doi.org/10.1016/j.physletb.2025.139914">Measurement of the total Compton scattering cross section between 6.5 and 11 GeV</a></h3><p>GlueX Collaboration · Physics Letters B 870, 139914</p></div>
-      <span>Collaboration</span>
+      <span>Published</span>
     </article>
-    <article class="collaboration-publication">
+    <article class="collaboration-publication" data-collaboration="gluex">
       <time datetime="2025">2025</time>
       <div><h3><a href="https://doi.org/10.1103/2tdc-5by6">Measurement of spin-density matrix elements in ϕ(1020) → K⁰<sub>S</sub>K⁰<sub>L</sub> photoproduction with a linearly polarized photon beam</a></h3><p>GlueX Collaboration · Physical Review C 112, 025203</p></div>
-      <span>Collaboration</span>
+      <span>Published</span>
     </article>
-    <article class="collaboration-publication">
+    <article class="collaboration-publication" data-collaboration="gluex">
       <time datetime="2025">2025</time>
       <div><h3><a href="https://doi.org/10.1103/jfzb-rfl4">First measurement of a⁰<sub>2</sub>(1320) polarized photoproduction cross section</a></h3><p>GlueX Collaboration · Physical Review C 112, 015204</p></div>
-      <span>Collaboration</span>
+      <span>Published</span>
     </article>
-    <article class="collaboration-publication">
+    <article class="collaboration-publication" data-collaboration="gluex">
       <time datetime="2025">2025</time>
       <div><h3><a href="https://doi.org/10.1016/j.physletb.2025.139368">Measurement of spin-density matrix elements in Δ⁺⁺(1232) photoproduction</a></h3><p>GlueX Collaboration · Physics Letters B 863, 139368</p></div>
-      <span>Collaboration</span>
+      <span>Published</span>
     </article>
-    <article class="collaboration-publication">
+    <article class="collaboration-publication" data-collaboration="gluex">
       <time datetime="2024">2024</time>
       <div><h3><a href="https://doi.org/10.1016/j.physletb.2024.138790">Search for axion-like particles through nuclear Primakoff production using the GlueX detector</a></h3><p>GlueX Collaboration · Physics Letters B 855, 138790</p></div>
-      <span>Collaboration</span>
+      <span>Published</span>
     </article>
-    <article class="collaboration-publication">
+    <article class="collaboration-publication" data-collaboration="gluex">
       <time datetime="2024">2024</time>
       <div><h3><a href="https://doi.org/10.1103/PhysRevLett.133.261903">Upper limit on the photoproduction cross section of the spin-exotic π₁(1600)</a></h3><p>GlueX Collaboration · Physical Review Letters 133, 261903</p></div>
-      <span>Collaboration</span>
+      <span>Published</span>
     </article>
-    <article class="collaboration-publication">
+    <article class="collaboration-publication" data-collaboration="gluex">
       <time datetime="2023">2023</time>
       <div><h3><a href="https://doi.org/10.1103/PhysRevC.108.055204">Measurement of spin-density matrix elements in ρ(770) production with a linearly polarized photon beam</a></h3><p>GlueX Collaboration · Physical Review C 108, 055204</p></div>
-      <span>Collaboration</span>
+      <span>Published</span>
     </article>
-    <article class="collaboration-publication">
+    <article class="collaboration-publication" data-collaboration="gluex">
       <time datetime="2023">2023</time>
       <div><h3><a href="https://doi.org/10.1103/PhysRevC.108.025201">Measurement of the J/ψ photoproduction cross section over the full near-threshold kinematic region</a></h3><p>GlueX Collaboration · Physical Review C 108, 025201</p></div>
-      <span>Collaboration</span>
+      <span>Published</span>
     </article>
-    <article class="collaboration-publication">
+    <article class="collaboration-publication" data-collaboration="gluex">
       <time datetime="2022">2022</time>
       <div><h3><a href="https://doi.org/10.1103/PhysRevD.105.052007">Search for photoproduction of axionlike particles at GlueX</a></h3><p>GlueX Collaboration · Physical Review D 105, 052007</p></div>
-      <span>Collaboration</span>
+      <span>Published</span>
     </article>
-    <article class="collaboration-publication">
+    <article class="collaboration-publication" data-collaboration="gluex">
       <time datetime="2022">2022</time>
       <div><h3><a href="https://doi.org/10.1103/PhysRevC.105.035201">Measurement of spin density matrix elements in Λ(1520) photoproduction at 8.2–8.8 GeV</a></h3><p>GlueX Collaboration · Physical Review C 105, 035201</p></div>
-      <span>Collaboration</span>
+      <span>Published</span>
     </article>
   </div>
 

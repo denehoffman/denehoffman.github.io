@@ -1,3 +1,6 @@
+{%- component home_section(kind) -%}
 <section class="home-section home-section--{{ kind }}">
   {{ body | markdown | safe }}
 </section>
+
+{%- endcomponent home_section -%}

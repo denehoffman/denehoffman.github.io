@@ -1,19 +1,22 @@
+{%- component figure(src, alt, video=false, source="", data="", source_label="Source", data_label="Data") -%}
 <figure class="article-figure" data-article-figure>
   <div class="article-figure__media">
-    {% if video | default(value=false) %}
+{%- if video | default(value=false) -%}
       <video src="{{ src }}" aria-label="{{ alt }}" autoplay loop muted playsinline controls preload="metadata"></video>
-    {% else %}
+{%- else -%}
       <img class="no-hover" src="{{ src }}" alt="{{ alt }}" loading="lazy" decoding="async">
-    {% endif %}
+{%- endif -%}
   </div>
   <figcaption>
     <span class="article-figure__number" aria-hidden="true"></span>
     <span class="article-figure__caption">{{ body | markdown(inline=true) | safe }}</span>
-    {% if source or data %}
+{%- if source or data -%}
       <span class="article-figure__links" aria-label="Figure resources">
-        {% if source %}<a href="{{ source }}">{{ source_label | default(value="Source") }}</a>{% endif %}
-        {% if data %}<a href="{{ data }}">{{ data_label | default(value="Data") }}</a>{% endif %}
+{%- if source -%}<a href="{{ source }}">{{ source_label | default(value="Source") }}</a>{%- endif -%}
+{%- if data -%}<a href="{{ data }}">{{ data_label | default(value="Data") }}</a>{%- endif -%}
       </span>
-    {% endif %}
+{%- endif -%}
   </figcaption>
 </figure>
+
+{%- endcomponent figure -%}

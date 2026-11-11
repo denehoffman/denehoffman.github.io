@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="{{ lang }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="{{ page.description }}">
+  <title>{{ page.title }} · {{ config.title }}</title>
+  <link rel="canonical" href="{{ current_url }}">
+  {% include "partials/csp.html" %}
+  {% include "partials/favicon.html" %}
+  {% include "partials/variables.html" %}
+  <link rel="stylesheet" href="{{ get_url(path='style.css') }}">
+  <link rel="stylesheet" href="{{ get_url(path='overrides.css') }}">
+  <script defer src="{{ get_url(path='bubble-physics.js') }}"></script>
+  <script defer src="{{ get_url(path='bubble-interactions.js') }}"></script>
+  <script defer src="{{ get_url(path='bubble-renderer.js') }}"></script>
+  <script defer src="{{ get_url(path='bubble-chamber.js') }}"></script>
+</head>
+<body>
+<main id="main-content" class="particle-playground" data-particle-playground>
+  <h1 class="playground-sr-only">Particle playground</h1>
+  <details class="playground-panel" open>
+    <summary>Particle playground</summary>
+    <p class="playground-intro">Click anywhere to add an event.</p>
+    <div class="playground-actions">
+      <button id="playground-pause" type="button" aria-pressed="false">Pause</button>
+      <button id="playground-clear" type="button">Clear</button>
+      <button id="playground-export" type="button">Save PNG</button>
+    </div>
+    <label for="playground-view">View</label>
+    <select id="playground-view"><option value="replay">In motion</option><option value="photograph">Photographs</option></select>
+    <label for="playground-topology">Reaction</label>
+    <select id="playground-topology"><option value="mixed">Mixed events</option><option value="track">Single track</option><option value="decay">Single decay</option><option value="cascade">Ξ cascade</option><option value="dalitz">Dalitz decay</option></select>
+    <label for="playground-event-rate">Activity <output id="playground-event-rate-value">5 / beam</output></label>
+    <input id="playground-event-rate" type="range" min="0" max="10" step="0.5" value="5">
+    <div id="playground-motion">
+      <label for="playground-speed">Speed <output id="playground-speed-value">1×</output></label>
+      <input id="playground-speed" type="range" min="0.25" max="2" step="0.25" value="1">
+    </div>
+    <details class="playground-beam">
+      <summary>Beam</summary>
+      <label for="playground-beam-density">Density <output id="playground-beam-density-value">10 tracks</output></label>
+      <input id="playground-beam-density" type="range" min="0" max="60" step="1" value="10">
+      <label class="playground-random-angle"><input id="playground-random-angle" type="checkbox" role="switch"> Random angle</label>
+      <label for="playground-beam-direction">Aim the beam <output id="playground-beam-direction-value">0°</output><span id="playground-beam-arrow" aria-hidden="true">→</span></label>
+      <input id="playground-beam-direction" type="range" min="0" max="359" step="1" value="0">
+    </details>
+    <a class="playground-back" href="{{ get_url(path='/') }}">← Back to the website</a>
+    <noscript><p>Enable JavaScript to play with the chamber.</p></noscript>
+  </details>
+</main>
+</body>
+</html>

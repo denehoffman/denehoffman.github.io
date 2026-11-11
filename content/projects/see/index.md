@@ -1,7 +1,7 @@
 +++
 title = "see"
 +++
-{{ project_header(project="see") }}
+{{ <project_header project="see" /> }}
 
 [`see`](https://github.com/denehoffman/see) is a deliberately small terminal image viewer for terminals with real graphics support. It sends images through Kitty graphics, iTerm2 inline images, or SIXEL rather than approximating them with ASCII, braille, or block characters.
 

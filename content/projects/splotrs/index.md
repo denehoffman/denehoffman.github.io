@@ -1,7 +1,7 @@
 +++
 title = "splotrs"
 +++
-{{ project_header(project="splotrs") }}
+{{ <project_header project="splotrs" /> }}
 
 [`splotrs`](https://github.com/denehoffman/splotrs) performs unbinned mixture fits and calculates a per-event sWeight for each component. Its numerical core is written in Rust using `ganesh`, while its Python interface accepts vectorized NumPy probability-density callbacks.
 

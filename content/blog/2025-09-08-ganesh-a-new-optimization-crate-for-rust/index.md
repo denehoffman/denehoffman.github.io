@@ -152,9 +152,9 @@ Now any algorithm which does not support bounds can simply operate on the intern
 
 It should be noted that L-BFGS-B has been a desired algorithm by at least a couple of users of `argmin` [for](https://github.com/argmin-rs/argmin/issues/137) [several](https://github.com/argmin-rs/argmin/issues/568) [years](https://github.com/argmin-rs/argmin/issues/357) without any visible progress (it appears that the current maintainer is a bit busy, I know the feeling). If I have enough time, I might volunteer to port my own code to `argmin`, and if any of the current contributors are reading this, they have my permission to do just that with attribution.
 
-{% alert(note=true) %}
+{% <alert note={true}> %}
 All of the issues I have with `argmin` are not reasons not to use it, and this blog post isn't intended as a hit piece. I'm just highlighting the reasons I decided to write my own crate and why I think it is a good addition to the existing Rust optimization ecosystem! I believe that `argmin` excels in its customizability, and `ganesh` should be seen as an alternative approach which I believe is a bit more user-friendly with sensible defaults.
-{% end %}
+{% </alert> %}
 
 # A New Optimization Crate: `ganesh`
 
@@ -238,9 +238,9 @@ if __name__ == '__main__':
     plt.close()
 
 ```
-{% figure(src="data.webp", alt="A two-dimensional histogram of the sampled toy dataset", source="https://github.com/denehoffman/ganesh/tree/90f145ee1dc66bb61f234fd9be2d857e6078cebe/examples/multivariate_normal_fit", source_label="Example code") %}
+{% <figure src="data.webp" alt="A two-dimensional histogram of the sampled toy dataset" source="https://github.com/denehoffman/ganesh/tree/90f145ee1dc66bb61f234fd9be2d857e6078cebe/examples/multivariate_normal_fit" source_label="Example code"> %}
 The sampled two-dimensional toy dataset used for the Gaussian fit.
-{% end %}
+{% </figure> %}
 
 Now we should get on to fitting these data to a model. For this, we'll first define the probability distribution function for a multivariate Gaussian:
 
@@ -563,9 +563,9 @@ for i in range(n_parameters):
 plt.savefig('traces.svg')
 plt.close()
 ```
-{% figure(src="traces.webp", alt="Parameter traces for every MCMC walker, including burn-in", source="https://github.com/denehoffman/ganesh/tree/90f145ee1dc66bb61f234fd9be2d857e6078cebe/examples/multivariate_normal_fit", source_label="Example code") %}
+{% <figure src="traces.webp" alt="Parameter traces for every MCMC walker, including burn-in" source="https://github.com/denehoffman/ganesh/tree/90f145ee1dc66bb61f234fd9be2d857e6078cebe/examples/multivariate_normal_fit" source_label="Example code"> %}
 The complete MCMC parameter traces, including the dashed burn-in region.
-{% end %}
+{% </figure> %}
 
 ```python
 _, ax = plt.subplots(nrows=n_parameters, sharex=True, figsize=(10, 50))
@@ -581,9 +581,9 @@ for i in range(n_parameters):
 plt.savefig('traces_burned.svg')
 plt.close()
 ```
-{% figure(src="traces_burned.webp", alt="Parameter traces for every MCMC walker after burn-in", source="https://github.com/denehoffman/ganesh/tree/90f145ee1dc66bb61f234fd9be2d857e6078cebe/examples/multivariate_normal_fit", source_label="Example code") %}
+{% <figure src="traces_burned.webp" alt="Parameter traces for every MCMC walker after burn-in" source="https://github.com/denehoffman/ganesh/tree/90f145ee1dc66bb61f234fd9be2d857e6078cebe/examples/multivariate_normal_fit" source_label="Example code"> %}
 The MCMC parameter traces after discarding burn-in.
-{% end %}
+{% </figure> %}
 
 ```python
 flat_chain = np.array(pickle.load(Path.open('flat_chain.pkl', 'rb')))
@@ -604,9 +604,9 @@ overplot_lines(
 plt.savefig('corner.svg')
 plt.close()
 ```
-{% figure(src="corner.webp", alt="Corner plot of the posterior parameter distributions", source="https://github.com/denehoffman/ganesh/tree/90f145ee1dc66bb61f234fd9be2d857e6078cebe/examples/multivariate_normal_fit", source_label="Example code") %}
+{% <figure src="corner.webp" alt="Corner plot of the posterior parameter distributions" source="https://github.com/denehoffman/ganesh/tree/90f145ee1dc66bb61f234fd9be2d857e6078cebe/examples/multivariate_normal_fit" source_label="Example code"> %}
 The posterior parameter distributions and pairwise correlations from the flattened MCMC chain.
-{% end %}
+{% </figure> %}
 
 This last plot is probably the most interesting to look at, since it shows us the actual posterior distribution of our parameters. In blue, we have the truth values used to generate the data, and in red we have the values obtained in our fit. While we are within $`3\sigma`$ of each truth value, the fact that the fit is far away from the means of the MCMC samples is not great, but it just means the algorithm probably terminated too soon and gave us a less-accurate fit. We can also see here that the MCMC parameter errors are very close to the symmetric errors we obtained from L-BFGS-B. The difference is that the ESS algorithm didn't actually need a gradient to compute these, and due to some fun math, the transforms we applied were taken into account when L-BFGS-B directly calculated the Hessian.
 
@@ -646,9 +646,9 @@ with Loom('walkers_corner.gif', fps=20, parallel=True) as loom:
         delayed(make_frame)(i, burned_chain, parameter_labels, ranges, loom) for i in range(n_steps)
     )
 ```
-{% figure(src="walkers_corner.webm", video=true, alt="Animated corner plot following the ensemble walkers", source="https://github.com/denehoffman/ganesh/tree/90f145ee1dc66bb61f234fd9be2d857e6078cebe/examples/multivariate_normal_fit", source_label="Example code") %}
+{% <figure src="walkers_corner.webm" video={true} alt="Animated corner plot following the ensemble walkers" source="https://github.com/denehoffman/ganesh/tree/90f145ee1dc66bb61f234fd9be2d857e6078cebe/examples/multivariate_normal_fit" source_label="Example code"> %}
 The ensemble walkers exploring the posterior parameter space after burn-in.
-{% end %}
+{% </figure> %}
 
 This entire example can be found (in a slightly more condensed form) in the [`examples/`](https://github.com/denehoffman/ganesh/tree/90f145ee1dc66bb61f234fd9be2d857e6078cebe/examples/multivariate_normal_fit) directory of `ganesh`. See the [`.justfile`](https://github.com/denehoffman/ganesh/blob/90f145ee1dc66bb61f234fd9be2d857e6078cebe/examples/multivariate_normal_fit/.justfile) in that directory for more information about how to run this and other examples.
 
@@ -658,6 +658,6 @@ I hope this has been an informative look into `ganesh`. The current goal for a v
 [^note_1]: Nearly every other implementation I've come across uses `10`, although Liu and Nocedal[^1] recommend $`3\leq m \leq 7`$.
 [^note_2]: This is a bit silly, since `MINUIT` is essentially just the BFGS algorithm with this bounds transformation, so this could all be avoided by just using L-BFGS-B. The technical reason for this is that `MINUIT` doesn't bother to calculate higher-order derivatives of the transformation functions and uses a linear approximation instead. `ganesh` does include these higher-order derivatives for bounds transformations.
 [^note_3]: I've been avoiding this partially because the functions I use in my research are already parallelized over their underlying datasets, and nested parallel loops are a bit of a pain to get right.
-[^1]: {{ paper_citation(key="Liu1989", authors="D. C. Liu and J. Nocedal", bibtex_authors="Liu, Dong C. and Nocedal, Jorge", title="On the limited memory BFGS method for large scale optimization", journal="Mathematical Programming", venue="Mathematical Programming 45(1–3), 503–528", volume="45", number="1–3", pages="503–528", year="1989", doi="10.1007/bf01589116") }}
-[^2]: {{ paper_citation(key="Goodman2010", authors="J. Goodman and J. Weare", bibtex_authors="Goodman, Jonathan and Weare, Jonathan", title="Ensemble samplers with affine invariance", journal="Communications in Applied Mathematics and Computational Science", venue="Communications in Applied Mathematics and Computational Science 5(1), 65–80", volume="5", number="1", pages="65–80", year="2010", doi="10.2140/camcos.2010.5.65") }}
-[^3]: {{ paper_citation(key="Karamanis2021", authors="M. Karamanis and F. Beutler", bibtex_authors="Karamanis, Minas and Beutler, Florian", title="Ensemble slice sampling: Parallel, black-box and gradient-free inference for correlated and multimodal distributions", journal="Statistics and Computing", venue="Statistics and Computing 31(5)", volume="31", number="5", year="2021", doi="10.1007/s11222-021-10038-2") }}
+[^1]: {{ <paper_citation key="Liu1989" authors="D. C. Liu and J. Nocedal" bibtex_authors="Liu, Dong C. and Nocedal, Jorge" title="On the limited memory BFGS method for large scale optimization" journal="Mathematical Programming" venue="Mathematical Programming 45(1–3), 503–528" volume="45" number="1–3" pages="503–528" year="1989" doi="10.1007/bf01589116" /> }}
+[^2]: {{ <paper_citation key="Goodman2010" authors="J. Goodman and J. Weare" bibtex_authors="Goodman, Jonathan and Weare, Jonathan" title="Ensemble samplers with affine invariance" journal="Communications in Applied Mathematics and Computational Science" venue="Communications in Applied Mathematics and Computational Science 5(1), 65–80" volume="5" number="1" pages="65–80" year="2010" doi="10.2140/camcos.2010.5.65" /> }}
+[^3]: {{ <paper_citation key="Karamanis2021" authors="M. Karamanis and F. Beutler" bibtex_authors="Karamanis, Minas and Beutler, Florian" title="Ensemble slice sampling: Parallel, black-box and gradient-free inference for correlated and multimodal distributions" journal="Statistics and Computing" venue="Statistics and Computing 31(5)" volume="31" number="5" year="2021" doi="10.1007/s11222-021-10038-2" /> }}

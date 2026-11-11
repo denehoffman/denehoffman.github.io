@@ -1,7 +1,7 @@
 +++
 title = "hddm-rs"
 +++
-{{ project_header(project="hddm-rs") }}
+{{ <project_header project="hddm-rs" /> }}
 
 [`hddm-rs`](https://github.com/denehoffman/hddm-rs) brings the Hierarchical Data Description Model used by GlueX into Rust. The workspace covers runtime I/O, compression and schema handling, derive macros for manually defined models, and a code generator for producing Rust bindings from HDDM headers.
 

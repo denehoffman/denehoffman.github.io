@@ -1,7 +1,7 @@
 +++
 title = "pdg-rs"
 +++
-{{ project_header(project="pdg-rs") }}
+{{ <project_header project="pdg-rs" /> }}
 
 [`pdg-rs`](https://github.com/denehoffman/pdg-rs) provides programmatic access to the Particle Data Group database of particle-physics measurements. It is independently developed and is not affiliated with the PDG; scientific uses should cite the underlying Review of Particle Physics data.
 

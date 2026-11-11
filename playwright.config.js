@@ -7,11 +7,14 @@ module.exports = defineConfig({
   use: {
     baseURL: "http://127.0.0.1:8099",
     colorScheme: "dark",
+    launchOptions: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH
+      ? { executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH }
+      : {},
     screenshot: "only-on-failure",
     trace: "retain-on-failure",
   },
   webServer: {
-    command: "zola build --base-url http://127.0.0.1:8099 && python3 -m http.server 8099 --bind 127.0.0.1 --directory public",
+    command: "zola build --base-url http://127.0.0.1:8099 --output-dir .test-site --force && python3 -m http.server 8099 --bind 127.0.0.1 --directory .test-site",
     url: "http://127.0.0.1:8099",
     reuseExistingServer: !process.env.CI,
   },

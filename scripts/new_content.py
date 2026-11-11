@@ -70,7 +70,7 @@ def create_project(slug: str, title: str, summary: str) -> Path:
 title = {json.dumps(title)}
 +++
 
-{{{{ project_header(project={json.dumps(slug)}) }}}}
+{{{{ <project_header project={json.dumps(slug)} /> }}}}
 
 Start writing here.
 ''',

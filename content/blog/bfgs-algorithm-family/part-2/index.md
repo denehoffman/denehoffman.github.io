@@ -12,7 +12,7 @@ series_section = "blog/bfgs-algorithm-family/_index.md"
 scripts = ["article-reading.js"]
 +++
 
-{% alert(note=true) %}
+{% <alert note={true}> %}
 Since writing the [previous post](@/blog/bfgs-algorithm-family/part-1/index.md), I have made several simplifications to the library that will change how some structs and traits are used here. The biggest change is that I've abandoned generic floats in favor of a feature gate:
 
  ```rust
@@ -24,7 +24,7 @@ Since writing the [previous post](@/blog/bfgs-algorithm-family/part-1/index.md),
  ```
 
 With this code, I can turn the `f32` version of my crate on and off with a feature flag. While generics can be nice, in this instance they were actually causing the crate to be slower (just according to some of my own internal benchmarks, this might not be the case in general) and more difficult to read. Any instances in the last post where there was a generic type `T` representing floating-point values have been replaced with this `Float` type, so `Status<T>` is now just `Status`, for example.
-{% end %}
+{% </alert> %}
 
 Let's talk about the core BFGS algorithm. The details I'm using here can be found in Nocedal and Wright's book ["Numerical Optimization"](https://doi.org/10.1007/978-0-387-40065-5) in Chapter 6: Quasi-Newton Methods. In the last post, I alluded to this and described gradient descent, but we should really cover what Newton's method is first.
 

@@ -2,7 +2,26 @@
   "use strict";
 
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-  if (reducedMotion.matches) return;
+  const playground = document.querySelector("[data-particle-playground]");
+  if (reducedMotion.matches && !playground) return;
+  if (playground) document.body.classList.add("is-particle-playground");
+  const physics = window.BubblePhysics;
+  const interactions = window.BubbleInteractions;
+  const settings = { speed: 1, automatic: true, activity: playground ? 5 : 0.6, replaySpeed: 1,
+    mode: "replay", beamAutomatic: true, randomBeamAngle: false, beamDensity: playground ? 10 : 2, backgroundTracks: playground ? 0.6 : 0.25, specks: playground ? 0.4 : 0.16 };
+  const EXPOSURE = { growth: 1000, hold: 7000 };
+  const TRACK_BUDGET = 96;
+  let exposureStarted = 0;
+  let exposureInitialized = false;
+  let nextBackgroundAt = 2000;
+  let nextBeamAt = 300;
+  const BEAM_INTERVAL = playground ? 6000 : 10000;
+  const MAXIMUM_BEAM_TRACKS = 120;
+  let specks = [];
+  let sceneRevision = 0;
+  let heldPhotoKey = null;
+  let simulationTime = 0;
+  let previousFrame = 0;
 
   // Visual handles. Particle masses, charges, and cτ values below remain in
   // physical units; these constants map the simulated chamber onto the page.
@@ -12,16 +31,11 @@
     stepPixels: 3.5,
     visualMillisecondsPerMeterAtC: 800,
     lifetimeScale: 8,
-    minimumIonizationLossGeVPerMeter: 0.003,
-    electronIonizationLossGeVPerMeter: 0.055,
     tailHoldMilliseconds: 9000,
     tailFadeMilliseconds: 4000,
     maximumTransportSteps: 14000,
-    eventCheckIntervalMilliseconds: 1000,
-    eventChancePerCheck: 0.10,
     maximumConcurrentEvents: 4,
   };
-  const CURVATURE_GEV_PER_TESLA_METER = 0.299792458;
   const PAUSE_STORAGE_KEY = "bubble-chamber-paused";
 
   const PARTICLES = {
@@ -36,8 +50,8 @@
     nu: { name: "ν", mass: 0, charge: 0, cTau: Infinity },
     p: { name: "p", mass: 0.938272088, charge: 1, cTau: Infinity },
     pbar: { name: "p̄", mass: 0.938272088, charge: -1, cTau: Infinity },
-    n: { name: "n", mass: 0.939565421, charge: 0, cTau: 0.265 },
-    nbar: { name: "n̄", mass: 0.939565421, charge: 0, cTau: 0.265 },
+    n: { name: "n", mass: 0.939565421, charge: 0, cTau: Infinity },
+    nbar: { name: "n̄", mass: 0.939565421, charge: 0, cTau: Infinity },
     KS: {
       name: "K⁰S",
       mass: 0.497611,
@@ -146,34 +160,36 @@
       <section class="bubble-chamber-explainer">
         <p class="bubble-chamber-explainer__kicker">Background simulation</p>
         <h2>Reading the chamber</h2>
-        <p>These tracks are simulated rather than recorded data.</p>
+        <p>These tracks are simulated particle paths in liquid hydrogen. Small deflections model scattering in the liquid; a directed particle beam crosses the chamber, while unrelated cosmic tracks and chamber specks form the background.</p>
         <ul>
-          <li><span class="bubble-chamber-key bubble-chamber-key--curve" aria-hidden="true"></span><span>Charged particles curve in a magnetic field. Tighter curves indicate lower momentum.</span></li>
-          <li><span class="bubble-chamber-key bubble-chamber-key--vertex" aria-hidden="true"></span><span>A fork or V marks a decay into charged daughter particles. Neutral parents leave no track.</span></li>
-          <li><span class="bubble-chamber-key bubble-chamber-key--drops" aria-hidden="true"></span><span>Broken, fading strokes mimic droplets forming along a particle path.</span></li>
+          <li><span class="bubble-chamber-key bubble-chamber-key--curve" aria-hidden="true"></span><span>Charged particles curve in a magnetic field. For particles with the same charge magnitude, tighter curves indicate lower momentum.</span></li>
+          <li><span class="bubble-chamber-key bubble-chamber-key--vertex" aria-hidden="true"></span><span>A decay can produce a kink, a fork, or a V where new charged tracks begin. Neutral particles leave no track.</span></li>
+          <li><span class="bubble-chamber-key bubble-chamber-key--drops" aria-hidden="true"></span><span>Each track is made of individual bubbles. Denser tracks indicate greater energy deposition in the liquid.</span></li>
         </ul>
-        <p class="bubble-chamber-explainer__hint">Choose a topology in the event explorer, then click or tap the page to generate it. The default is a π⁰ Dalitz decay.</p>
+        <p class="bubble-chamber-explainer__hint">Choose an event type in the explorer, then click or tap the page to create an event. The default is a π⁰ Dalitz decay.</p>
         <p class="bubble-chamber-explainer__reference"><a href="https://home.cern/science/experiments/gargamelle/">Learn about CERN’s Gargamelle bubble chamber <span aria-hidden="true">↗</span></a></p>
+        <p class="bubble-chamber-playground-link"><a href="/playground/">Open particle playground <span aria-hidden="true">↗</span></a></p>
       </section>
     </details>
     <details class="bubble-chamber-explorer">
-      <summary class="bubble-chamber-control" aria-label="Open the decay explorer">
+      <summary class="bubble-chamber-control" aria-label="Open the event explorer">
         <span aria-hidden="true">⌁</span>
       </summary>
       <section class="bubble-chamber-explorer-panel">
         <p class="bubble-chamber-explainer__kicker">Event explorer</p>
-        <h2>Build a decay</h2>
-        <p>Generate one event at a time, then compare its decay chain with the tracks in the chamber.</p>
-        <div class="bubble-chamber-event-types" role="group" aria-label="Event topology">
+        <h2>Explore particle tracks</h2>
+        <p>Choose an event to see its particles and compare the reaction with the tracks in the chamber.</p>
+        <div class="bubble-chamber-event-types" role="group" aria-label="Event type">
           <button type="button" data-event-kind="decay"><span class="bubble-chamber-topology" aria-hidden="true">V</span>Single decay</button>
           <button type="button" data-event-kind="cascade"><span class="bubble-chamber-topology" aria-hidden="true">Y</span>Cascade decay</button>
           <button type="button" data-event-kind="dalitz"><span class="bubble-chamber-topology" aria-hidden="true">γ*</span>Dalitz decay</button>
           <button type="button" data-event-kind="track"><span class="bubble-chamber-topology" aria-hidden="true">↝</span>Single track</button>
         </div>
         <article class="bubble-chamber-event-readout" aria-live="polite">
-          <p class="bubble-chamber-event-readout__empty">Choose a topology to inspect its particles.</p>
+          <p class="bubble-chamber-event-readout__empty">Choose an event type to see its particles.</p>
         </article>
-        <p class="bubble-chamber-explorer-note"><span aria-hidden="true">○</span> Neutral particles leave no track; charged particles bend in opposite directions according to charge.</p>
+        <p class="bubble-chamber-explorer-note"><span aria-hidden="true">○</span> Neutral particles leave no track. Positive and negative particles bend in opposite directions.</p>
+        <p class="bubble-chamber-playground-link"><a href="/playground/">Open particle playground <span aria-hidden="true">↗</span></a></p>
       </section>
     </details>
   `;
@@ -193,16 +209,28 @@
   };
 
   const events = [];
+  const beamJobs = new Set();
+  function removeEvent(index) {
+    events[index].layer.dispose();
+    events.splice(index, 1);
+    sceneRevision += 1;
+  }
+  function cancelBeams() {
+    for (const job of beamJobs) job.cancelled = true;
+  }
+  function clearEvents() {
+    cancelBeams();
+    while (events.length) removeEvent(events.length - 1);
+  }
   let width = 0;
   let height = 0;
   let pixelRatio = 1;
   let animationFrame = 0;
-  let paused = readPausedPreference();
-  let pausedAt = paused ? performance.now() : 0;
+  let paused = playground ? reducedMotion.matches : readPausedPreference();
   let statusTimeout = 0;
   let selectedEventKind = "dalitz";
-  let beamAngle = randomBetween(-0.18, 0.18);
-  let nextEventCheckAt = performance.now() + CONFIG.eventCheckIntervalMilliseconds;
+  let beamAngle = 0;
+  let manualBeamDegrees = 0;
 
   function readPausedPreference() {
     try {
@@ -228,7 +256,7 @@
     return Math.exp(randomBetween(Math.log(minimum), Math.log(maximum)));
   }
 
-  function throughTrackMomentum() {
+  function singleTrackMomentum() {
     const choice = Math.random();
     if (choice < 0.52) return logUniform(1.4, 4.2);
     if (choice < 0.82) return logUniform(0.38, 1.4);
@@ -246,6 +274,7 @@
   }
 
   function resize() {
+    cancelBeams();
     width = window.innerWidth;
     height = window.innerHeight;
     pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
@@ -254,9 +283,9 @@
     canvas.style.width = `${width}px`;
     canvas.style.height = `${height}px`;
     context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
-    events.length = 0;
-    beamAngle = randomBetween(-0.18, 0.18);
-    nextEventCheckAt = performance.now() + CONFIG.eventCheckIntervalMilliseconds;
+    if (!playground) clearEvents();
+    buildChamberSpecks();
+    draw(simulationTime);
   }
 
   function isOnScreen(point, margin = 0) {
@@ -287,19 +316,8 @@
   }
 
   function beamStart() {
-    const fromLeft = Math.random() < 0.75;
-    if (fromLeft) {
-      return {
-        x: -18,
-        y: randomBetween(height * 0.08, height * 0.92),
-        angle: beamAngle + randomBetween(-0.035, 0.035),
-      };
-    }
-    return {
-      x: width + 18,
-      y: randomBetween(height * 0.08, height * 0.92),
-      angle: Math.PI + beamAngle + randomBetween(-0.035, 0.035),
-    };
+    return physics.beamEntry(width, height, beamAngle,
+      randomBetween(-0.3, 0.3) * Math.min(width, height));
   }
 
   function clickStart(point) {
@@ -309,7 +327,7 @@
     return {
       x,
       y,
-      angle: centerAngle + randomBetween(-0.65, 0.65),
+      angle: Number.isFinite(point.angle) ? point.angle : centerAngle + randomBetween(-0.65, 0.65),
     };
   }
 
@@ -452,78 +470,9 @@
   }
 
   function transportCharged(particle, start, initialMomentum) {
-    const points = [{ x: start.x, y: start.y }];
-    const times = [0];
-    const states = [];
-    const stepMeters = CONFIG.stepPixels / CONFIG.pixelsPerMeter;
-    let x = start.x;
-    let y = start.y;
-    let px = initialMomentum.px;
-    let py = initialMomentum.py;
-    let elapsed = 0;
-    let properLength = 0;
-    let pathLength = 0;
-    let entered = isOnScreen(start);
-    let exitedOnce = false;
-    let returnedAfterExit = false;
-    let stopReason = "transport-limit";
-
-    states.push({ x, y, px, py, properLength, pathLength });
-    for (let index = 1; index <= CONFIG.maximumTransportSteps; index += 1) {
-      const momentum = Math.hypot(px, py);
-      const totalEnergy = Math.hypot(particle.mass, momentum);
-      const beta = momentum / totalEnergy;
-      const betaGamma = momentum / particle.mass;
-      if (totalEnergy - particle.mass < 0.0008 || momentum < 0.001) {
-        stopReason = "ranged-out";
-        break;
-      }
-
-      let angle = Math.atan2(py, px);
-      const radiusMeters =
-        momentum /
-        (CURVATURE_GEV_PER_TESLA_METER * Math.abs(particle.charge) * CONFIG.magneticFieldTesla);
-      angle += (particle.charge * stepMeters) / radiusMeters;
-      x += Math.cos(angle) * CONFIG.stepPixels;
-      y += Math.sin(angle) * CONFIG.stepPixels;
-      pathLength += stepMeters;
-      properLength += stepMeters / Math.max(betaGamma, 1e-6);
-      elapsed += (CONFIG.visualMillisecondsPerMeterAtC * stepMeters) / Math.max(beta, 0.03);
-
-      const baseStoppingPower =
-        particle.mass < 0.01
-          ? CONFIG.electronIonizationLossGeVPerMeter
-          : CONFIG.minimumIonizationLossGeVPerMeter;
-      const stoppingPower = baseStoppingPower / Math.max(beta * beta, 0.1);
-      const nextEnergy = Math.max(particle.mass, totalEnergy - stoppingPower * stepMeters);
-      const nextMomentum = Math.sqrt(Math.max(0, nextEnergy * nextEnergy - particle.mass * particle.mass));
-      px = nextMomentum * Math.cos(angle);
-      py = nextMomentum * Math.sin(angle);
-      points.push({ x, y });
-      times.push(elapsed);
-      states.push({ x, y, px, py, properLength, pathLength });
-      const onScreen = isOnScreen({ x, y });
-      const nearScreen = isOnScreen({ x, y }, 26);
-      entered ||= onScreen;
-      if (exitedOnce && onScreen) returnedAfterExit = true;
-      if (entered && !nearScreen) {
-        const radiusPixels = radiusMeters * CONFIG.pixelsPerMeter;
-        if (!exitedOnce) {
-          exitedOnce = true;
-          // Tight tracks remain in the simulated chamber so their next orbit
-          // can cross the viewport again. Broad tracks are retired off-screen.
-          if (radiusPixels > Math.min(width, height) * 0.7) {
-            stopReason = "exited";
-            break;
-          }
-        } else if (returnedAfterExit) {
-          stopReason = "exited-after-return";
-          break;
-        }
-      }
-    }
-
-    return { particle, points, times, states, stopReason };
+    return physics.transport(particle, start, initialMomentum, {
+      ...CONFIG, isInside: isOnScreen,
+    });
   }
 
   function visibleIndexBounds(transport) {
@@ -606,48 +555,23 @@
     };
   }
 
-  function addTexture(track) {
-    const isElectron = track.particle.mass < 0.01;
-    track.segmentStrengths = new Array(track.points.length).fill(1);
-    track.lineWidth = isElectron ? 0.38 : 0.58;
-    let gapRemaining = 0;
-    let density = isElectron ? randomBetween(0.985, 0.997) : randomBetween(0.68, 0.9);
-    for (let index = 1; index < track.points.length; index += 1) {
-      if (gapRemaining > 0) {
-        track.segmentStrengths[index] = 0;
-        gapRemaining -= 1;
-        continue;
-      }
-      if (Math.random() > density) {
-        gapRemaining = isElectron ? 1 : Math.floor(randomBetween(1, 4));
-        track.segmentStrengths[index] = 0;
-        continue;
-      }
-      track.segmentStrengths[index] = isElectron
-        ? randomBetween(0.78, 1)
-        : randomBetween(0.48, 1);
-      if (!isElectron && Math.random() < 0.025) density = randomBetween(0.62, 0.94);
-    }
-    return track;
-  }
-
   function makeTrack(transport, delay = 0, endIndex = transport.points.length - 1) {
-    const points = transport.points.slice(0, endIndex + 1);
-    const times = transport.times.slice(0, endIndex + 1);
-    return addTexture({
+    const track = {
       particle: transport.particle,
-      points,
-      times,
+      points: transport.points.slice(0, endIndex + 1),
+      times: transport.times.slice(0, endIndex + 1),
+      states: transport.states.slice(0, endIndex + 1),
       delay,
       tailHold: CONFIG.tailHoldMilliseconds,
       tailFade: CONFIG.tailFadeMilliseconds,
       stopReason: endIndex < transport.points.length - 1 ? "decayed" : transport.stopReason,
-      segmentStrengths: [],
-    });
+    };
+    track.bubbles = physics.sampleBubbles(track, CONFIG);
+    return track;
   }
 
   function trackEndTime(track) {
-    return track.delay + track.times[track.times.length - 1];
+    return track.endTime ?? track.delay + track.times[track.times.length - 1];
   }
 
   function particleLatex(particle) {
@@ -703,7 +627,7 @@
     return { kind, label, reaction, reactionLatex, explanation, particles, tracks };
   }
 
-  function makeThroughTrack(startOverride = null) {
+  function makeSingleTrack(startOverride = null) {
     const particle = PARTICLES[chooseWeighted([
       { weight: 4, value: "pi+" },
       { weight: 4, value: "pi-" },
@@ -713,14 +637,14 @@
       { weight: 1, value: "mu-" },
     ]).value];
     const start = startOverride ? clickStart(startOverride) : beamStart();
-    const momentum = momentumFromMagnitude(throughTrackMomentum(), start.angle);
+    const momentum = momentumFromMagnitude(singleTrackMomentum(), start.angle);
     return makeEventRecord(
       "track",
-      "Through-going particle",
-      `${particle.name} crosses the chamber`,
-      `${particleLatex(particle)}\\;\\text{through-going}`,
-      "A lone charged particle enters from outside the frame. Its curvature reveals the sign of its charge and its transverse momentum.",
-      [particleEntry(particle, "incoming")],
+      "Single track",
+      particle.name,
+      particleLatex(particle),
+      "A single charged particle bends in the magnetic field. The bend direction depends on its charge, and tighter curvature indicates lower momentum.",
+      [particleEntry(particle, "charged particle")],
       [makeTrack(transportCharged(particle, start, momentum))],
     );
   }
@@ -743,13 +667,13 @@
 
     if (parent.charge === 0) {
       vertex = selectNeutralDecay(parent, start, start.angle, parentMomentumMagnitude);
-      if (!vertex) return makeThroughTrack(startOverride);
+      if (!vertex) return makeSingleTrack(startOverride);
       parentMomentum = momentumFromMagnitude(parentMomentumMagnitude, start.angle);
     } else {
       const initialMomentum = momentumFromMagnitude(parentMomentumMagnitude, start.angle);
       const parentTransport = transportCharged(parent, start, initialMomentum);
       const decayIndex = selectChargedDecayState(parent, parentTransport);
-      if (decayIndex === null) return makeThroughTrack(startOverride);
+      if (decayIndex === null) return makeSingleTrack(startOverride);
       const state = parentTransport.states[decayIndex];
       vertex = { x: state.x, y: state.y };
       parentMomentum = { px: state.px, py: state.py };
@@ -792,8 +716,8 @@
       `${parent.name} → ${daughters.map((particle) => particle.name).join(" + ")}`,
       `${particleLatex(parent)} \\to ${daughters.map(particleLatex).join(" + ")}`,
       parent.charge === 0
-        ? "The neutral parent travels invisibly before producing charged tracks at a displaced vertex."
-        : "The charged parent leaves a track up to the decay vertex, where its daughter tracks begin.",
+        ? "The neutral parent leaves no track. Its decay becomes visible where the charged decay products begin their tracks."
+        : "The charged parent leaves a track up to its decay point, where the charged decay products begin their tracks.",
       [particleEntry(parent, "parent"), ...daughters.map((particle) => particleEntry(particle, "daughter"))],
       tracks,
     );
@@ -890,7 +814,7 @@
         "Ξ cascade",
         `${parent.name} → ${lambda.name} + ${bachelorPion.name}; ${lambda.name} → ${lambdaDaughters.map((particle) => particle.name).join(" + ")}`,
         `${particleLatex(parent)} \\to ${particleLatex(lambda)} + ${particleLatex(bachelorPion)},\\quad ${particleLatex(lambda)} \\to ${lambdaDaughters.map(particleLatex).join(" + ")}`,
-        "The charged cascade parent produces a neutral Λ, which travels unseen before decaying at a second, separated vertex.",
+        "A charged Ξ decays into a pion and a neutral Λ. The Λ leaves no track before decaying again, so the two decay points are separated by a gap.",
         [
           particleEntry(parent, "parent"),
           particleEntry(lambda, "intermediate"),
@@ -920,7 +844,7 @@
         };
     const parentMomentum = momentumFromMagnitude(
       logUniform(0.035, 0.28),
-      beamAngle + randomBetween(-0.8, 0.8),
+      (vertexOverride?.angle ?? beamAngle) + randomBetween(-0.8, 0.8),
     );
 
     // π0 -> γ γ*, followed by γ* -> e+ e−. This sequential construction is
@@ -957,10 +881,10 @@
     ];
     return makeEventRecord(
       "dalitz",
-      "Dalitz conversion",
+      "Dalitz decay",
       "π0 → γ + γ* → γ + e+ + e−",
       "\\pi^0 \\to \\gamma\\gamma^*,\\quad \\gamma^* \\to e^+e^-",
-      "The real photon and short-lived virtual photon are invisible. The electron–positron pair appears as two tight, oppositely curving tracks from one vertex.",
+      "The π⁰ decays into a photon and an electron–positron pair. The photon leaves no track; the pair produces two tracks that curve in opposite directions from the same decay point.",
       [
         particleEntry(parent, "parent"),
         particleEntry(gamma, "daughter"),
@@ -972,28 +896,290 @@
     );
   }
 
-  function addEvent(now, eventRecord) {
+  function addEvent(now, eventRecord, ambient = false, layer = null) {
     const { tracks } = eventRecord;
-    if (tracks.length === 0) return false;
+    if (tracks.length === 0 || events.length >= 100) return false;
+    if (playground) {
+      if (tracks.length > TRACK_BUDGET) return false;
+      let retained = events.reduce((count, event) => count + event.tracks.length, 0);
+      while (events.length && retained + tracks.length > TRACK_BUDGET) {
+        const index = events.findIndex((event) => event.record.kind !== "beam");
+        if (index < 0) return false;
+        retained -= events[index].tracks.length;
+        removeEvent(index);
+      }
+    }
     const lifetime = Math.max(
       ...tracks.map((track) => trackEndTime(track) + track.tailHold + track.tailFade),
     );
-    events.push({ start: now, lifetime, tracks, record: eventRecord });
+    if (!layer) {
+      layer = window.BubbleRenderer.createLayer(width, height, pixelRatio, { photograph: settings.mode === "photograph" });
+      for (const track of tracks) layer.addTrack(track);
+      for (const step of layer.prepare()) { /* small foreground events */ }
+    }
+    for (const track of tracks) {
+      track.endTime = trackEndTime(track);
+      // Transport samples are no longer needed once the display layer is built.
+      delete track.points;
+      delete track.states;
+      delete track.times;
+      delete track.bubbles;
+    }
+    events.push({ start: now, lifetime, tracks, layer, record: eventRecord, ambient });
+    sceneRevision += 1;
     return true;
   }
 
-  function spawnEvent(now) {
+  function makeRandomEvent(vertex = null) {
     const choice = Math.random();
-    return addEvent(
-      now,
-      choice < 0.35
-        ? makeThroughTrack()
+    return choice < 0.35
+        ? makeSingleTrack(vertex)
         : choice < 0.7
-          ? makeDecayEvent()
+          ? makeDecayEvent(vertex)
           : choice < 0.88
-            ? makeCascadeEvent()
-            : makeDalitzEvent(),
-    );
+            ? makeCascadeEvent(vertex)
+            : makeDalitzEvent(vertex);
+  }
+
+  function makeBackgroundEvent() {
+    const particle = PARTICLES[Math.random() < 0.5 ? "mu+" : "mu-"];
+    const start = { x: randomBetween(width * 0.1, width * 0.9), y: -18,
+      angle: Math.PI / 2 + randomBetween(-0.65, 0.65) };
+    return { kind: "background", tracks: [makeTrack(transportCharged(particle, start,
+      momentumFromMagnitude(randomBetween(2.5, 7), start.angle)))] };
+  }
+
+  // Posted-message tasks yield to input/rendering without the minimum delay
+  // imposed on nested timers. Hundreds of small cache batches must not each
+  // incur a timer-clamp wait before the completed beam can be displayed.
+  const preparationQueue = [];
+  const preparationChannel = new MessageChannel();
+  preparationChannel.port1.onmessage = () => preparationQueue.shift()?.();
+  const yieldToControls = () => new Promise((resolve) => {
+    preparationQueue.push(resolve);
+    preparationChannel.port2.postMessage(null);
+  });
+
+  async function prepareLayer(layer, job) {
+    let batch = 0;
+    let batchStarted = performance.now();
+    for (const step of layer.prepare()) {
+      if (job.cancelled) return false;
+      if (++batch >= 4 || performance.now() - batchStarted >= 4) {
+        await yieldToControls();
+        batch = 0;
+        batchStarted = performance.now();
+      }
+    }
+    return !job.cancelled;
+  }
+
+  function exposureEventCount() {
+    // Poisson occupancy: an average of N events does not force every plate to
+    // contain exactly N. This is an illustrative rate, not a measured flux.
+    const threshold = Math.exp(-settings.activity);
+    let product = 1;
+    let count = 0;
+    do { product *= Math.random(); count += 1; } while (product > threshold);
+    return count - 1;
+  }
+
+  function* materializeProduct(product, vertex, delay, vertices, role = "secondary") {
+    const id = product.id;
+    if (id === "gamma") return; // its energy remains in the invisible event record
+    const particle = id === "K0" ? PARTICLES.KS : PARTICLES[id];
+    const momentum = { px: product.px, py: product.py };
+    let decayVertex = vertex;
+    let decayMomentum = momentum;
+    let decayDelay = delay;
+    if (particle.charge !== 0) {
+      const transported = transportCharged(particle, vertex, momentum);
+      const decayIndex = id === "Xi-" ? selectChargedDecayState(particle, transported) : null;
+      const track = makeTrack(transported, delay, decayIndex ?? transported.points.length - 1);
+      track.role = role;
+      yield track;
+      if (decayIndex === null) return;
+      const state = transported.states[decayIndex];
+      decayVertex = { x: state.x, y: state.y };
+      decayMomentum = { px: state.px, py: state.py };
+      decayDelay = trackEndTime(track);
+    } else if (id !== "pi0") {
+      const magnitude = Math.hypot(product.px, product.py);
+      const flight = selectNeutralDecay(particle, vertex, Math.atan2(product.py, product.px), magnitude);
+      if (!flight) return; // a neutral product can leave the camera view
+      decayVertex = { x: flight.x, y: flight.y };
+      decayDelay += CONFIG.visualMillisecondsPerMeterAtC * flight.labDistanceMeters
+        / Math.max(0.03, magnitude / product.energy);
+    }
+    const decay = interactions.decay(id, decayMomentum);
+    if (!decay) return;
+    vertices.push({ type: "decay", vertex: decayVertex, time: decayDelay,
+      initial: [decay.parent], products: decay.products });
+    for (const child of decay.products) yield* materializeProduct(child, decayVertex, decayDelay, vertices);
+  }
+
+  function beamPresent() {
+    return events.some((event) => event.record.kind === "beam")
+      || [...beamJobs].some((job) => !job.cancelled);
+  }
+
+  async function spawnBeam() {
+    if (beamPresent()) return 0;
+    const retained = events.filter((event) => event.record.kind === "beam")
+      .reduce((count, event) => count + event.tracks.length, 0);
+    const pending = [...beamJobs].filter((job) => !job.cancelled)
+      .reduce((count, job) => count + job.count, 0);
+    const count = Math.min(settings.beamDensity, MAXIMUM_BEAM_TRACKS - retained - pending);
+    if (count <= 0 || events.length + beamJobs.size >= 100) return 0;
+    const job = { count, cancelled: false };
+    beamJobs.add(job);
+    const button = document.querySelector(".playground-beam");
+    button?.setAttribute("aria-busy", "true");
+    const layer = window.BubbleRenderer.createLayer(width, height, pixelRatio, { photograph: settings.mode === "photograph" });
+    if (settings.randomBeamAngle) {
+      beamAngle = -Math.floor(Math.random() * 360) * Math.PI / 180;
+      if (playground) updateBeamDirectionControl();
+    }
+    const direction = beamAngle;
+    const tracks = [];
+    const vertices = [];
+    const selectedKind = playground ? selectedEventKind : "mixed";
+    const additionalTracks = { track: 2, decay: 4, cascade: 7, dalitz: 4, mixed: 7 }[selectedKind];
+    // One reaction per primary, with room for all associated products and for
+    // manual clicks. Never truncate the products of an accepted interaction.
+    const reactionCount = settings.automatic ? Math.min(exposureEventCount(), count,
+      Math.max(0, Math.floor((80 - count) / additionalTracks))) : 0;
+    const shuffled = Array.from({ length: count }, (_, index) => index);
+    for (let index = shuffled.length - 1; index > 0; index -= 1) {
+      const other = Math.floor(Math.random() * (index + 1));
+      [shuffled[index], shuffled[other]] = [shuffled[other], shuffled[index]];
+    }
+    const reacting = new Set(shuffled.slice(0, reactionCount));
+    let batchStarted = performance.now();
+    let batchTracks = 0;
+    let attached = false;
+    try {
+      // Yield even before the first pair, so clicks never synchronously transport
+      // a whole burst. Geometry changes and Clear cancel outstanding jobs.
+      await yieldToControls();
+      for (let index = 0; index < count; index += 1) {
+        if (job.cancelled) return null;
+        const angle = direction + randomBetween(-0.004, 0.004);
+        const offset = Math.max(-0.2, Math.min(0.2, physics.normal() * 0.045)) * Math.min(width, height);
+        const start = physics.beamEntry(width, height, angle, offset);
+        // Represent longitudinal bunch phase as an entry-time offset. Keep
+        // the same entry port/direction, without extra bending in an invented
+        // upstream stretch of magnet or liquid.
+        const along = Math.min(520, Math.abs(physics.normal()) * 180);
+        const magnitude = randomBetween(5, 9);
+        const beta = magnitude / Math.hypot(PARTICLES["pi-"].mass, magnitude);
+        const entryDelay = CONFIG.visualMillisecondsPerMeterAtC * along / CONFIG.pixelsPerMeter / beta;
+        const transported = transportCharged(PARTICLES["pi-"], start,
+          momentumFromMagnitude(magnitude, angle));
+        let indexAtVertex = null;
+        let production = null;
+        if (reacting.has(index)) {
+          const candidates = transported.states.map((state, position) => ({ state, position }))
+            .filter(({ state }) => isOnScreen(state, -32));
+          if (candidates.length > 8) {
+            const selected = candidates[Math.floor(candidates.length * randomBetween(0.15, 0.7))];
+            indexAtVertex = selected.position;
+            production = interactions.produce(selectedKind, { px: selected.state.px, py: selected.state.py });
+          }
+        }
+        const incoming = makeTrack(transported, entryDelay,
+          production ? indexAtVertex : transported.points.length - 1);
+        incoming.role = "beam-incoming";
+        let generated = [incoming];
+        if (production) {
+          const vertex = transported.points[indexAtVertex];
+          const time = entryDelay + transported.times[indexAtVertex];
+          incoming.stopReason = "interaction";
+          incoming.interaction = { ...production, vertex, time };
+          vertices.push({ type: "production", ...incoming.interaction });
+          generated = (function* () {
+            yield incoming;
+            for (const product of production.products) {
+              yield* materializeProduct(product, vertex, time, vertices, product.id === "p" ? "recoil" : "secondary");
+            }
+          })();
+        }
+        for (const track of generated) {
+          if (job.cancelled) return null;
+          tracks.push(track);
+          layer.addTrack(track);
+          if (++batchTracks >= 2 || performance.now() - batchStarted >= 4) {
+            await yieldToControls();
+            batchTracks = 0;
+            batchStarted = performance.now();
+          }
+        }
+      }
+      if (!await prepareLayer(layer, job)) return null;
+      if (events.length >= 100) return 0;
+      const startTime = settings.mode === "photograph" ? exposureStarted : simulationTime;
+      attached = addEvent(startTime, { kind: "beam", primaryCount: count, tracks, vertices }, false, layer);
+      draw(simulationTime);
+      return count;
+    } finally {
+      if (!attached) layer.dispose();
+      beamJobs.delete(job);
+      if (beamJobs.size === 0) button?.removeAttribute("aria-busy");
+    }
+  }
+
+  function spawnBackground(now) {
+    const ambientCount = events.filter((event) => event.ambient).length;
+    if (settings.backgroundTracks <= 0 || events.length >= 100 || ambientCount >= 4) return;
+    addEvent(now, makeBackgroundEvent(), true);
+  }
+
+  function buildChamberSpecks() {
+    sceneRevision += 1;
+    specks = [];
+    const count = Math.round(width * height / 4500 * settings.specks);
+    // Most spurious nucleation is near the edge; a few fixed local sites add
+    // spatial correlation. This is an optical approximation, not a boiling rate.
+    const sites = Array.from({ length: 3 }, () => ({
+      x: Math.random() < 0.5 ? randomBetween(0, 30) : width - randomBetween(0, 30),
+      y: randomBetween(0, height),
+    }));
+    for (let index = 0; index < count; index += 1) {
+      const clustered = index % 3 === 0;
+      const site = sites[Math.floor(index / 3) % sites.length];
+      specks.push({
+        x: clustered ? site.x + physics.normal() * 12 : randomBetween(0, width),
+        y: clustered ? site.y + physics.normal() * 20 : randomBetween(0, height),
+        radius: randomBetween(0.48, clustered ? 1.45 : 1.0),
+        strength: randomBetween(0.45, 0.85),
+      });
+    }
+  }
+
+  function beginExposure(now, includeBeam = true) {
+    clearEvents();
+    exposureStarted = now;
+    exposureInitialized = true;
+    buildChamberSpecks();
+    if (includeBeam && settings.beamAutomatic) spawnBeam();
+    if (settings.backgroundTracks > 0) spawnBackground(now);
+
+  }
+
+  function preparePhotoEvent(includeBeam = true) {
+    if (settings.mode === "photograph") beginExposure(simulationTime, includeBeam);
+  }
+
+  function replayTiming() {
+    if (!playground) return { hold: CONFIG.tailHoldMilliseconds, fade: CONFIG.tailFadeMilliseconds };
+    // Budget visible tracks rather than making the visitor balance rate and
+    // lifetime. Include beam occupancy and a small allowance for flight time.
+    const arrivals = (settings.automatic && settings.beamAutomatic ? settings.activity * 2.2 / (BEAM_INTERVAL / 1000) : 0)
+      + (settings.beamAutomatic ? settings.beamDensity / (BEAM_INTERVAL / 1000) : 0)
+      + settings.backgroundTracks * 0.175;
+    const seconds = Math.max(6, Math.min(26, 40 / Math.max(0.1, arrivals)));
+    const fade = Math.min(2000, seconds * 150);
+    return { hold: Math.max(2000, seconds * 1000 - fade - 2000), fade };
   }
 
   function chargeLabel(charge) {
@@ -1037,11 +1223,12 @@
   }
 
   function makeSelectedEvent(kind, vertexOverride = null) {
+    if (kind === "mixed") return makeRandomEvent(vertexOverride);
     const factories = {
       decay: () => makeDecayEvent(vertexOverride),
       cascade: () => makeCascadeEvent(vertexOverride),
       dalitz: () => makeDalitzEvent(vertexOverride),
-      track: () => makeThroughTrack(vertexOverride),
+      track: () => makeSingleTrack(vertexOverride),
     };
     const factory = factories[kind];
     if (!factory) return null;
@@ -1063,23 +1250,23 @@
 
     const eventRecord = makeSelectedEvent(kind);
     if (!eventRecord) {
-      showStatus("That topology could not be placed. Try again.");
+      showStatus("Could not generate this event. Try again.");
       return;
     }
-    events.length = 0;
-    if (!addEvent(performance.now(), eventRecord)) {
+    preparePhotoEvent();
+    if (!playground) clearEvents();
+    if (!addEvent(simulationTime, eventRecord)) {
       showStatus("No visible tracks were generated. Try again.");
       return;
     }
     renderEventReadout(eventRecord);
-    showStatus(`${eventRecord.label} generated`);
   }
 
   function handleClick(event) {
     if (event.defaultPrevented || event.button !== 0) return;
     if (
       event.target.closest(
-        ".bubble-chamber-controls, .laddu-spectrum, a, button, input, summary, video, audio",
+        ".bubble-chamber-controls, .playground-panel, .laddu-spectrum, a, button, input, select, label, summary, video, audio",
       )
     ) return;
     if (window.getSelection()?.toString()) return;
@@ -1089,17 +1276,23 @@
       return;
     }
 
-    while (events.length >= CONFIG.maximumConcurrentEvents) events.shift();
+    if (playground && events.length >= 100) {
+      showStatus("Chamber full. Clear tracks to create more events.");
+      return;
+    }
+    if (!playground) {
+      while (events.length >= CONFIG.maximumConcurrentEvents) removeEvent(0);
+    }
     const eventRecord = makeSelectedEvent(selectedEventKind, {
       x: event.clientX,
       y: event.clientY,
     });
-    if (!eventRecord || !addEvent(performance.now(), eventRecord)) {
-      showStatus("That topology could not be placed. Try again.");
+    if (eventRecord) preparePhotoEvent();
+    if (!eventRecord || !addEvent(simulationTime, eventRecord)) {
+      showStatus("Could not generate this event. Try again.");
       return;
     }
     if (explorer.open) renderEventReadout(eventRecord);
-    showEventFeedback(eventRecord);
   }
 
   function showStatus(message) {
@@ -1109,10 +1302,6 @@
     statusTimeout = window.setTimeout(() => status.classList.remove("visible"), 2400);
   }
 
-  function showEventFeedback(eventRecord) {
-    showStatus(`${eventRecord.label} generated`);
-  }
-
   function updatePauseControl() {
     const label = paused ? "Resume bubble chamber" : "Pause bubble chamber";
     pauseButton.setAttribute("aria-label", label);
@@ -1120,25 +1309,24 @@
     pauseButton.setAttribute("aria-pressed", String(paused));
     pauseButton.querySelector("span").textContent = paused ? "▶" : "Ⅱ";
     controls.classList.toggle("paused", paused);
+    if (playground) {
+      const button = document.querySelector("#playground-pause");
+      button.textContent = paused ? "Resume" : "Pause";
+      button.setAttribute("aria-pressed", String(paused));
+    }
   }
 
   function setPaused(nextPaused) {
     if (paused === nextPaused) return;
-    const now = performance.now();
     paused = nextPaused;
-    storePausedPreference(paused);
-
+    if (!playground) storePausedPreference(paused);
+    previousFrame = 0;
     if (paused) {
-      pausedAt = now;
       window.cancelAnimationFrame(animationFrame);
       animationFrame = 0;
-      draw(now);
+      draw(simulationTime);
       showStatus("Bubble chamber paused");
     } else {
-      const pauseDuration = Math.max(0, now - pausedAt);
-      for (const event of events) event.start += pauseDuration;
-      nextEventCheckAt += pauseDuration;
-      pausedAt = 0;
       if (!document.hidden && !animationFrame) {
         animationFrame = window.requestAnimationFrame(animate);
       }
@@ -1148,91 +1336,67 @@
     updatePauseControl();
   }
 
-  function lowerBound(values, target) {
-    let low = 0;
-    let high = values.length;
-    while (low < high) {
-      const middle = (low + high) >> 1;
-      if (values[middle] < target) low = middle + 1;
-      else high = middle;
-    }
-    return low;
-  }
-
-  function upperBound(values, target) {
-    let low = 0;
-    let high = values.length;
-    while (low < high) {
-      const middle = (low + high) >> 1;
-      if (values[middle] <= target) low = middle + 1;
-      else high = middle;
-    }
-    return low;
-  }
-
-  function pointOpacity(eventAge, track, pointIndex) {
-    const age = eventAge - track.delay - track.times[pointIndex];
-    if (age < 0) return 0;
-    if (age <= track.tailHold) return 1;
-    return Math.max(0, 1 - (age - track.tailHold) / track.tailFade);
-  }
-
-  function drawTrack(track, eventAge) {
-    const localAge = eventAge - track.delay;
-    if (localAge < 0) return;
-    const newestIndex = Math.min(track.points.length - 1, upperBound(track.times, localAge) - 1);
-    const oldestIndex = Math.max(
-      1,
-      lowerBound(track.times, localAge - track.tailHold - track.tailFade),
-    );
-    context.lineWidth = track.lineWidth;
-    for (let index = oldestIndex; index <= newestIndex; index += 1) {
-      const strength = track.segmentStrengths[index];
-      if (strength <= 0) continue;
-      context.globalAlpha = pointOpacity(eventAge, track, index) * strength;
-      context.beginPath();
-      context.moveTo(track.points[index - 1].x, track.points[index - 1].y);
-      context.lineTo(track.points[index].x, track.points[index].y);
-      context.stroke();
-    }
-  }
-
   function draw(now) {
-    context.clearRect(0, 0, width, height);
+    const photo = settings.mode === "photograph";
+    const exposure = { scale: 1 };
+    const timing = replayTiming();
     const color = getComputedStyle(canvas).color;
-    context.strokeStyle = color;
-    context.fillStyle = color;
-    context.lineCap = "round";
+    const developed = photo && now - exposureStarted >= EXPOSURE.growth
+      && events.every((event) => now - event.start >= EXPOSURE.growth);
+    const key = developed ? `${sceneRevision}:${events.length}:${color}` : null;
+    // A held photograph does not change. Avoid repainting thousands of bubbles
+    // until the scene, appearance, or exposure phase actually changes.
+    if (key !== null && key === heldPhotoKey) return;
+    heldPhotoKey = key;
+    context.clearRect(0, 0, width, height);
+    context.fillStyle = "black";
+    const speckGrowth = photo ? Math.max(0, Math.min(1, (now - exposureStarted) / EXPOSURE.growth)) : 1;
+    for (const bubble of specks) {
+      context.globalAlpha = bubble.strength * speckGrowth;
+      context.beginPath();
+      context.arc(bubble.x, bubble.y, bubble.radius * (0.2 + 0.8 * Math.sqrt(speckGrowth)), 0, Math.PI * 2);
+      context.fill();
+    }
     for (let index = events.length - 1; index >= 0; index -= 1) {
       const event = events[index];
-      const eventAge = now - event.start;
-      if (eventAge >= event.lifetime) {
-        events.splice(index, 1);
+      const age = now - event.start;
+      const lifetime = playground
+        ? Math.max(...event.tracks.map((track) => trackEndTime(track) + timing.hold + timing.fade))
+        : event.lifetime;
+      if (!photo && age >= lifetime) {
+        removeEvent(index);
         continue;
       }
-      for (const track of event.tracks) drawTrack(track, eventAge);
+      const opacity = (event.ambient ? 0.48 : 1) * exposure.scale;
+      if (opacity > 0) event.layer.draw(context, { age, opacity, photo,
+        growth: Math.max(0, Math.min(1, age / EXPOSURE.growth)), scale: 1,
+        hold: timing.hold, fade: timing.fade, keep: false });
     }
     context.globalAlpha = 1;
+    context.globalCompositeOperation = "source-in";
+    context.fillStyle = color;
+    context.fillRect(0, 0, width, height);
+    context.globalCompositeOperation = "source-over";
   }
 
-  function animate(now) {
-    draw(now);
-
-    if (now >= nextEventCheckAt) {
-      const missedChecks = Math.floor(
-        (now - nextEventCheckAt) / CONFIG.eventCheckIntervalMilliseconds,
-      );
-      nextEventCheckAt +=
-        (missedChecks + 1) * CONFIG.eventCheckIntervalMilliseconds;
-      const chanceAcrossChecks =
-        1 - Math.pow(1 - CONFIG.eventChancePerCheck, missedChecks + 1);
-      if (
-        events.length < CONFIG.maximumConcurrentEvents &&
-        Math.random() < chanceAcrossChecks
-      ) {
-        spawnEvent(now);
+  function animate(frameTime) {
+    if (previousFrame) simulationTime += (frameTime - previousFrame) * settings.speed;
+    previousFrame = frameTime;
+    const now = simulationTime;
+    if (settings.mode === "photograph") {
+      const period = EXPOSURE.growth + EXPOSURE.hold;
+      if (!exposureInitialized || now - exposureStarted >= period) beginExposure(now);
+    } else {
+      if (settings.beamAutomatic && now >= nextBeamAt && !beamPresent()) {
+        nextBeamAt = now + 300;
+        spawnBeam();
+      }
+      if (now >= nextBackgroundAt) {
+        nextBackgroundAt = now + 2000;
+        if (Math.random() < settings.backgroundTracks * 0.35) spawnBackground(now);
       }
     }
+    draw(now);
     animationFrame = window.requestAnimationFrame(animate);
   }
 
@@ -1243,11 +1407,125 @@
       return;
     }
     if (!paused && !animationFrame) {
-      events.length = 0;
-      nextEventCheckAt =
-        performance.now() + CONFIG.eventCheckIntervalMilliseconds;
+      previousFrame = 0;
+      if (!playground) clearEvents();
       animationFrame = window.requestAnimationFrame(animate);
     }
+  }
+
+  function updateBeamDirectionControl() {
+    const degrees = settings.randomBeamAngle
+      ? (Math.round(-beamAngle * 180 / Math.PI) + 360) % 360 : manualBeamDegrees;
+    const direction = document.querySelector("#playground-beam-direction");
+    direction.value = degrees;
+    direction.disabled = settings.randomBeamAngle;
+    document.querySelector("#playground-beam-direction-value").textContent = `${degrees}°`;
+    document.querySelector("#playground-beam-arrow").style.transform = `rotate(${-degrees}deg)`;
+  }
+
+  function updatePlaygroundControls() {
+    const photo = settings.mode === "photograph";
+    const activity = settings.activity;
+    document.querySelector("#playground-event-rate-value").textContent = activity === 0 ? "Off" : `${activity} / beam`;
+    const rate = document.querySelector("#playground-event-rate");
+    rate.max = "10";
+    rate.value = activity;
+    rate.setAttribute("aria-valuetext", `${activity} reactions per beam passage on average`);
+    document.querySelector("#playground-motion").hidden = photo;
+    document.querySelector("#playground-clear").textContent = photo ? "Next photo" : "Clear";
+    const speed = settings.replaySpeed;
+    document.querySelector("#playground-speed").value = speed;
+    document.querySelector("#playground-speed-value").textContent = `${speed}×`;
+    document.querySelector("#playground-speed").setAttribute("aria-valuetext", `${speed} times normal speed`);
+    document.querySelector("#playground-beam-density-value").textContent = settings.beamDensity ? `${settings.beamDensity} tracks` : "Off";
+  }
+
+  function initializePlayground() {
+    selectedEventKind = "mixed";
+    document.querySelector("#playground-topology").addEventListener("change", (event) => {
+      selectedEventKind = event.target.value;
+    });
+    document.querySelector("#playground-beam-density").addEventListener("input", (event) => {
+      settings.beamDensity = Number(event.target.value);
+      settings.beamAutomatic = settings.beamDensity > 0;
+      if (!settings.beamAutomatic) {
+        cancelBeams();
+        for (let index = events.length - 1; index >= 0; index -= 1) {
+          if (events[index].record.kind === "beam") removeEvent(index);
+        }
+      }
+      nextBeamAt = simulationTime + 300;
+      updatePlaygroundControls();
+      draw(simulationTime);
+    });
+    document.querySelector("#playground-view").addEventListener("change", (event) => {
+      settings.mode = event.target.value;
+      settings.speed = settings.mode === "photograph" ? 1 : settings.replaySpeed;
+      settings.automatic = settings.activity > 0;
+      clearEvents();
+      exposureInitialized = false;
+      if (settings.mode === "photograph") beginExposure(simulationTime - (paused ? EXPOSURE.growth : 0));
+      updatePlaygroundControls();
+      draw(simulationTime);
+    });
+    document.querySelector("#playground-random-angle").addEventListener("change", (event) => {
+      settings.randomBeamAngle = event.target.checked;
+      if (!settings.randomBeamAngle) beamAngle = -manualBeamDegrees * Math.PI / 180;
+      updateBeamDirectionControl();
+    });
+    document.querySelector("#playground-beam-direction").addEventListener("input", (event) => {
+      manualBeamDegrees = Number(event.target.value);
+      beamAngle = -manualBeamDegrees * Math.PI / 180;
+      updateBeamDirectionControl();
+    });
+    document.querySelector("#playground-speed").addEventListener("input", (event) => {
+      settings.replaySpeed = Number(event.target.value);
+      settings.speed = settings.replaySpeed;
+      updatePlaygroundControls();
+    });
+    document.querySelector("#playground-event-rate").addEventListener("input", (event) => {
+      const activity = Number(event.target.value);
+      settings.activity = activity;
+      settings.automatic = activity > 0;
+      updatePlaygroundControls();
+      draw(simulationTime);
+    });
+    document.querySelector("#playground-pause").addEventListener("click", () => setPaused(!paused));
+    document.querySelector("#playground-clear").addEventListener("click", () => {
+      if (settings.mode === "photograph") beginExposure(simulationTime - (paused ? EXPOSURE.growth : 0));
+      else clearEvents();
+      draw(simulationTime);
+    });
+    document.querySelector("#playground-export").addEventListener("click", exportChamber);
+    updatePlaygroundControls();
+  }
+
+  function exportChamber() {
+    draw(simulationTime);
+    const output = document.createElement("canvas");
+    output.width = canvas.width;
+    output.height = canvas.height;
+    const outputContext = output.getContext("2d");
+    if (!outputContext) {
+      showStatus("PNG export is unavailable in this browser.");
+      return;
+    }
+    outputContext.fillStyle = getComputedStyle(document.body).backgroundColor;
+    outputContext.fillRect(0, 0, output.width, output.height);
+    outputContext.drawImage(canvas, 0, 0);
+    output.toBlob((blob) => {
+      if (!blob) {
+        showStatus("PNG export failed. Please try again.");
+        return;
+      }
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "bubble-chamber.png";
+      link.click();
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+      showStatus("Chamber exported as PNG");
+    }, "image/png");
   }
 
   window.addEventListener("resize", resize, { passive: true });
@@ -1270,14 +1548,18 @@
   });
   document.addEventListener("click", handleClick);
   document.addEventListener("visibilitychange", handleVisibility);
-  reducedMotion.addEventListener("change", () => window.location.reload());
+  reducedMotion.addEventListener("change", () => {
+    if (playground) setPaused(reducedMotion.matches);
+    else window.location.reload();
+  });
   for (const button of explorer.querySelectorAll("[data-event-kind]")) {
     const topology = button.querySelector(".bubble-chamber-topology");
     renderLatex(TOPOLOGY_LATEX[button.dataset.eventKind], topology, topology.textContent);
   }
+  if (playground) initializePlayground();
   updateEventKindControls();
   resize();
   updatePauseControl();
-  if (paused) draw(pausedAt);
+  if (paused) draw(simulationTime);
   else animationFrame = window.requestAnimationFrame(animate);
 })();

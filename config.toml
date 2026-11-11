@@ -1,5 +1,8 @@
 theme = "duckquill"
 
+# Keep the unfinished post out of builds without editing its files.
+ignored_content = ["**/2026-06-08-amplitude-analysis-part-1/**", "**/2026-06-08-amplitude-analysis-part-1"]
+
 title = "Dene Hoffman"
 base_url = "https://denehoffman.com"
 description = "My personal website and blog"
@@ -20,6 +23,7 @@ bottom_footnotes = true
 github_alerts = true
 
 [markdown.highlighting]
+style = "class"
 light_theme = "solarized-light"
 dark_theme = "solarized-dark"
 extra_grammars = ["syntaxes/math.json"]
@@ -32,6 +36,7 @@ index_format = "fuse_json"
 skip_prefixes = [
   "https://math.stackexchange.com/a/2785578/127253",
   "https://doi.org/10.1137/0916069",
+  "https://doi.org/10.1002/adom.201700617",
 ]
 
 [extra]
@@ -46,7 +51,7 @@ show_backlinks = true
 katex = true
 card = true
 styles = ["overrides.css"]
-scripts = ["mobile-nav.js", "bubble-chamber.js"]
+scripts = ["mobile-nav.js", "bubble-physics.js", "bubble-interactions.js", "bubble-renderer.js", "bubble-chamber.js"]
 
 
 csp = [
@@ -75,6 +80,7 @@ csp = [
     "https://toot.community",
   ] },
   { directive = "connect-src", domains = [
+    "'self'",
     "https://toot.community",
   ] },
   { directive = "base-uri", domains = [

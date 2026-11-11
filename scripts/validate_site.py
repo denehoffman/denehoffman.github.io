@@ -54,7 +54,7 @@ def validate_projects(errors: list[str]) -> None:
         if not page.exists():
             error(f"project {slug!r}: missing {page.relative_to(ROOT)}", errors)
             continue
-        expected = f'project_header(project="{slug}")'
+        expected = f'<project_header project="{slug}" />'
         if expected not in page.read_text(encoding="utf-8"):
             error(f"{page.relative_to(ROOT)}: expected {{{{ {expected} }}}}", errors)
 

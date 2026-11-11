@@ -947,7 +947,7 @@ main:has(> .home-projects) > h1:first-child + aside img {
   inset: 0;
   width: 100%;
   height: 100%;
-  color: rgb(70 78 82 / 0.18);
+  color: rgb(58 68 74 / 0.32);
   pointer-events: none;
 }
 
@@ -962,12 +962,12 @@ body > #sidebar {
 }
 
 [data-theme="dark"] .bubble-chamber {
-  color: rgb(206 213 207 / 0.15);
+  color: rgb(218 226 221 / 0.29);
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) .bubble-chamber {
-    color: rgb(206 213 207 / 0.15);
+    color: rgb(218 226 221 / 0.29);
   }
 }
 
@@ -3723,4 +3723,229 @@ main:has(> .publication-years) > h1[id] {
   .maryada-bnb__bound {
     transition: none;
   }
+}
+
+// A full-window chamber with a collapsible tool panel.
+body.is-particle-playground {
+  --playground-surface: var(--bg-color);
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: var(--bg-color);
+}
+
+body > main.particle-playground {
+  position: fixed;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  max-width: none;
+  pointer-events: none;
+}
+
+.playground-sr-only {
+  position: absolute;
+  overflow: hidden;
+  clip-path: inset(50%);
+  width: 1px;
+  height: 1px;
+  white-space: nowrap;
+}
+
+.playground-panel {
+  --bg-color: var(--playground-surface);
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  box-sizing: border-box;
+  margin: 0;
+  box-shadow: var(--shadow-glass);
+  border: 1px solid var(--fg-muted-2);
+  border-radius: 1rem;
+  background: var(--bg-color);
+  padding: 1rem;
+  width: min(20rem, calc(100vw - 2rem));
+  max-height: calc(100dvh - 2rem);
+  overflow-y: auto;
+  color: var(--fg-color);
+  font-family: var(--font-scholarly-sans);
+  font-size: 0.85rem;
+  pointer-events: auto;
+  text-align: left;
+}
+
+.playground-panel > summary {
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 650;
+}
+
+.playground-panel p {
+  margin: 0.7rem 0;
+  line-height: 1.5;
+}
+
+.playground-panel label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: 0.8rem;
+}
+
+.playground-panel input[type="range"],
+.playground-panel select {
+  box-sizing: border-box;
+  margin: 0.35rem 0 0;
+  width: 100%;
+  min-height: 2rem;
+  accent-color: var(--accent-color);
+}
+
+.playground-panel select,
+.playground-actions button {
+  border: 1px solid var(--fg-muted-3);
+  border-radius: 0.45rem;
+  background: var(--bg-color);
+  padding: 0.45rem;
+  color: var(--fg-color);
+  font: inherit;
+}
+
+.playground-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 1rem;
+}
+
+.playground-actions button {
+  flex: 1 1 auto;
+  cursor: pointer;
+  min-height: 2.5rem;
+}
+
+.playground-actions button:hover {
+  border-color: var(--accent-color);
+  color: var(--accent-color);
+}
+
+.playground-panel :focus-visible {
+  outline: 2px solid var(--accent-color);
+  outline-offset: 3px;
+}
+
+.playground-panel .playground-note {
+  font-size: 0.75rem;
+}
+
+.is-particle-playground .bubble-chamber {
+  color: rgb(58 68 74 / 0.65);
+}
+
+[data-theme="dark"] .is-particle-playground .bubble-chamber {
+  color: rgb(218 226 221 / 0.65);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .is-particle-playground .bubble-chamber {
+    color: rgb(218 226 221 / 0.65);
+  }
+}
+
+.is-particle-playground .bubble-chamber-controls > :not(.bubble-chamber-status) {
+  display: none;
+}
+
+.playground-panel > summary::before {
+  display: none;
+}
+
+.playground-panel > summary::after {
+  float: right;
+  content: "+";
+}
+
+.playground-panel[open] > summary::after {
+  content: "−";
+}
+
+.playground-panel input[type="range"] {
+  appearance: auto;
+  box-shadow: none;
+  background: transparent;
+  padding: 0;
+}
+
+.bubble-chamber-playground-link {
+  margin: 1rem 0 0;
+  border-top: 1px solid var(--fg-muted-2);
+  padding-top: 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 650;
+}
+
+// Override the theme's more specific details:not(.closable) surface rule.
+.particle-playground > .playground-panel {
+  background: var(--playground-surface);
+}
+
+.playground-panel .playground-beam {
+  margin: 1rem 0;
+  border: 1px solid var(--accent-color);
+  border-radius: 0.5rem;
+  background: var(--playground-surface);
+  padding: 0.65rem;
+}
+
+.playground-beam > summary {
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 650;
+}
+
+.playground-beam > summary::before {
+  display: none;
+}
+
+#playground-beam-arrow {
+  display: inline-block;
+  margin-left: auto;
+  font-size: 1.1rem;
+}
+
+.playground-panel .playground-intro {
+  margin: 0.6rem 0;
+}
+
+.playground-back {
+  display: inline-block;
+  margin-top: 1rem;
+  font-size: 0.75rem;
+}
+
+.playground-beam > summary::after {
+  float: right;
+  content: "+";
+}
+
+.playground-beam[open] > summary::after {
+  content: "−";
+}
+
+.playground-panel .playground-random-angle {
+  justify-content: flex-start;
+}
+
+.playground-random-angle input {
+  appearance: auto;
+  margin: 0;
+  width: 1rem;
+  height: 1rem;
+  accent-color: var(--accent-color);
+}
+
+.playground-random-angle input::before {
+  display: none;
 }
